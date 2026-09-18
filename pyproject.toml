@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "budget_coupled_robust_bp"
+version = "0.1.0"
+description = "Budget-Coupled Robust Belief Propagation for Visual Hallucination Detection (Inference Core)"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "numpy>=1.24.0",
+    "scipy>=1.10.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+]
+vlm = [
+    "torch>=2.0.0",
+    "transformers>=4.36.0",
+    "pillow>=9.0.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = "-p no:langsmith"

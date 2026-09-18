@@ -1,0 +1,92 @@
+[
+  {
+    "test_id": "affirmative_dogs_and_car",
+    "text": "The image contains two dogs and a red car.",
+    "expected_accepted": ["dog", "car"],
+    "expected_rejected_reasons": []
+  },
+  {
+    "test_id": "direct_negation_dog",
+    "text": "There is no dog in the room.",
+    "expected_accepted": [],
+    "expected_rejected_reasons": ["negated"]
+  },
+  {
+    "test_id": "uncertainty_dog",
+    "text": "There might be a dog hiding under the bench.",
+    "expected_accepted": ["bench"],
+    "expected_rejected_reasons": ["uncertain"]
+  },
+  {
+    "test_id": "question_dog",
+    "text": "Is there a dog near the tree?",
+    "expected_accepted": [],
+    "expected_rejected_reasons": ["question"]
+  },
+  {
+    "test_id": "hypothetical_dog",
+    "text": "If a dog were here, the cat would run away.",
+    "expected_accepted": [],
+    "expected_rejected_reasons": ["hypothetical"]
+  },
+  {
+    "test_id": "non_visual_dog",
+    "text": "The owner has a dog at home.",
+    "expected_accepted": [],
+    "expected_rejected_reasons": ["non_visual"]
+  },
+  {
+    "test_id": "depiction_dog",
+    "text": "On the wall hangs a painting of a dog.",
+    "expected_accepted": [],
+    "expected_rejected_reasons": ["depiction"]
+  },
+  {
+    "test_id": "multiword_hot_dog_precedence",
+    "text": "A person is eating a hot dog.",
+    "expected_accepted": ["hot dog", "person"],
+    "expected_rejected_reasons": []
+  },
+  {
+    "test_id": "multiword_wine_glass",
+    "text": "There is a wine glass on the dining table.",
+    "expected_accepted": ["dining table", "wine glass"],
+    "expected_rejected_reasons": []
+  },
+  {
+    "test_id": "homonym_color_orange",
+    "text": "A man is driving an orange car.",
+    "expected_accepted": ["car", "person"],
+    "expected_rejected_reasons": ["ambiguous_sense"]
+  },
+  {
+    "test_id": "fruit_orange_affirmative",
+    "text": "There is an apple and an orange in the bowl.",
+    "expected_accepted": ["apple", "bowl", "orange"],
+    "expected_rejected_reasons": []
+  },
+  {
+    "test_id": "verb_train_rejection",
+    "text": "The athlete went to train today.",
+    "expected_accepted": [],
+    "expected_rejected_reasons": ["ambiguous_sense"]
+  },
+  {
+    "test_id": "vehicle_train_affirmative",
+    "text": "A long freight train is moving along the tracks.",
+    "expected_accepted": ["train"],
+    "expected_rejected_reasons": []
+  },
+  {
+    "test_id": "coordinated_negation_scope",
+    "text": "There are no cats or dogs on the couch.",
+    "expected_accepted": ["couch"],
+    "expected_rejected_reasons": ["negated", "negated"]
+  },
+  {
+    "test_id": "repeated_mentions_deduplication",
+    "text": "A dog is running near another dog in the park.",
+    "expected_accepted": ["dog"],
+    "expected_rejected_reasons": []
+  }
+]

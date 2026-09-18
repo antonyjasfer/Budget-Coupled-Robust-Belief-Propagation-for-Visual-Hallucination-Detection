@@ -1,0 +1,10 @@
+{"question_id": 1, "image": "000000000101.jpg", "text": "Is there a person in the image?", "label": "yes", "category": "person", "variant": "popular"}
+{"question_id": 2, "image": "000000000101.jpg", "text": "Is there a dog in the image?", "label": "yes", "category": "dog", "variant": "popular"}
+{"question_id": 3, "image": "000000000101.jpg", "text": "Is there a frisbee in the image?", "label": "no", "category": "frisbee", "variant": "adversarial"}
+{"question_id": 4, "image": "000000000102.jpg", "text": "Is there a dog in the image?", "label": "yes", "category": "dog", "variant": "popular"}
+{"question_id": 5, "image": "000000000102.jpg", "text": "Is there a cat in the image?", "label": "no", "category": "cat", "variant": "adversarial"}
+{"question_id": 6, "image": "000000000103.jpg", "text": "Is there a cat in the image?", "label": "yes", "category": "cat", "variant": "random"}
+{"question_id": 7, "image": "000000000103.jpg", "text": "Is there a chair in the image?", "label": "no", "category": "chair", "variant": "random"}
+{"question_id": 8, "image": "000000000104.jpg", "text": "Is there a chair in the image?", "label": "yes", "category": "chair", "variant": "popular"}
+{"question_id": 9, "image": "000000000105.jpg", "text": "Is there a person in the image?", "label": "yes", "category": "person", "variant": "random"}
+{"question_id": 10, "image": "000000000105.jpg", "text": "Is there a dog in the image?", "label": "no", "category": "dog", "variant": "adversarial"}

@@ -1,0 +1,23 @@
+{
+  "schema_version": "1.0.0",
+  "pipeline_name": "visual_hallucination_data_pipeline",
+  "description": "Configuration for object-existence claim manifests and deterministic splitting.",
+  "splits": {
+    "default_seed": 42,
+    "proportions": {
+      "train": 0.50,
+      "validation": 0.15,
+      "calibration": 0.15,
+      "test": 0.20
+    }
+  },
+  "constraints": {
+    "claim_types_allowed": ["object_existence"],
+    "pgm_label_mapping": {
+      "supported": -1,
+      "hallucinated": 1,
+      "unknown": null
+    },
+    "max_tree_nodes": 50
+  }
+}

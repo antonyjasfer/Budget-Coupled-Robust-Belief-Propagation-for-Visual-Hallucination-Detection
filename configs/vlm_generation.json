@@ -1,0 +1,16 @@
+{
+  "model_name": "llava-hf/llava-1.5-7b-hf",
+  "prompt": "Describe the visible physical objects in two short sentences.\nDo not speculate about objects outside the image.",
+  "max_new_tokens": 64,
+  "do_sample": false,
+  "temperature": 0.0,
+  "seed": 42,
+  "device": "cpu",
+  "dtype": "float32",
+  "local_files_only": true,
+  "metadata": {
+    "decoding": "greedy",
+    "batch_size": 1,
+    "conversation_template": "USER: <image>\\n{prompt}\\nASSISTANT:"
+  }
+}

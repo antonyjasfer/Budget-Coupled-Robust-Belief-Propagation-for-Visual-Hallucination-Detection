@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0.0",
+  "alias_rules_version": "1.0.0",
+  "extractor_name": "conservative_rule_based_v1",
+  "supported_categories": "coco_80",
+  "filtering_rules": {
+    "filter_negation": true,
+    "filter_uncertainty": true,
+    "filter_questions": true,
+    "filter_hypotheticals": true,
+    "filter_non_visual": true,
+    "filter_depictions": true,
+    "filter_color_homonyms": true
+  },
+  "evidence_contracts": {
+    "features": [
+      {
+        "name": "detector_score",
+        "type": "float",
+        "range": [0.0, 1.0],
+        "semantics": "raw_max_confidence"
+      },
+      {
+        "name": "similarity_score",
+        "type": "float",
+        "range": [-1.0, 1.0],
+        "semantics": "raw_cosine_similarity"
+      }
+    ],
+    "default_view_id": "original"
+  }
+}

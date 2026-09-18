@@ -222,6 +222,7 @@ class SyntheticVLMProvider:
         return {
             "model_name": self.model_name,
             "model_revision": self.model_revision,
+            "resolved_revision": self.model_revision,
             "is_synthetic": True,
             "provider_kind": self.provider_kind,
             "provider_type": "SyntheticVLMProvider",

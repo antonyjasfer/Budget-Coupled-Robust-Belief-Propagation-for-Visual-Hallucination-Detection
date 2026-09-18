@@ -200,3 +200,262 @@ def test_production_pilot_rejects_synthetic_fallback(synthetic_manifest_and_spli
                 split_registry=split_reg.registry,
                 sample_size=2,
             )
+
+
+def test_real_provider_revision_lifecycle_and_cache_hit(synthetic_manifest_and_splits):
+    """
+    Regression test: Real provider resolves actual revision, caches on 1st run, hits cache on 2nd run,
+    and never serializes 'not_loaded' into response provenance or bundle metadata.
+    """
+    manifest, split_reg = synthetic_manifest_and_splits
+
+    class MockRealLLaVAProvider:
+        is_synthetic: bool = False
+        provider_kind: str = "llava_15_hf"
+        generation_count: int = 0
+
+        def __init__(self, model_revision: str = "b234b804b114d9e37bb655e11cbbb5f5e971b7a9"):
+            self.model_name = "llava-hf/llava-1.5-7b-hf"
+            self.model_revision = model_revision
+            self.device = "cpu"
+            self.dtype = "float32"
+            self.local_files_only = True
+            self.provider_kind = "llava_15_hf"
+
+        def resolve_revision(self) -> str:
+            return self.model_revision
+
+        def get_model_info(self):
+            rev = self.resolve_revision()
+            return {
+                "model_name": self.model_name,
+                "model_revision": rev,
+                "resolved_revision": rev,
+                "is_synthetic": False,
+                "provider_kind": self.provider_kind,
+                "device": self.device,
+                "dtype": self.dtype,
+                "local_files_only": self.local_files_only,
+                "provider_type": "LLaVA15Provider",
+            }
+
+        def generate_caption(self, image_path, prompt=None, gen_config=None, image_id=None, image_hash=None):
+            self.generation_count += 1
+            from src.vlm.provider import VLMResponse
+            cfg = gen_config or VLMGenerationConfig()
+            return VLMResponse.create(
+                image_id=image_id or "img1",
+                image_path=image_path,
+                image_hash=image_hash or "hash_real_1",
+                caption="A real cat and a dog on the floor.",
+                model_name=self.model_name,
+                model_revision=self.model_revision,
+                prompt=prompt or cfg.prompt,
+                gen_config=cfg,
+                is_synthetic=False,
+                provider_kind=self.provider_kind,
+                execution_time_seconds=0.05,
+            )
+
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        cache = VLMCache(tmp_dir)
+        cfg = VLMGenerationConfig(model_name="llava-hf/llava-1.5-7b-hf")
+
+        # Run 1: First request with fresh provider (cache miss, 1 generation)
+        provider1 = MockRealLLaVAProvider()
+        bundle1, stats1 = run_vlm_pilot(
+            manifest=manifest,
+            provider=provider1,
+            cache=cache,
+            gen_config=cfg,
+            split_registry=split_reg.registry,
+            sample_size=1,
+            seed=42,
+        )
+
+        assert stats1.cache_hits == 0
+        assert stats1.cache_misses == 1
+        assert stats1.generated_captions == 1
+        assert provider1.generation_count == 1
+
+        # Check provenance and bundle metadata
+        assert bundle1.entries[0].model_revision == "b234b804b114d9e37bb655e11cbbb5f5e971b7a9"
+        assert bundle1.entries[0].model_revision != "not_loaded"
+        assert bundle1.metadata["model_info"]["resolved_revision"] == "b234b804b114d9e37bb655e11cbbb5f5e971b7a9"
+        assert bundle1.metadata["model_info"]["model_revision"] == "b234b804b114d9e37bb655e11cbbb5f5e971b7a9"
+
+        # Run 2: Identical second request with a new fresh provider instance (cache hit, 0 generation)
+        provider2 = MockRealLLaVAProvider()
+        bundle2, stats2 = run_vlm_pilot(
+            manifest=manifest,
+            provider=provider2,
+            cache=cache,
+            gen_config=cfg,
+            split_registry=split_reg.registry,
+            sample_size=1,
+            seed=42,
+        )
+
+        assert stats2.cache_hits == 1
+        assert stats2.cache_misses == 0
+        assert stats2.generated_captions == 0
+        assert provider2.generation_count == 0  # Crucial: Must not invoke generation again
+
+        assert bundle2.entries[0].model_revision == "b234b804b114d9e37bb655e11cbbb5f5e971b7a9"
+        assert bundle2.metadata["model_info"]["resolved_revision"] == "b234b804b114d9e37bb655e11cbbb5f5e971b7a9"
+        assert bundle2.metadata["model_info"]["model_revision"] == "b234b804b114d9e37bb655e11cbbb5f5e971b7a9"
+
+
+def test_real_provider_changed_revision_creates_cache_miss(synthetic_manifest_and_splits):
+    """Changed model revision must cause a cache miss."""
+    manifest, split_reg = synthetic_manifest_and_splits
+
+    class MockRealProvider:
+        is_synthetic: bool = False
+        provider_kind: str = "llava_15_hf"
+
+        def __init__(self, rev: str):
+            self.model_name = "llava-hf/llava-1.5-7b-hf"
+            self.model_revision = rev
+            self.provider_kind = "llava_15_hf"
+
+        def resolve_revision(self) -> str:
+            return self.model_revision
+
+        def get_model_info(self):
+            return {
+                "model_name": self.model_name,
+                "model_revision": self.model_revision,
+                "resolved_revision": self.model_revision,
+                "is_synthetic": False,
+                "provider_kind": self.provider_kind,
+                "provider_type": "LLaVA15Provider",
+            }
+
+        def generate_caption(self, image_path, prompt=None, gen_config=None, image_id=None, image_hash=None):
+            from src.vlm.provider import VLMResponse
+            cfg = gen_config or VLMGenerationConfig()
+            return VLMResponse.create(
+                image_id=image_id or "img1",
+                image_path=image_path,
+                image_hash=image_hash or "hash1",
+                caption="A chair and a table.",
+                model_name=self.model_name,
+                model_revision=self.model_revision,
+                prompt=prompt or cfg.prompt,
+                gen_config=cfg,
+                is_synthetic=False,
+                provider_kind=self.provider_kind,
+                execution_time_seconds=0.01,
+            )
+
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        cache = VLMCache(tmp_dir)
+        cfg = VLMGenerationConfig(model_name="llava-hf/llava-1.5-7b-hf")
+
+        # Run with revision 1
+        bundle1, stats1 = run_vlm_pilot(
+            manifest=manifest,
+            provider=MockRealProvider(rev="rev_alpha"),
+            cache=cache,
+            gen_config=cfg,
+            split_registry=split_reg.registry,
+            sample_size=1,
+            seed=42,
+        )
+        assert stats1.cache_misses == 1
+        assert stats1.cache_hits == 0
+
+        # Run with revision 2 (different revision -> cache miss)
+        bundle2, stats2 = run_vlm_pilot(
+            manifest=manifest,
+            provider=MockRealProvider(rev="rev_beta"),
+            cache=cache,
+            gen_config=cfg,
+            split_registry=split_reg.registry,
+            sample_size=1,
+            seed=42,
+        )
+        assert stats2.cache_misses == 1
+        assert stats2.cache_hits == 0
+
+
+def test_real_and_synthetic_provider_isolation_in_pipeline(synthetic_manifest_and_splits):
+    """Synthetic and real providers remain strictly isolated in cache during pipeline runs."""
+    manifest, split_reg = synthetic_manifest_and_splits
+
+    class MockRealProvider:
+        is_synthetic: bool = False
+        provider_kind: str = "llava_15_hf"
+        model_revision: str = "rev_shared_name"
+
+        def __init__(self):
+            self.model_name = "test-model"
+
+        def resolve_revision(self) -> str:
+            return self.model_revision
+
+        def get_model_info(self):
+            return {
+                "model_name": self.model_name,
+                "model_revision": self.model_revision,
+                "resolved_revision": self.model_revision,
+                "is_synthetic": False,
+                "provider_kind": self.provider_kind,
+                "provider_type": "LLaVA15Provider",
+            }
+
+        def generate_caption(self, image_path, prompt=None, gen_config=None, image_id=None, image_hash=None):
+            from src.vlm.provider import VLMResponse
+            cfg = gen_config or VLMGenerationConfig()
+            return VLMResponse.create(
+                image_id=image_id or "img1",
+                image_path=image_path,
+                image_hash=image_hash or "hash1",
+                caption="A real car in the driveway.",
+                model_name=self.model_name,
+                model_revision=self.model_revision,
+                prompt=prompt or cfg.prompt,
+                gen_config=cfg,
+                is_synthetic=False,
+                provider_kind=self.provider_kind,
+                execution_time_seconds=0.01,
+            )
+
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        cache = VLMCache(tmp_dir)
+        cfg = VLMGenerationConfig(model_name="test-model")
+
+        # 1. Run with synthetic provider
+        synth_provider = SyntheticVLMProvider(
+            model_name="test-model",
+            model_revision="rev_shared_name",
+        )
+        bundle_s, stats_s = run_vlm_pilot(
+            manifest=manifest,
+            provider=synth_provider,
+            cache=cache,
+            gen_config=cfg,
+            split_registry=split_reg.registry,
+            sample_size=1,
+            seed=42,
+        )
+        assert stats_s.generated_captions == 1
+        assert bundle_s.entries[0].is_synthetic is True
+
+        # 2. Run with real provider (must MISS and not consume synthetic cache)
+        real_provider = MockRealProvider()
+        bundle_r, stats_r = run_vlm_pilot(
+            manifest=manifest,
+            provider=real_provider,
+            cache=cache,
+            gen_config=cfg,
+            split_registry=split_reg.registry,
+            sample_size=1,
+            seed=42,
+        )
+        assert stats_r.cache_misses == 1
+        assert stats_r.cache_hits == 0
+        assert stats_r.generated_captions == 1
+        assert bundle_r.entries[0].is_synthetic is False
+

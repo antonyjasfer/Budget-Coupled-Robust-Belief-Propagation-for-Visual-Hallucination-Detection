@@ -139,11 +139,22 @@ def check_local_checkpoint_availability(
     if target_cache_dir.exists():
         snapshots_dir = target_cache_dir / "snapshots"
         if snapshots_dir.exists():
-            snapshots = list(snapshots_dir.iterdir())
+            snapshots = [s for s in snapshots_dir.iterdir() if s.is_dir()]
             if snapshots:
                 res["local_found"] = True
                 res["resolved_revision"] = snapshots[0].name
                 return res
+
+    # Also check if transformers AutoConfig can resolve local commit hash from cache
+    try:
+        from transformers import AutoConfig
+        cfg = AutoConfig.from_pretrained(model_name, local_files_only=True)
+        if hasattr(cfg, "_commit_hash") and cfg._commit_hash:
+            res["local_found"] = True
+            res["resolved_revision"] = str(cfg._commit_hash)
+            return res
+    except Exception:
+        pass
 
     # Also check if local directory with weights is specified
     local_path = Path(model_name)

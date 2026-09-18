@@ -35,17 +35,47 @@ class LLaVA15Provider:
     def __init__(
         self,
         model_name: str = "llava-hf/llava-1.5-7b-hf",
+        model_revision: Optional[str] = None,
         device: str = "cpu",
         dtype: str = "float32",
         local_files_only: bool = True,
         allow_download: bool = False,
     ):
         self.model_name = model_name
+        self.model_revision = model_revision
         self.device = device
         self.dtype = dtype
         self.local_files_only = local_files_only and (not allow_download)
         self.allow_download = allow_download
         self.provider_kind = "llava_15_hf"
+
+    def resolve_revision(self) -> str:
+        """
+        Resolve the exact model commit hash / revision without eagerly loading full model tensor weights.
+        """
+        if self.model_revision:
+            return self.model_revision
+        if LLaVA15Provider._resolved_revision is not None and LLaVA15Provider._loaded_model_id == self.model_name:
+            return LLaVA15Provider._resolved_revision
+
+        # Try resolving revision lightweight from AutoConfig without tensor weight instantiation
+        try:
+            from transformers import AutoConfig
+            config = AutoConfig.from_pretrained(
+                self.model_name,
+                local_files_only=self.local_files_only,
+            )
+            if hasattr(config, "_commit_hash") and config._commit_hash:
+                revision = str(config._commit_hash)
+            elif hasattr(config, "to_dict"):
+                revision = f"cfg_{hashlib.sha256(str(config.to_dict()).encode('utf-8')).hexdigest()[:12]}"
+            else:
+                revision = "unknown_revision"
+            LLaVA15Provider._resolved_revision = revision
+            LLaVA15Provider._loaded_model_id = self.model_name
+            return revision
+        except Exception:
+            return LLaVA15Provider._resolved_revision or "not_loaded"
 
     def _ensure_loaded(self):
         """Lazy-load the model and processor once per process."""
@@ -94,9 +124,11 @@ class LLaVA15Provider:
         # Inspect resolved revision or config hash
         revision = "unknown_revision"
         if hasattr(model, "config") and hasattr(model.config, "_commit_hash") and model.config._commit_hash:
-            revision = model.config._commit_hash
-        elif hasattr(model, "config"):
+            revision = str(model.config._commit_hash)
+        elif hasattr(model, "config") and hasattr(model.config, "to_dict"):
             revision = f"cfg_{hashlib.sha256(str(model.config.to_dict()).encode('utf-8')).hexdigest()[:12]}"
+        elif self.model_revision:
+            revision = self.model_revision
 
         LLaVA15Provider._loaded_model_id = self.model_name
         LLaVA15Provider._model_instance = model
@@ -104,9 +136,11 @@ class LLaVA15Provider:
         LLaVA15Provider._resolved_revision = revision
 
     def get_model_info(self) -> Dict[str, Any]:
+        rev = self.resolve_revision()
         return {
             "model_name": self.model_name,
-            "resolved_revision": LLaVA15Provider._resolved_revision or "not_loaded",
+            "model_revision": rev,
+            "resolved_revision": rev,
             "is_synthetic": False,
             "provider_kind": self.provider_kind,
             "device": self.device,
@@ -150,7 +184,7 @@ class LLaVA15Provider:
 
         processor = LLaVA15Provider._processor_instance
         model = LLaVA15Provider._model_instance
-        revision = LLaVA15Provider._resolved_revision or "unknown"
+        revision = self.resolve_revision()
 
         inputs = processor(
             text=conversation_prompt,

@@ -213,7 +213,7 @@ def run_vlm_pilot(
 
     stats = PilotRunStats(selected_image_count=len(selected_entries))
     bundle_entries: List[AnnotationBundleEntry] = []
-    model_info = provider.get_model_info()
+    model_info = dict(provider.get_model_info())
     provider_kind = getattr(provider, "provider_kind", "synthetic_fixture" if provider.is_synthetic else "llava_15_hf")
 
     for entry in selected_entries:
@@ -236,15 +236,24 @@ def run_vlm_pilot(
             img_hash = hashlib.sha256(img_id.encode("utf-8")).hexdigest()
 
         # 2. Check cache with provider_kind and is_synthetic isolation
-        cached_resp = cache.get(
-            image_hash=img_hash,
-            model_name=model_info.get("model_name", config.model_name),
-            model_revision=model_info.get("model_revision", model_info.get("resolved_revision", "rev0")),
-            prompt=config.prompt,
-            gen_config=config,
-            provider_kind=provider_kind,
-            is_synthetic=provider.is_synthetic,
-        )
+        target_revision = model_info.get("model_revision") or model_info.get("resolved_revision")
+        if not target_revision or target_revision == "not_loaded":
+            if hasattr(provider, "resolve_revision"):
+                target_revision = provider.resolve_revision()
+            elif hasattr(provider, "model_revision"):
+                target_revision = provider.model_revision
+
+        cached_resp = None
+        if target_revision and target_revision != "not_loaded":
+            cached_resp = cache.get(
+                image_hash=img_hash,
+                model_name=model_info.get("model_name", config.model_name),
+                model_revision=target_revision,
+                prompt=config.prompt,
+                gen_config=config,
+                provider_kind=provider_kind,
+                is_synthetic=provider.is_synthetic,
+            )
 
         if cached_resp is not None:
             stats.cache_hits += 1
@@ -261,6 +270,9 @@ def run_vlm_pilot(
             # Store to cache
             cache.put(vlm_resp, gen_config=config)
             stats.generated_captions += 1
+            if vlm_resp.model_revision and vlm_resp.model_revision != "not_loaded":
+                model_info["model_revision"] = vlm_resp.model_revision
+                model_info["resolved_revision"] = vlm_resp.model_revision
 
         # Reject synthetic output in production mode
         if not provider.is_synthetic and vlm_resp.is_synthetic:
@@ -305,6 +317,17 @@ def run_vlm_pilot(
         )
         bundle_entries.append(bundle_entry)
 
+    # Refresh model_info after execution so resolved_revision is accurate
+    final_model_info = dict(provider.get_model_info())
+    if bundle_entries:
+        resolved_entry_rev = bundle_entries[0].model_revision
+        if resolved_entry_rev and resolved_entry_rev != "not_loaded":
+            final_model_info["model_revision"] = resolved_entry_rev
+            final_model_info["resolved_revision"] = resolved_entry_rev
+    elif model_info.get("resolved_revision") and model_info.get("resolved_revision") != "not_loaded":
+        final_model_info["model_revision"] = model_info.get("model_revision")
+        final_model_info["resolved_revision"] = model_info.get("resolved_revision")
+
     bundle_id = f"bundle_pilot_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}"
     bundle = AnnotationBundle(
         bundle_id=bundle_id,
@@ -316,7 +339,7 @@ def run_vlm_pilot(
         metadata={
             "pilot_seed": seed,
             "sample_size": sample_size,
-            "model_info": model_info,
+            "model_info": final_model_info,
             "gen_config": config.to_dict(),
         },
     )

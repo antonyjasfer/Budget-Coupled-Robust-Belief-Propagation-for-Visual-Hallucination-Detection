@@ -166,3 +166,51 @@ def test_refuse_to_cache_empty_response():
 
         with pytest.raises(ValueError, match="Refusing to cache empty"):
             cache.put(invalid_resp, gen_config=cfg)
+
+
+def test_cache_key_matches_response_provenance():
+    """Cache key computation must strictly align with the response provenance attributes."""
+    cfg = VLMGenerationConfig(model_name="llava-hf/llava-1.5-7b-hf")
+    resp = VLMResponse.create(
+        image_id="img_109",
+        image_path="000000000109.jpg",
+        image_hash="hash109",
+        caption="A cat on a rug.",
+        model_name="llava-hf/llava-1.5-7b-hf",
+        model_revision="b234b804b114d9e37bb655e11cbbb5f5e971b7a9",
+        prompt=cfg.prompt,
+        gen_config=cfg,
+        is_synthetic=False,
+        provider_kind="llava_15_hf",
+    )
+
+    computed_key = VLMCache.compute_cache_key(
+        image_hash=resp.image_hash,
+        model_name=resp.model_name,
+        model_revision=resp.model_revision,
+        prompt=resp.prompt,
+        gen_config=cfg,
+        provider_kind=resp.provider_kind,
+        is_synthetic=resp.is_synthetic,
+    )
+
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        cache = VLMCache(tmp_dir)
+        target_path = cache.put(resp, gen_config=cfg)
+        expected_path = Path(tmp_dir) / f"{computed_key}.json"
+        assert target_path == expected_path
+        assert target_path.exists()
+
+        # Lookup using the exact resolved revision
+        hit = cache.get(
+            image_hash="hash109",
+            model_name="llava-hf/llava-1.5-7b-hf",
+            model_revision="b234b804b114d9e37bb655e11cbbb5f5e971b7a9",
+            prompt=cfg.prompt,
+            gen_config=cfg,
+            provider_kind="llava_15_hf",
+            is_synthetic=False,
+        )
+        assert hit is not None
+        assert hit.model_revision == resp.model_revision
+

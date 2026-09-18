@@ -131,25 +131,53 @@ class VisualEvidencePipeline:
             )
 
         # 3. Retrieve or generate VLM caption
+        if hasattr(self.vlm_provider, "resolve_revision"):
+            resolved_rev = self.vlm_provider.resolve_revision()
+        else:
+            resolved_rev = getattr(self.vlm_provider, "model_revision", "snapshot")
+
         vlm_resp = self.vlm_cache.get(
             image_hash=computed_hash,
             model_name=self.vlm_provider.model_name,
-            model_revision=getattr(self.vlm_provider, "resolve_revision", lambda: "snapshot")(),
+            model_revision=resolved_rev,
             prompt=self.gen_config.prompt,
             gen_config=self.gen_config,
             provider_kind=self.vlm_provider.provider_kind,
             is_synthetic=self.vlm_provider.is_synthetic,
         )
 
+        vlm_source = "cache"
+        if vlm_resp is not None:
+            # Prevent synthetic/manual cache contamination:
+            # If using a real neural provider, ensure cached record itself originated from real inference
+            if not self.vlm_provider.is_synthetic:
+                cached_src = getattr(vlm_resp, "generation_source", None)
+                if (
+                    vlm_resp.is_synthetic
+                    or vlm_resp.provider_kind != "llava_15_hf"
+                    or cached_src != "real_inference"
+                ):
+                    logger.warning(
+                        f"Rejecting contaminated cache entry for image {entry.image.image_id}: "
+                        f"is_synthetic={vlm_resp.is_synthetic}, provider_kind={vlm_resp.provider_kind}, "
+                        f"source={cached_src}"
+                    )
+                    vlm_resp = None
+
         if vlm_resp is None:
-            vlm_resp = self.vlm_provider.generate_caption(
+            fresh_resp = self.vlm_provider.generate_caption(
                 image_path=img_path,
                 prompt=self.gen_config.prompt,
                 gen_config=self.gen_config,
                 image_id=entry.image.image_id,
                 image_hash=computed_hash,
             )
-            self.vlm_cache.put(vlm_resp, gen_config=self.gen_config)
+            vlm_source = "real_inference" if not self.vlm_provider.is_synthetic else "synthetic_fixture"
+            fresh_resp.generation_source = vlm_source
+            self.vlm_cache.put(fresh_resp, gen_config=self.gen_config)
+            vlm_resp = fresh_resp
+        else:
+            vlm_source = "cache"
 
         caption_text = vlm_resp.caption
 
@@ -187,6 +215,8 @@ class VisualEvidencePipeline:
                 "vlm_model": vlm_resp.model_name,
                 "vlm_revision": vlm_resp.model_revision,
                 "vlm_execution_time": vlm_resp.execution_time_seconds,
+                "vlm_generation_source": vlm_source,
+                "vlm_provider_kind": vlm_resp.provider_kind,
             }
             if det_res.error:
                 meta["detector_error"] = det_res.error
@@ -213,11 +243,13 @@ class VisualEvidencePipeline:
                 clip_revision=clip_res.model_revision,
                 clip_prompt_template=clip_res.prompt_template,
                 preprocessing_configuration=clip_res.preprocessing_configuration,
+                vlm_generation_source=vlm_source,
                 is_synthetic=bool(is_synth),
                 metadata=meta,
             )
             rec.validate()
             claim_records.append(rec)
+
 
         return claim_records
 

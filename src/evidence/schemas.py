@@ -160,6 +160,7 @@ class ClaimLevelEvidenceRecord:
     clip_revision: Optional[str] = None
     clip_prompt_template: Optional[str] = None
     preprocessing_configuration: Optional[Dict[str, Any]] = None
+    vlm_generation_source: str = "real_inference"
     schema_version: str = EVIDENCE_SCHEMA_VERSION
     is_synthetic: bool = False
     metadata: Dict[str, Any] = field(default_factory=dict)
@@ -228,6 +229,7 @@ class ClaimLevelEvidenceRecord:
             "clip_revision": self.clip_revision,
             "clip_prompt_template": self.clip_prompt_template,
             "preprocessing_configuration": self.preprocessing_configuration,
+            "vlm_generation_source": self.vlm_generation_source,
             "schema_version": self.schema_version,
             "is_synthetic": self.is_synthetic,
             "metadata": self.metadata,
@@ -255,8 +257,10 @@ class ClaimLevelEvidenceRecord:
             clip_revision=data.get("clip_revision"),
             clip_prompt_template=data.get("clip_prompt_template"),
             preprocessing_configuration=data.get("preprocessing_configuration"),
+            vlm_generation_source=str(data.get("vlm_generation_source", "real_inference")),
             schema_version=str(data.get("schema_version", EVIDENCE_SCHEMA_VERSION)),
             is_synthetic=bool(data.get("is_synthetic", False)),
             metadata=dict(data.get("metadata", {})),
         )
+
 

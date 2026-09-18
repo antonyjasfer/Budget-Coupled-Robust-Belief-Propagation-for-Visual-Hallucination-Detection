@@ -92,6 +92,13 @@ class LLaVA15Provider:
             ) from e
 
         torch_dtype = getattr(torch, self.dtype, torch.float32)
+        model_kwargs = {
+            "torch_dtype": torch_dtype,
+            "low_cpu_mem_usage": True,
+            "local_files_only": self.local_files_only,
+        }
+        if self.device != "cpu" and torch.cuda.is_available():
+            model_kwargs["device_map"] = self.device
 
         try:
             processor = AutoProcessor.from_pretrained(
@@ -100,9 +107,7 @@ class LLaVA15Provider:
             )
             model = LlavaForConditionalGeneration.from_pretrained(
                 self.model_name,
-                torch_dtype=torch_dtype,
-                low_cpu_mem_usage=True,
-                local_files_only=self.local_files_only,
+                **model_kwargs,
             )
         except Exception as err:
             if self.local_files_only:
@@ -118,8 +123,9 @@ class LLaVA15Provider:
         for param in model.parameters():
             param.requires_grad = False
 
-        if self.device != "cpu" and torch.cuda.is_available():
+        if "device_map" not in model_kwargs and self.device != "cpu" and torch.cuda.is_available():
             model = model.to(self.device)
+
 
         # Inspect resolved revision or config hash
         revision = "unknown_revision"
@@ -223,4 +229,6 @@ class LLaVA15Provider:
             is_synthetic=False,
             provider_kind=self.provider_kind,
             execution_time_seconds=elapsed,
+            generation_source="real_inference",
         )
+

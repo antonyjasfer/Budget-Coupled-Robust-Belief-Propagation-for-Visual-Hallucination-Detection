@@ -53,17 +53,20 @@ class VLMCache:
         gen_config: VLMGenerationConfig,
         provider_kind: str = "synthetic_fixture",
         is_synthetic: bool = True,
+        generation_source: Optional[str] = None,
     ) -> str:
         """
         Compute a SHA256 cache key that changes whenever any input, prompt, model snapshot,
-        provider kind, synthetic provenance, or generation parameter changes.
+        provider kind, synthetic provenance, generation source, or generation parameter changes.
         """
         prompt_hash = hashlib.sha256(prompt.encode("utf-8")).hexdigest()
+        src = generation_source or ("synthetic_fixture" if is_synthetic else "real_inference")
         key_dict = {
             "cache_version": "v2",
             "image_hash": image_hash,
             "provider_kind": provider_kind,
             "is_synthetic": is_synthetic,
+            "generation_source": src,
             "model_name": model_name,
             "model_revision": model_revision,
             "prompt_hash": prompt_hash,
@@ -84,10 +87,14 @@ class VLMCache:
         gen_config: VLMGenerationConfig,
         provider_kind: str = "synthetic_fixture",
         is_synthetic: bool = True,
+        generation_source: Optional[str] = None,
     ) -> Optional[VLMResponse]:
         """
         Retrieve cached response if it exists and passes data integrity validation.
+        Strictly enforces that real inference queries cannot be satisfied by synthetic
+        or manually fabricated cache entries.
         """
+        src = generation_source or ("synthetic_fixture" if is_synthetic else "real_inference")
         cache_key = self.compute_cache_key(
             image_hash=image_hash,
             model_name=model_name,
@@ -96,6 +103,7 @@ class VLMCache:
             gen_config=gen_config,
             provider_kind=provider_kind,
             is_synthetic=is_synthetic,
+            generation_source=src,
         )
         cache_path = self._get_path_for_key(cache_key)
 
@@ -123,6 +131,13 @@ class VLMCache:
             if response.provider_kind != provider_kind:
                 raise ValueError("Provider kind mismatch in cache file")
 
+            # Prevent synthetic/manual cache contamination:
+            # If querying for real inference, reject entries that did not originate from real inference
+            if not is_synthetic:
+                entry_src = getattr(response, "generation_source", "unknown")
+                if entry_src != "real_inference":
+                    raise ValueError(f"Contaminated cache entry: generation_source is '{entry_src}', expected 'real_inference'")
+
             self.stats.hits += 1
             return response
         except Exception as e:
@@ -138,6 +153,7 @@ class VLMCache:
         if not response.caption or not response.response_id:
             raise ValueError("Refusing to cache empty or invalid response record")
 
+        gen_src = getattr(response, "generation_source", "synthetic_fixture" if response.is_synthetic else "real_inference")
         cache_key = self.compute_cache_key(
             image_hash=response.image_hash,
             model_name=response.model_name,
@@ -146,8 +162,10 @@ class VLMCache:
             gen_config=gen_config,
             provider_kind=response.provider_kind,
             is_synthetic=response.is_synthetic,
+            generation_source=gen_src,
         )
         target_path = self._get_path_for_key(cache_key)
+
 
         if target_path.exists() and not overwrite:
             return target_path

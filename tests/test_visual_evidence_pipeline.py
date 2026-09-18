@@ -265,8 +265,126 @@ def test_visual_evidence_pipeline_end_to_end(tmp_path):
         assert l["detector_available"] is True
         assert l["similarity_available"] is True
         assert l["split"] == "train"
+        assert l["vlm_generation_source"] in ("real_inference", "cache", "synthetic_fixture")
         # Confirm PGM fields are NOT present
         assert "theta" not in l
         assert "epsilon" not in l
         assert "J_ij" not in l
         assert "posterior" not in l
+
+
+def test_vlm_cache_contamination_prevention(tmp_path):
+    """
+    Ensure the cache prevents contamination:
+    A cache record should NOT be treated as a valid real LLaVA response merely because
+    is_synthetic == False.
+    If generation_source is manual or synthetic, cache retrieval for real inference MUST reject it.
+    """
+    cache = VLMCache(tmp_path / "cache")
+    cfg = VLMGenerationConfig(model_name="llava-hf/llava-1.5-7b-hf")
+    img_file = create_dummy_image(tmp_path / "test_img.jpg")
+    img_hash = compute_file_sha256(img_file)
+
+    from src.vlm.provider import VLMResponse
+
+    # 1. Store a contaminated record where is_synthetic=False, but generation_source="manual_prepopulated"
+    manual_resp = VLMResponse.create(
+        image_id="coco_contam_1",
+        image_path=img_file,
+        image_hash=img_hash,
+        caption="A manually fabricated caption pretending to be real.",
+        model_name="llava-hf/llava-1.5-7b-hf",
+        model_revision="test_rev",
+        prompt="Describe the image.",
+        gen_config=cfg,
+        is_synthetic=False,
+        provider_kind="manual",
+        generation_source="manual_prepopulated",
+    )
+    cache.put(response=manual_resp, gen_config=cfg)
+
+    # 2. Querying cache for real inference (is_synthetic=False, generation_source="real_inference")
+    # MUST return None because the key or content does not match genuine real inference
+    cached_entry = cache.get(
+        image_hash=img_hash,
+        model_name="llava-hf/llava-1.5-7b-hf",
+        model_revision="test_rev",
+        prompt="Describe the image.",
+        gen_config=cfg,
+        provider_kind="llava_15_hf",
+        is_synthetic=False,
+        generation_source="real_inference",
+    )
+    assert cached_entry is None, "Cache failed to reject contaminated manual response!"
+
+    # 3. Store a genuine real inference record
+    real_resp = VLMResponse.create(
+        image_id="coco_real_1",
+        image_path=img_file,
+        image_hash=img_hash,
+        caption="A real LLaVA caption produced by neural weights.",
+        model_name="llava-hf/llava-1.5-7b-hf",
+        model_revision="test_rev",
+        prompt="Describe the image.",
+        gen_config=cfg,
+        is_synthetic=False,
+        provider_kind="llava_15_hf",
+        generation_source="real_inference",
+    )
+    cache.put(response=real_resp, gen_config=cfg)
+
+    # 4. Querying cache for real inference must successfully return the genuine real inference record
+    cached_real = cache.get(
+        image_hash=img_hash,
+        model_name="llava-hf/llava-1.5-7b-hf",
+        model_revision="test_rev",
+        prompt="Describe the image.",
+        gen_config=cfg,
+        provider_kind="llava_15_hf",
+        is_synthetic=False,
+        generation_source="real_inference",
+    )
+    assert cached_real is not None
+    assert cached_real.caption == "A real LLaVA caption produced by neural weights."
+    assert cached_real.generation_source == "real_inference"
+
+
+def test_pipeline_provenance_and_source_propagation(tmp_path):
+    """
+    Test that VisualEvidencePipeline sets vlm_generation_source to:
+    - 'synthetic_fixture' on fresh generation when using SyntheticVLMProvider
+    - 'cache' when loaded from a valid cached entry
+    """
+    img = create_dummy_image(tmp_path / "img_prov.jpg")
+    img_hash = compute_file_sha256(img)
+
+    entry = DatasetManifestEntry(
+        image=ImageRecord(image_id="coco_prov_01", dataset_source=DatasetSource.COCO, file_name=str(img), file_hash=img_hash),
+        split=SplitName.TRAIN,
+    )
+    manifest = create_manifest("prov_manifest", entries=[entry])
+
+    cache = VLMCache(tmp_path / "cache")
+    vlm = SyntheticVLMProvider(mock_captions={"coco_prov_01": "A bird sitting on a tree branch."})
+    cfg = VLMGenerationConfig(model_name="synthetic-vlm")
+
+    pipe = VisualEvidencePipeline(
+        vlm_provider=vlm,
+        vlm_cache=cache,
+        claim_extractor=ConservativeClaimExtractor(create_coco_category_registry()),
+        detector_provider=MockDetectorProvider(fixed_scores={"bird": 0.82}),
+        clip_provider=MockCLIPProvider(fixed_scores={"bird": 0.51}),
+        gen_config=cfg,
+    )
+
+    # Run 1: Fresh inference from synthetic provider
+    records_1, _ = pipe.run(manifest)
+    assert len(records_1) == 1
+    assert records_1[0].vlm_generation_source == "synthetic_fixture"
+
+    # Run 2: Re-run with the same cache -> provenance must indicate "cache"
+    records_2, _ = pipe.run(manifest)
+    assert len(records_2) == 1
+    assert records_2[0].vlm_generation_source == "cache"
+
+

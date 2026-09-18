@@ -102,6 +102,7 @@ class VLMResponse:
     created_at: str
     provider_kind: str = "synthetic_fixture"
     execution_time_seconds: float = 0.0
+    generation_source: str = "real_inference"
 
     @classmethod
     def create(
@@ -117,13 +118,15 @@ class VLMResponse:
         is_synthetic: bool,
         provider_kind: str = "synthetic_fixture",
         execution_time_seconds: float = 0.0,
+        generation_source: Optional[str] = None,
     ) -> "VLMResponse":
         prompt_hash = hashlib.sha256(prompt.encode("utf-8")).hexdigest()
         caption_hash = hashlib.sha256(caption.encode("utf-8")).hexdigest()[:16]
+        resolved_source = generation_source or ("synthetic_fixture" if is_synthetic else "real_inference")
         
-        # Build collision-resistant response_id distinguishing provider kind, synthetic flag, and response content
+        # Build collision-resistant response_id distinguishing provider kind, synthetic flag, source, and response content
         id_content = (
-            f"{image_id}:{image_hash}:{provider_kind}:{is_synthetic}:{model_name}:"
+            f"{image_id}:{image_hash}:{provider_kind}:{is_synthetic}:{resolved_source}:{model_name}:"
             f"{model_revision}:{prompt_hash}:{caption_hash}:{gen_config.get_param_hash()}"
         )
         response_id = f"resp_{hashlib.sha256(id_content.encode('utf-8')).hexdigest()[:16]}"
@@ -147,6 +150,7 @@ class VLMResponse:
             created_at=created_at,
             provider_kind=provider_kind,
             execution_time_seconds=execution_time_seconds,
+            generation_source=resolved_source,
         )
 
     def to_dict(self) -> Dict[str, Any]:
@@ -156,6 +160,7 @@ class VLMResponse:
     def from_dict(cls, data: Dict[str, Any]) -> "VLMResponse":
         is_synth = bool(data.get("is_synthetic", True))
         default_kind = "synthetic_fixture" if is_synth else "llava_15_hf"
+        default_source = "synthetic_fixture" if is_synth else "real_inference"
         return cls(
             response_id=data["response_id"],
             image_id=data["image_id"],
@@ -173,7 +178,9 @@ class VLMResponse:
             created_at=data["created_at"],
             provider_kind=str(data.get("provider_kind", default_kind)),
             execution_time_seconds=float(data.get("execution_time_seconds", 0.0)),
+            generation_source=str(data.get("generation_source", default_source)),
         )
+
 
 
 @runtime_checkable

@@ -28,6 +28,7 @@ class LLaVA15Provider:
     provider_kind: str = "llava_15_hf"
 
     _loaded_model_id: Optional[str] = None
+    _loaded_quantization: Optional[bool] = None
     _model_instance: Any = None
     _processor_instance: Any = None
     _resolved_revision: Optional[str] = None
@@ -40,6 +41,11 @@ class LLaVA15Provider:
         dtype: str = "float32",
         local_files_only: bool = True,
         allow_download: bool = False,
+        load_in_4bit: bool = False,
+        quantization_type: str = "nf4",
+        bnb_4bit_compute_dtype: Optional[str] = "float16",
+        bnb_4bit_use_double_quant: bool = True,
+        device_map: Optional[str] = None,
     ):
         self.model_name = model_name
         self.model_revision = model_revision
@@ -48,6 +54,11 @@ class LLaVA15Provider:
         self.local_files_only = local_files_only and (not allow_download)
         self.allow_download = allow_download
         self.provider_kind = "llava_15_hf"
+        self.load_in_4bit = bool(load_in_4bit)
+        self.quantization_type = str(quantization_type)
+        self.bnb_4bit_compute_dtype = str(bnb_4bit_compute_dtype or "float16")
+        self.bnb_4bit_use_double_quant = bool(bnb_4bit_use_double_quant)
+        self.device_map = device_map or ("auto" if self.load_in_4bit else None)
 
     def resolve_revision(self) -> str:
         """
@@ -79,7 +90,11 @@ class LLaVA15Provider:
 
     def _ensure_loaded(self):
         """Lazy-load the model and processor once per process."""
-        if LLaVA15Provider._model_instance is not None and LLaVA15Provider._loaded_model_id == self.model_name:
+        if (
+            LLaVA15Provider._model_instance is not None
+            and LLaVA15Provider._loaded_model_id == self.model_name
+            and LLaVA15Provider._loaded_quantization == self.load_in_4bit
+        ):
             return
 
         try:
@@ -88,17 +103,45 @@ class LLaVA15Provider:
         except ImportError as e:
             raise RuntimeError(
                 f"Missing required VLM runtime dependencies: {e}. "
-                "Install with 'uv add torch transformers pillow' or supply a local virtual environment with PyTorch and Transformers."
+                "Install with 'uv add torch transformers pillow bitsandbytes' or supply a local virtual environment with PyTorch and Transformers."
             ) from e
 
-        torch_dtype = getattr(torch, self.dtype, torch.float32)
-        model_kwargs = {
-            "torch_dtype": torch_dtype,
-            "low_cpu_mem_usage": True,
-            "local_files_only": self.local_files_only,
-        }
-        if self.device != "cpu" and torch.cuda.is_available():
-            model_kwargs["device_map"] = self.device
+        if self.load_in_4bit:
+            if not torch.cuda.is_available():
+                raise RuntimeError(
+                    "4-bit inference using bitsandbytes requires an active CUDA GPU runtime. "
+                    "torch.cuda.is_available() returned False."
+                )
+            try:
+                from transformers import BitsAndBytesConfig
+            except ImportError as err:
+                raise RuntimeError(
+                    f"BitsAndBytesConfig not available in transformers: {err}. "
+                    "Ensure 'bitsandbytes' is installed via 'uv add --optional vlm bitsandbytes'."
+                ) from err
+
+            compute_dtype_torch = getattr(torch, self.bnb_4bit_compute_dtype, torch.float16)
+            quantization_config = BitsAndBytesConfig(
+                load_in_4bit=True,
+                bnb_4bit_quant_type=self.quantization_type,
+                bnb_4bit_compute_dtype=compute_dtype_torch,
+                bnb_4bit_use_double_quant=self.bnb_4bit_use_double_quant,
+            )
+            model_kwargs = {
+                "quantization_config": quantization_config,
+                "device_map": self.device_map or "auto",
+                "low_cpu_mem_usage": True,
+                "local_files_only": self.local_files_only,
+            }
+        else:
+            torch_dtype = getattr(torch, self.dtype, torch.float32)
+            model_kwargs = {
+                "torch_dtype": torch_dtype,
+                "low_cpu_mem_usage": True,
+                "local_files_only": self.local_files_only,
+            }
+            if self.device != "cpu" and torch.cuda.is_available():
+                model_kwargs["device_map"] = self.device_map or self.device
 
         try:
             processor = AutoProcessor.from_pretrained(
@@ -126,7 +169,6 @@ class LLaVA15Provider:
         if "device_map" not in model_kwargs and self.device != "cpu" and torch.cuda.is_available():
             model = model.to(self.device)
 
-
         # Inspect resolved revision or config hash
         revision = "unknown_revision"
         if hasattr(model, "config") and hasattr(model.config, "_commit_hash") and model.config._commit_hash:
@@ -137,6 +179,7 @@ class LLaVA15Provider:
             revision = self.model_revision
 
         LLaVA15Provider._loaded_model_id = self.model_name
+        LLaVA15Provider._loaded_quantization = self.load_in_4bit
         LLaVA15Provider._model_instance = model
         LLaVA15Provider._processor_instance = processor
         LLaVA15Provider._resolved_revision = revision
@@ -153,6 +196,10 @@ class LLaVA15Provider:
             "dtype": self.dtype,
             "local_files_only": self.local_files_only,
             "provider_type": "LLaVA15Provider",
+            "quantization_enabled": self.load_in_4bit,
+            "quantization_type": self.quantization_type if self.load_in_4bit else None,
+            "compute_dtype": self.bnb_4bit_compute_dtype if self.load_in_4bit else self.dtype,
+            "device_map": self.device_map or ("auto" if self.load_in_4bit else (self.device if self.device != "cpu" else None)),
         }
 
     def generate_caption(
@@ -172,6 +219,11 @@ class LLaVA15Provider:
             device=self.device,
             dtype=self.dtype,
             local_files_only=self.local_files_only,
+            load_in_4bit=self.load_in_4bit,
+            quantization_type=self.quantization_type,
+            bnb_4bit_use_double_quant=self.bnb_4bit_use_double_quant,
+            compute_dtype=self.bnb_4bit_compute_dtype if self.load_in_4bit else self.dtype,
+            device_map=self.device_map or ("auto" if self.load_in_4bit else (self.device if self.device != "cpu" else None)),
         )
         active_prompt = prompt or config.prompt
         img_id = image_id or path_obj.stem
@@ -198,7 +250,10 @@ class LLaVA15Provider:
             return_tensors="pt",
         )
 
-        if self.device != "cpu" and torch.cuda.is_available():
+        if self.load_in_4bit:
+            target_device = getattr(model, "device", None) or (self.device if torch.cuda.is_available() else "cpu")
+            inputs = {k: v.to(target_device) for k, v in inputs.items()}
+        elif self.device != "cpu" and torch.cuda.is_available():
             inputs = {k: v.to(self.device) for k, v in inputs.items()}
 
         start_time = time.time()

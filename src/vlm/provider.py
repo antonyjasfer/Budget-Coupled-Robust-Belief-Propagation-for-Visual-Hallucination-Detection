@@ -43,6 +43,11 @@ class VLMGenerationConfig:
     dtype: str = "float32"
     local_files_only: bool = True
     metadata: Dict[str, Any] = field(default_factory=dict)
+    load_in_4bit: bool = False
+    quantization_type: str = "nf4"
+    bnb_4bit_use_double_quant: bool = True
+    compute_dtype: str = "float16"
+    device_map: Optional[str] = None
 
     def get_param_hash(self) -> str:
         """Compute deterministic hash of the generation parameters."""
@@ -55,6 +60,11 @@ class VLMGenerationConfig:
             "seed": self.seed,
             "device": self.device,
             "dtype": self.dtype,
+            "load_in_4bit": self.load_in_4bit,
+            "quantization_type": self.quantization_type,
+            "bnb_4bit_use_double_quant": self.bnb_4bit_use_double_quant,
+            "compute_dtype": self.compute_dtype,
+            "device_map": self.device_map,
         }
         serialized = json.dumps(data, sort_keys=True)
         return hashlib.sha256(serialized.encode("utf-8")).hexdigest()
@@ -78,6 +88,11 @@ class VLMGenerationConfig:
             dtype=data.get("dtype", "float32"),
             local_files_only=bool(data.get("local_files_only", True)),
             metadata=data.get("metadata", {}),
+            load_in_4bit=bool(data.get("load_in_4bit", False)),
+            quantization_type=str(data.get("quantization_type", "nf4")),
+            bnb_4bit_use_double_quant=bool(data.get("bnb_4bit_use_double_quant", True)),
+            compute_dtype=str(data.get("compute_dtype", "float16")),
+            device_map=data.get("device_map", None),
         )
 
 
@@ -103,6 +118,10 @@ class VLMResponse:
     provider_kind: str = "synthetic_fixture"
     execution_time_seconds: float = 0.0
     generation_source: str = "real_inference"
+    quantization_enabled: bool = False
+    quantization_type: Optional[str] = None
+    compute_dtype: Optional[str] = None
+    device_map: Optional[str] = None
 
     @classmethod
     def create(
@@ -119,6 +138,10 @@ class VLMResponse:
         provider_kind: str = "synthetic_fixture",
         execution_time_seconds: float = 0.0,
         generation_source: Optional[str] = None,
+        quantization_enabled: Optional[bool] = None,
+        quantization_type: Optional[str] = None,
+        compute_dtype: Optional[str] = None,
+        device_map: Optional[str] = None,
     ) -> "VLMResponse":
         prompt_hash = hashlib.sha256(prompt.encode("utf-8")).hexdigest()
         caption_hash = hashlib.sha256(caption.encode("utf-8")).hexdigest()[:16]
@@ -133,6 +156,11 @@ class VLMResponse:
         
         created_at = datetime.now(timezone.utc).isoformat()
         
+        quant_enabled = quantization_enabled if quantization_enabled is not None else bool(getattr(gen_config, "load_in_4bit", False))
+        quant_type = quantization_type if quantization_type is not None else (getattr(gen_config, "quantization_type", "nf4") if quant_enabled else None)
+        comp_dtype = compute_dtype if compute_dtype is not None else (getattr(gen_config, "compute_dtype", "float16") if quant_enabled else getattr(gen_config, "dtype", "float32"))
+        dev_map = device_map if device_map is not None else (getattr(gen_config, "device_map", None) or ("auto" if quant_enabled else (gen_config.device if gen_config.device != "cpu" else None)))
+
         return cls(
             response_id=response_id,
             image_id=image_id,
@@ -151,6 +179,10 @@ class VLMResponse:
             provider_kind=provider_kind,
             execution_time_seconds=execution_time_seconds,
             generation_source=resolved_source,
+            quantization_enabled=quant_enabled,
+            quantization_type=quant_type,
+            compute_dtype=comp_dtype,
+            device_map=dev_map,
         )
 
     def to_dict(self) -> Dict[str, Any]:
@@ -161,6 +193,10 @@ class VLMResponse:
         is_synth = bool(data.get("is_synthetic", True))
         default_kind = "synthetic_fixture" if is_synth else "llava_15_hf"
         default_source = "synthetic_fixture" if is_synth else "real_inference"
+        quant_enabled = bool(data.get("quantization_enabled", data.get("gen_config", {}).get("load_in_4bit", False)))
+        quant_type = data.get("quantization_type", data.get("gen_config", {}).get("quantization_type") if quant_enabled else None)
+        comp_dtype = data.get("compute_dtype", data.get("gen_config", {}).get("compute_dtype", data.get("dtype")))
+        dev_map = data.get("device_map", data.get("gen_config", {}).get("device_map"))
         return cls(
             response_id=data["response_id"],
             image_id=data["image_id"],
@@ -179,6 +215,10 @@ class VLMResponse:
             provider_kind=str(data.get("provider_kind", default_kind)),
             execution_time_seconds=float(data.get("execution_time_seconds", 0.0)),
             generation_source=str(data.get("generation_source", default_source)),
+            quantization_enabled=quant_enabled,
+            quantization_type=quant_type,
+            compute_dtype=comp_dtype,
+            device_map=dev_map,
         )
 
 

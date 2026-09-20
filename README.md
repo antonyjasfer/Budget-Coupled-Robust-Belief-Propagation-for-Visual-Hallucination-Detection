@@ -200,3 +200,34 @@ uv run python -m src.vlm.cli run-pilot --manifest tests/fixtures/coco_instances_
 # 5. Run real-model caption acquisition (in GPU environment with installed dependencies)
 uv run python -m src.vlm.cli generate-caption --image-path path/to/image.jpg --config configs/vlm_generation.json
 ```
+
+---
+
+## 6. Milestone 6: Real Visual Evidence Pipeline & Memory-Safe 4-Bit Inference
+
+The visual evidence extraction pipeline connects genuine COCO training images to real neural models:
+$$\text{10 Real COCO Images} \xrightarrow{\text{LLaVA-1.5-7B}} \text{Captions} \xrightarrow{\text{Conservative Extractor}} \text{Claims} \xrightarrow{\text{OWL-ViT + CLIP}} \text{Claim-Level JSONL}$$
+
+### Memory-Safe 4-Bit Execution (Tesla T4 / Google Colab 15 GB)
+On GPUs with $\le 16\text{ GB}$ VRAM (e.g., Google Colab Tesla T4), loading the unquantized FP16 checkpoint onto `cuda:0` risks OOM runtime termination during weight allocation. The pipeline provides an optional 4-bit inference mode via `bitsandbytes` NF4 quantization with automatic multi-device dispatch (`device_map="auto"`).
+
+#### Exact Colab Command for T4 4-Bit Run:
+```bash
+python experiments/run_full_evidence_pipeline.py --load-in-4bit --dtype float16 --allow-download
+```
+
+#### Standard FP16 Run (For GPUs with $\ge 24\text{ GB}$ VRAM):
+```bash
+python experiments/run_full_evidence_pipeline.py --device cuda:0 --dtype float16 --allow-download
+```
+
+### Reproducibility & Provenance Tracking
+Every response and model record explicitly logs the runtime execution provenance:
+- `quantization_enabled`: `True` in 4-bit mode, `False` in FP16 mode.
+- `quantization_type`: `"nf4"` (Normalized Float 4).
+- `compute_dtype`: `"float16"` (`torch.float16` for matrix multiplication).
+- `device_map`: `"auto"` (multi-layer auto-dispatch).
+- Exact model checkpoint: `llava-hf/llava-1.5-7b-hf`.
+- Greedy decoding: `do_sample=False`, `temperature=0.0`, `max_new_tokens=64`.
+- Strict split isolation: 10 images strictly drawn from `TRAIN` split.
+- Raw uncalibrated evidence: $d_i \in [0, 1]$, $g_i \in [-1, 1]$. No PGM fitting ($\theta_i$, $\epsilon_i$, $J_{ij}$, posteriors) is introduced at this stage.

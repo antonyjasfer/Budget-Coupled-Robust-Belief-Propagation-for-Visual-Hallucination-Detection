@@ -21,6 +21,7 @@ vlm = [
     "torch>=2.0.0",
     "transformers>=4.36.0",
     "pillow>=9.0.0",
+    "bitsandbytes>=0.50.2",
 ]
 
 [tool.pytest.ini_options]

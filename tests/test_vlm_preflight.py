@@ -145,4 +145,6 @@ def test_check_runtime_packages_structure():
     assert "torch" in pkgs
     assert "transformers" in pkgs
     assert "PIL" in pkgs
+    assert "bitsandbytes" in pkgs
     assert isinstance(pkgs["torch"]["installed"], bool)
+    assert isinstance(pkgs["bitsandbytes"]["installed"], bool)

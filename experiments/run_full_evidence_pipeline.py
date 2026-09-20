@@ -108,6 +108,7 @@ def parse_args():
     parser.add_argument("--detector-model", type=str, default="google/owlvit-base-patch32", help="Detector model ID")
     parser.add_argument("--clip-model", type=str, default="openai/clip-vit-base-patch32", help="CLIP model ID")
     parser.add_argument("--allow-download", action="store_true", help="Explicitly permit downloading missing neural weights from HF")
+    parser.add_argument("--load-in-4bit", action="store_true", help="Enable 4-bit NF4 quantization via bitsandbytes with device_map='auto' for memory-safe T4 GPU execution")
     parser.add_argument("--output", type=str, default="data/exports/claim_level_evidence.jsonl", help="Output JSONL path")
     parser.add_argument("--sample-size", type=int, default=10, help="Number of real COCO images to process")
     return parser.parse_args()
@@ -115,6 +116,8 @@ def parse_args():
 
 def run_pipeline_demonstration():
     args = parse_args()
+    device_map = "auto" if args.load_in_4bit else None
+    compute_dtype = "float16" if args.load_in_4bit else args.dtype
 
     print("=" * 80)
     print("MILESTONE 6: REAL VISUAL EVIDENCE PIPELINE (ACTUAL LLaVA-1.5 INFERENCE)")
@@ -122,6 +125,7 @@ def run_pipeline_demonstration():
     print(f"  Configuration:")
     print(f"    Target Device    : {args.device}")
     print(f"    Target Dtype     : {args.dtype}")
+    print(f"    4-bit Quantized  : {args.load_in_4bit} (device_map={device_map})")
     print(f"    CUDA Available   : {torch.cuda.is_available()}")
     print(f"    VLM Model        : {args.model_name}")
     print(f"    Detector Model   : {args.detector_model}")
@@ -173,14 +177,20 @@ def run_pipeline_demonstration():
         dtype=args.dtype,
         allow_download=args.allow_download,
         local_files_only=not args.allow_download,
+        load_in_4bit=args.load_in_4bit,
+        device_map=device_map,
     )
     cfg = VLMGenerationConfig(
         model_name=args.model_name,
         device=args.device,
         dtype=args.dtype,
+        load_in_4bit=args.load_in_4bit,
+        compute_dtype=compute_dtype,
+        device_map=device_map,
     )
     vlm_revision = vlm_provider.resolve_revision()
     print(f"   LLaVA-1.5 resolved revision: {vlm_revision}")
+    print(f"   LLaVA-1.5 model info       : {vlm_provider.get_model_info()}")
 
     # 4. Initialize Real Detector and Real CLIP Providers
     print("\n3. Initializing Real Neural Evidence Extractors...")

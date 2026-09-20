@@ -59,6 +59,7 @@ from src.vlm.cache import VLMCache
 from src.evidence.detector_provider import HuggingFaceDetectorProvider
 from src.evidence.clip_provider import TransformersCLIPProvider
 from src.evidence.pipeline import VisualEvidencePipeline
+from src.evidence.schemas import ClaimLevelEvidenceRecord
 
 
 # 10 genuine COCO 2017 training image IDs (No captions or synthetic text)
@@ -113,6 +114,43 @@ def parse_args():
     parser.add_argument("--output", type=str, default="data/exports/claim_level_evidence.jsonl", help="Output JSONL path")
     parser.add_argument("--sample-size", type=int, default=10, help="Number of real COCO images to process")
     return parser.parse_args()
+
+
+def format_evidence_score(score: Optional[float]) -> str:
+    """Format an evidence score for display, returning 'UNAVAILABLE' if None."""
+    if score is None:
+        return "UNAVAILABLE"
+    return f"{score:.4f}"
+
+
+def validate_evidence_results(records: List[ClaimLevelEvidenceRecord], stats: Any) -> None:
+    """
+    Validate that all extracted claims contain complete, available neural evidence.
+    If any evidence is missing or unavailable, prints a detailed diagnostic failure
+    summary and exits with status code 1.
+    """
+    failed_records = [
+        r for r in records
+        if not r.detector_available or not r.similarity_available or r.detector_score is None or r.clip_score is None
+    ]
+    if failed_records or (hasattr(stats, "unavailable_or_failed_count") and stats.unavailable_or_failed_count > 0):
+        print("\n" + "!" * 80)
+        print("CRITICAL EXPERIMENT FAILURE: UNAVAILABLE OR FAILED EVIDENCE DETECTED")
+        print("!" * 80)
+        print(f"  Total Extracted Claims       : {len(records)}")
+        print(f"  Claims with Missing Evidence : {len(failed_records)}")
+        print("\n  Affected Claims and Diagnostics:")
+        for fr in failed_records:
+            print(f"    - Claim ID: {fr.claim_id} | Image: {fr.image_id} | Category: '{fr.object_category}'")
+            if not fr.detector_available or fr.detector_score is None:
+                det_err = (fr.metadata or {}).get("detector_error", "Detector score is None or unavailable")
+                print(f"        Detector Failure: {det_err}")
+            if not fr.similarity_available or fr.clip_score is None:
+                clip_err = (fr.metadata or {}).get("clip_error", "CLIP score is None or unavailable")
+                print(f"        CLIP Failure    : {clip_err}")
+        print("!" * 80)
+        print("Aborting: Full real visual evidence pipeline requires 100% available evidence.")
+        sys.exit(1)
 
 
 def run_pipeline_demonstration():
@@ -200,6 +238,7 @@ def run_pipeline_demonstration():
     detector_provider = HuggingFaceDetectorProvider(
         model_name=args.detector_model,
         device=args.evidence_device,
+        local_files_only=not args.allow_download,
     )
     print(f"     Detector revision: {detector_provider.resolve_revision()}")
 
@@ -207,6 +246,7 @@ def run_pipeline_demonstration():
     clip_provider = TransformersCLIPProvider(
         model_name=args.clip_model,
         device=args.evidence_device,
+        local_files_only=not args.allow_download,
     )
     print(f"     CLIP revision: {clip_provider.resolve_revision()}")
 
@@ -250,16 +290,21 @@ def run_pipeline_demonstration():
     print("\nSample Claim-Level Evidence Records:")
     print("-" * 80)
     for r in records[:5]:
+        det_score_str = format_evidence_score(r.detector_score)
+        clip_score_str = format_evidence_score(r.clip_score)
         print(f"Claim ID: {r.claim_id}")
         print(f"  Image ID        : {r.image_id}")
         print(f"  Category        : {r.object_category}")
         print(f"  Surface Span    : '{r.text_span}'")
         print(f"  Caption         : '{r.caption}'")
         print(f"  VLM Source      : {r.vlm_generation_source}")
-        print(f"  Detector Score  : {r.detector_score:.4f} (model: {r.detector_model}, available: {r.detector_available})")
-        print(f"  CLIP Score      : {r.clip_score:.4f} (model: {r.clip_model}, available: {r.similarity_available})")
+        print(f"  Detector Score  : {det_score_str} (model: {r.detector_model}, available: {r.detector_available})")
+        print(f"  CLIP Score      : {clip_score_str} (model: {r.clip_model}, available: {r.similarity_available})")
         print(f"  Split / Synth   : {r.split} / is_synthetic={r.is_synthetic}")
         print("-" * 80)
+
+    # 7. Strict Experiment Validation
+    validate_evidence_results(records, stats)
 
     # 7. Post-Condition Assertions
     assert stats.images_processed == min(args.sample_size, len(manifest.entries))

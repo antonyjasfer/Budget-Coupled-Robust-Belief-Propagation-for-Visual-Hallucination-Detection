@@ -7,7 +7,7 @@ import json
 import pytest
 import tempfile
 import math
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 import torch
 
 from src.data.schemas import (
@@ -462,5 +462,125 @@ def test_evidence_providers_and_claim_records_device_provenance(tmp_path):
     assert d["detector_configuration"]["device"] == "cpu"
     assert d["preprocessing_configuration"]["device"] == "cpu"
     assert d["metadata"]["vlm_device"] == "cuda:0"
+
+
+def test_allow_download_propagation_to_detector_and_clip():
+    """Verify that --allow-download sets local_files_only=False on detector and CLIP."""
+    from experiments.run_full_evidence_pipeline import parse_args
+
+    # 1. When --allow-download is passed
+    with patch("sys.argv", ["run_full_evidence_pipeline.py", "--allow-download"]):
+        args = parse_args()
+        assert args.allow_download is True
+        detector = HuggingFaceDetectorProvider(
+            model_name="google/owlvit-base-patch32",
+            local_files_only=not args.allow_download,
+        )
+        assert detector.local_files_only is False
+
+        clip = TransformersCLIPProvider(
+            model_name="openai/clip-vit-base-patch32",
+            local_files_only=not args.allow_download,
+        )
+        assert clip.local_files_only is False
+
+    # 2. When --allow-download is omitted
+    with patch("sys.argv", ["run_full_evidence_pipeline.py"]):
+        args = parse_args()
+        assert args.allow_download is False
+        detector = HuggingFaceDetectorProvider(
+            model_name="google/owlvit-base-patch32",
+            local_files_only=not args.allow_download,
+        )
+        assert detector.local_files_only is True
+
+        clip = TransformersCLIPProvider(
+            model_name="openai/clip-vit-base-patch32",
+            local_files_only=not args.allow_download,
+        )
+        assert clip.local_files_only is True
+
+
+def test_safe_none_reporting():
+    """Verify that format_evidence_score and reporting loop handle None scores safely."""
+    from experiments.run_full_evidence_pipeline import format_evidence_score
+
+    assert format_evidence_score(None) == "UNAVAILABLE"
+    assert format_evidence_score(0.85432) == "0.8543"
+    assert format_evidence_score(-0.12345) == "-0.1235"
+
+    rec = ClaimLevelEvidenceRecord(
+        claim_id="c_none",
+        image_id="img_none",
+        object_category="cat",
+        detector_score=None,
+        detector_available=False,
+        clip_score=None,
+        similarity_available=False,
+    )
+    rec.validate()
+
+    det_str = format_evidence_score(rec.detector_score)
+    clip_str = format_evidence_score(rec.clip_score)
+    formatted = f"Detector: {det_str} | CLIP: {clip_str}"
+    assert formatted == "Detector: UNAVAILABLE | CLIP: UNAVAILABLE"
+
+
+def test_unavailable_evidence_produces_controlled_failure(capsys):
+    """Verify that unavailable evidence outputs diagnostics and exits with code 1 without TypeError."""
+    from experiments.run_full_evidence_pipeline import validate_evidence_results
+
+    rec_fail = ClaimLevelEvidenceRecord(
+        claim_id="c_fail_01",
+        image_id="img_01",
+        object_category="person",
+        detector_score=None,
+        detector_available=False,
+        clip_score=None,
+        similarity_available=False,
+        metadata={
+            "detector_error": "Cannot find model weights locally",
+            "clip_error": "Connection timed out",
+        },
+    )
+    rec_fail.validate()
+
+    mock_stats = MagicMock()
+    mock_stats.unavailable_or_failed_count = 1
+
+    with pytest.raises(SystemExit) as exc_info:
+        validate_evidence_results([rec_fail], mock_stats)
+
+    assert exc_info.value.code == 1
+    captured = capsys.readouterr().out
+    assert "CRITICAL EXPERIMENT FAILURE: UNAVAILABLE OR FAILED EVIDENCE DETECTED" in captured
+    assert "c_fail_01" in captured
+    assert "person" in captured
+    assert "Cannot find model weights locally" in captured
+    assert "Connection timed out" in captured
+
+
+def test_valid_evidence_produces_normal_output(capsys):
+    """Verify that complete valid evidence passes validation cleanly."""
+    from experiments.run_full_evidence_pipeline import validate_evidence_results
+
+    rec_ok = ClaimLevelEvidenceRecord(
+        claim_id="c_ok_01",
+        image_id="img_01",
+        object_category="dog",
+        detector_score=0.88,
+        detector_available=True,
+        clip_score=0.62,
+        similarity_available=True,
+    )
+    rec_ok.validate()
+
+    mock_stats = MagicMock()
+    mock_stats.unavailable_or_failed_count = 0
+
+    # Should not raise SystemExit
+    validate_evidence_results([rec_ok], mock_stats)
+    captured = capsys.readouterr().out
+    assert "CRITICAL EXPERIMENT FAILURE" not in captured
 
 

@@ -4,9 +4,11 @@
 **Milestone 2: Dataset Manifests, Label-Safe Claim Schemas, and Leakage-Safe Splits**  
 **Milestone 3: Deterministic Object-Existence Claim Extraction and Raw Evidence Contracts**  
 **Milestone 4: Frozen-VLM Caption Acquisition, Caching, and Pilot Pipeline**  
-**Milestone 5: Real-Image Pilot Readiness, 11-Gate Preflight, and Portable Execution**
+**Milestone 5: Real-Image Pilot Readiness, 11-Gate Preflight, and Portable Execution**  
+**Milestone 6: Real Visual Evidence Pipeline & Memory-Safe 4-Bit Inference**  
+**Milestone 7: Human-Annotated Ground Truth Dataset & Double-Blind Annotation Infrastructure**
 
-A pure mathematical inference engine implementing exact Belief Propagation, brute-force ground-truth verification, and budget-coupled robust dynamic programming over binary attractive tree graphical models, coupled with a typed data foundation, conservative object-existence claim extraction, raw visual evidence contracts, atomic disk caching with synthetic/real provenance isolation, structured preflight verification, and portable real-image pilot packaging.
+A pure mathematical inference engine implementing exact Belief Propagation, brute-force ground-truth verification, and budget-coupled robust dynamic programming over binary attractive tree graphical models, coupled with a typed data foundation, conservative object-existence claim extraction, raw visual evidence contracts, atomic disk caching with synthetic/real provenance isolation, structured preflight verification, portable real-image pilot packaging, real multimodal visual evidence extraction, and double-blind, leak-free human annotation infrastructure with multiclass Cohen's kappa verification.
 
 ---
 
@@ -232,3 +234,49 @@ Every response and model record explicitly logs the runtime execution provenance
 - Greedy decoding: `do_sample=False`, `temperature=0.0`, `max_new_tokens=64`.
 - Strict split isolation: 10 images strictly drawn from `TRAIN` split.
 - Raw uncalibrated evidence: $d_i \in [0, 1]$, $g_i \in [-1, 1]$. No PGM fitting ($\theta_i$, $\epsilon_i$, $J_{ij}$, posteriors) is introduced at this stage.
+
+---
+
+## 7. Milestone 7: Human-Annotated Ground Truth Dataset & Annotation Infrastructure
+
+Milestone 7 constructs a leak-free, double-blind annotation infrastructure and reproducible ground-truth dataset for evaluating visual hallucination detection models.
+
+### 7.1 Double-Blind Evidence Masking
+To prevent human cognitive bias:
+- **Forbidden Fields:** Human annotators are strictly blinded to all model evidence (`detector_score`, `clip_score`, availability flags), model confidence, posteriors, PGM parameters ($\theta, \epsilon, J$), model predictions, and dataset split partitions.
+- **Caption Masking:** Full VLM captions are stripped by default to prevent linguistic confirmation bias. Annotators receive only the image reference, target canonical object category, surface form, and a minimal local sentence clause where necessary.
+
+### 7.2 Independent Double Annotation & Adjudication Protocol
+- **Dual Independent Streams:** Annotator A and Annotator B complete independent templates (`m7_template_annotator_A.jsonl`, `m7_template_annotator_B.jsonl`).
+- **Disagreement Policy:** If Annotator A $\neq$ Annotator B, no automated consensus is formed. Disagreement is explicitly flagged (`has_disagreement = True`), and the claim is routed to an expert adjudicator. Both raw inputs are permanently preserved alongside the adjudicated record.
+- **Canonical Labels:** Ground-truth status is restricted to `SUPPORTED`, `HALLUCINATED`, and `UNKNOWN`.
+- **UNKNOWN Semantics:** `UNKNOWN` denotes indeterminate physical visual presence (e.g. extreme occlusion). It is never conflated with `HALLUCINATED`, `ABSTAIN`, or an Ising state.
+
+### 7.3 Inter-Annotator Agreement (Multiclass Cohen's Kappa)
+Evaluated over the $3 \times 3$ matrix of $\{ \text{SUPPORTED}, \text{HALLUCINATED}, \text{UNKNOWN} \}$:
+$$\kappa = \frac{P_o - P_e}{1 - P_e}$$
+- **Zero Denominator Safeguard:** When chance agreement $P_e = 1.0$, the pipeline avoids zero division, returning `cohens_kappa = None`, `kappa_defined = False`, and an informative status message.
+
+### 7.4 Split Leakage & Duplicate Assignment Safeguards
+- **Sequence-Level Auditing:** Split assignments are validated as a sequence rather than collapsing into a dictionary, guaranteeing that conflicting or duplicate assignment attempts for the same image are caught.
+- **Identity Group Preservation:** Split partitions strictly respect `ImageIdentityGroup` boundaries to prevent multi-crop or multi-view leakage across partitions.
+- **SHA-256 Scope:** Content hashes guarantee zero cross-split byte-identical image overlap. (Note: SHA-256 does not detect resized or color-shifted near-duplicates).
+
+### 7.5 Current Benchmark & Real Evidence Coverage
+The target benchmark reserves 600 images (target ratios: 50% train, 15% validation, 15% calibration, 20% test). In strict adherence to honest accounting:
+- **Reserved Image Universe:** 600 images target.
+- **Current Real M6 Coverage:** 10 genuine COCO train2017 images with 15 extracted affirmative claims.
+- **Current Human Annotations:** 0 (Annotation coverage: 0.00%). Zero synthetic human annotations are fabricated for real claims.
+
+### 7.6 Execution Commands
+```bash
+# Run complete M7 pipeline on available real M6 evidence
+python -m experiments.run_m7_dataset_pipeline all --target-size 600
+
+# Export masked annotation templates for human annotators
+python -m experiments.run_m7_dataset_pipeline export-templates --output-dir data/annotations
+
+# Audit dataset quality, split leakage, and inter-annotator agreement
+python -m experiments.run_m7_dataset_pipeline audit --manifest data/manifests/m7_image_manifest.json
+```
+

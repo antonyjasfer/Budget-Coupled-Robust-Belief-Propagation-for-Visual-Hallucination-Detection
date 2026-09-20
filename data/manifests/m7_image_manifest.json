@@ -1,0 +1,199 @@
+{
+  "schema_version": "1.0.0",
+  "manifest_id": "m7_coco_master_manifest",
+  "created_at": "2026-09-20T12:55:37.581346+00:00",
+  "description": "M7 master image manifest with deterministic group splitting",
+  "entries": [
+    {
+      "image": {
+        "image_id": "coco_000000000009",
+        "dataset_source": "coco",
+        "file_name": null,
+        "file_hash": "35cdfe8259aca40d564baf33ee749d82ce852446bd9574f0c47551d8bfffda99",
+        "width": null,
+        "height": null,
+        "coco_id": null,
+        "metadata": {
+          "m6_response_id": "resp_4a42737a947ef125"
+        }
+      },
+      "claims": [],
+      "annotations": [],
+      "responses": [],
+      "split": "train"
+    },
+    {
+      "image": {
+        "image_id": "coco_000000000025",
+        "dataset_source": "coco",
+        "file_name": null,
+        "file_hash": "d8f12a26d8803701cabac80494b080f998e5ed9bafaf61a2825ce6212c85487a",
+        "width": null,
+        "height": null,
+        "coco_id": null,
+        "metadata": {
+          "m6_response_id": "resp_74598236b74adb2c"
+        }
+      },
+      "claims": [],
+      "annotations": [],
+      "responses": [],
+      "split": "calibration"
+    },
+    {
+      "image": {
+        "image_id": "coco_000000000030",
+        "dataset_source": "coco",
+        "file_name": null,
+        "file_hash": "0444b10826d376ad9075805061405f6071a62b80eda29c5f284ed77b093d5b1d",
+        "width": null,
+        "height": null,
+        "coco_id": null,
+        "metadata": {
+          "m6_response_id": "resp_e331640b648181fe"
+        }
+      },
+      "claims": [],
+      "annotations": [],
+      "responses": [],
+      "split": "validation"
+    },
+    {
+      "image": {
+        "image_id": "coco_000000000034",
+        "dataset_source": "coco",
+        "file_name": null,
+        "file_hash": "2c46871034fa901ae795a8bb916ba7f2f728507cab9e511cced0986bd083d193",
+        "width": null,
+        "height": null,
+        "coco_id": null,
+        "metadata": {
+          "m6_response_id": "resp_a7961c99d190dad6"
+        }
+      },
+      "claims": [],
+      "annotations": [],
+      "responses": [],
+      "split": "train"
+    },
+    {
+      "image": {
+        "image_id": "coco_000000000036",
+        "dataset_source": "coco",
+        "file_name": null,
+        "file_hash": "7b04d9d0a1ea8b930e11f293a832bdfe8d43892fdb96f1038219196d41a86b95",
+        "width": null,
+        "height": null,
+        "coco_id": null,
+        "metadata": {
+          "m6_response_id": "resp_22bb468c4429202d"
+        }
+      },
+      "claims": [],
+      "annotations": [],
+      "responses": [],
+      "split": "validation"
+    },
+    {
+      "image": {
+        "image_id": "coco_000000000042",
+        "dataset_source": "coco",
+        "file_name": null,
+        "file_hash": "9da8dbb3f415b0549a2c7ef8930e245af324191cc4c4465a7d75f05d96b0781d",
+        "width": null,
+        "height": null,
+        "coco_id": null,
+        "metadata": {
+          "m6_response_id": "resp_2b29b9232c32f7cd"
+        }
+      },
+      "claims": [],
+      "annotations": [],
+      "responses": [],
+      "split": "train"
+    },
+    {
+      "image": {
+        "image_id": "coco_000000000049",
+        "dataset_source": "coco",
+        "file_name": null,
+        "file_hash": "0a29047d4bd83d26ae5370c03447bfa1ccd7005362ee180510e47af61746273a",
+        "width": null,
+        "height": null,
+        "coco_id": null,
+        "metadata": {
+          "m6_response_id": "resp_3abdad6658819b1c"
+        }
+      },
+      "claims": [],
+      "annotations": [],
+      "responses": [],
+      "split": "train"
+    },
+    {
+      "image": {
+        "image_id": "coco_000000000061",
+        "dataset_source": "coco",
+        "file_name": null,
+        "file_hash": "03919a304272b466ac9415ecc8eebf7e6ec6d5a370e027ea8ed8c348e73d4024",
+        "width": null,
+        "height": null,
+        "coco_id": null,
+        "metadata": {
+          "m6_response_id": "resp_0f82a355fac57d00"
+        }
+      },
+      "claims": [],
+      "annotations": [],
+      "responses": [],
+      "split": "train"
+    },
+    {
+      "image": {
+        "image_id": "coco_000000000064",
+        "dataset_source": "coco",
+        "file_name": null,
+        "file_hash": "efb62bc395400df8dfe6ab5ea3577913ca029753628f37af4bcca8144fd67af5",
+        "width": null,
+        "height": null,
+        "coco_id": null,
+        "metadata": {
+          "m6_response_id": "resp_52fdd0eff98e9aa0"
+        }
+      },
+      "claims": [],
+      "annotations": [],
+      "responses": [],
+      "split": "test"
+    },
+    {
+      "image": {
+        "image_id": "coco_000000000071",
+        "dataset_source": "coco",
+        "file_name": null,
+        "file_hash": "c9e8680a3bdd1021d8cce453d91255df472e9c7cf79bf6312b80b5df8d7b665c",
+        "width": null,
+        "height": null,
+        "coco_id": null,
+        "metadata": {
+          "m6_response_id": "resp_4e484fd03115b533"
+        }
+      },
+      "claims": [],
+      "annotations": [],
+      "responses": [],
+      "split": "calibration"
+    }
+  ],
+  "metadata": {
+    "target_benchmark_size": 600,
+    "seed": 42,
+    "split_seed": 42,
+    "split_achieved_counts": {
+      "train": 5,
+      "validation": 2,
+      "calibration": 2,
+      "test": 1
+    }
+  }
+}

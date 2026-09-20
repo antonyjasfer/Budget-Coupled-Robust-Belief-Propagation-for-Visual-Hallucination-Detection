@@ -191,3 +191,143 @@ def test_synthetic_end_to_end_pipeline_with_annotations(tmp_path):
     assert report.unknown_count == 1
     # 4 resolved out of 5 total claims = 80.0%
     assert report.annotation_coverage_pct == pytest.approx(80.0)
+
+
+def test_generate_dataset_lock_and_checksums(tmp_path):
+    """Verify dataset lock generation, SHA-256 calculation, and status determination."""
+    from src.annotation.workflow import generate_dataset_lock
+
+    manifest_p = tmp_path / "m7_manifest.json"
+    claims_p = tmp_path / "m7_claims.jsonl"
+    gt_p = tmp_path / "m7_ground_truth.jsonl"
+    lock_p = tmp_path / "m7_dataset_lock.json"
+
+    # 1. Incomplete/Pending test
+    manifest_p.write_text(json.dumps({"entries": [{"image": {"image_id": "img1"}, "split": "train"}]}))
+    claims_p.write_text(json.dumps({"claim_id": "c1", "is_synthetic": False}) + "\n")
+    gt_p.write_text(json.dumps({"claim_id": "c1", "final_ground_truth": None}) + "\n")
+
+    lock_info = generate_dataset_lock(
+        manifest_path=manifest_p,
+        claims_path=claims_p,
+        ground_truth_path=gt_p,
+        target_count=600,
+        lock_output_path=lock_p,
+    )
+
+    assert lock_info["status"] == "PENDING_ANNOTATION"
+    assert lock_info["actual_manifest_image_count"] == 1
+    assert lock_info["target_image_count"] == 600
+    assert lock_info["total_claims_count"] == 1
+    assert lock_info["resolved_ground_truth_count"] == 0
+    assert lock_p.exists()
+    assert lock_info["checksums"]["m7_manifest_sha256"] is not None
+    assert lock_info["checksums"]["m7_claims_sha256"] is not None
+    assert lock_info["checksums"]["m7_ground_truth_sha256"] is not None
+
+    # 2. Complete/Locked test (satisfying all conditions)
+    # 2 images, target count 2
+    man_data = {
+        "entries": [
+            {"image": {"image_id": "img1"}, "split": "train"},
+            {"image": {"image_id": "img2"}, "split": "test"},
+        ]
+    }
+    manifest_p.write_text(json.dumps(man_data))
+    claims_p.write_text(
+        json.dumps({"claim_id": "c1", "is_synthetic": False}) + "\n" +
+        json.dumps({"claim_id": "c2", "is_synthetic": False}) + "\n"
+    )
+    gt_p.write_text(
+        json.dumps({"claim_id": "c1", "final_ground_truth": "supported", "disagreement": False}) + "\n" +
+        json.dumps({"claim_id": "c2", "final_ground_truth": "hallucinated", "disagreement": False}) + "\n"
+    )
+
+    lock_info_full = generate_dataset_lock(
+        manifest_path=manifest_p,
+        claims_path=claims_p,
+        ground_truth_path=gt_p,
+        target_count=2,
+        lock_output_path=lock_p,
+    )
+
+    assert lock_info_full["status"] == "LOCKED"
+    assert lock_info_full["actual_manifest_image_count"] == 2
+    assert lock_info_full["resolved_ground_truth_count"] == 2
+    assert lock_info_full["unresolved_disputes_count"] == 0
+    assert lock_info_full["all_real_evidence"] is True
+
+
+def test_scalable_evidence_acquisition_mocked(tmp_path):
+    """Verify scalable evidence acquisition runner with mock providers and checkpointing."""
+    from experiments.run_m7_evidence_acquisition import run_evidence_acquisition
+    from src.evidence.detector_provider import MockDetectorProvider
+    from src.evidence.clip_provider import MockCLIPProvider
+    from src.vlm.provider import SyntheticVLMProvider, VLMGenerationConfig
+    from src.vlm.cache import VLMCache
+    from PIL import Image
+
+    # Create dummy images
+    img1 = tmp_path / "img1.jpg"
+    img2 = tmp_path / "img2.jpg"
+    Image.new("RGB", (32, 32), color="red").save(img1)
+    Image.new("RGB", (32, 32), color="blue").save(img2)
+
+    manifest_entries = [
+        DatasetManifestEntry(
+            image=ImageRecord(image_id="coco_1", dataset_source=DatasetSource.COCO, file_name=str(img1)),
+            split=SplitName.TRAIN,
+        ),
+        DatasetManifestEntry(
+            image=ImageRecord(image_id="coco_2", dataset_source=DatasetSource.COCO, file_name=str(img2)),
+            split=SplitName.VALIDATION,
+        ),
+    ]
+    manifest = create_manifest("m7_test_manifest", entries=manifest_entries)
+    manifest_p = tmp_path / "m7_manifest.json"
+    with open(manifest_p, "w", encoding="utf-8") as f:
+        json.dump(manifest.to_dict(), f, indent=2)
+
+    out_claims_p = tmp_path / "m7_claims.jsonl"
+    cache = VLMCache(tmp_path / "vlm_cache")
+
+    mock_captions = {
+        "coco_1": "A cat on a rug.",
+        "coco_2": "A dog on grass.",
+    }
+    vlm = SyntheticVLMProvider(mock_captions=mock_captions)
+    det = MockDetectorProvider(fixed_scores={"cat": 0.85, "dog": 0.90})
+    clip = MockCLIPProvider(fixed_scores={"cat": 0.40, "dog": 0.50})
+
+    # Pass 1: max_images=1
+    claims_pass1 = run_evidence_acquisition(
+        manifest_path=str(manifest_p),
+        output_claims_path=str(out_claims_p),
+        vlm_provider=vlm,
+        vlm_cache=cache,
+        detector_provider=det,
+        clip_provider=clip,
+        image_base_dir=str(tmp_path),
+        max_images=1,
+        resume=True,
+    )
+    assert len(claims_pass1) == 1
+    assert claims_pass1[0].image_id == "coco_1"
+
+    # Pass 2: resume and process remaining image
+    claims_pass2 = run_evidence_acquisition(
+        manifest_path=str(manifest_p),
+        output_claims_path=str(out_claims_p),
+        vlm_provider=vlm,
+        vlm_cache=cache,
+        detector_provider=det,
+        clip_provider=clip,
+        image_base_dir=str(tmp_path),
+        max_images=None,
+        resume=True,
+    )
+    assert len(claims_pass2) == 2
+    assert set(c.image_id for c in claims_pass2) == {"coco_1", "coco_2"}
+    assert claims_pass2[0].split == "train"
+    assert claims_pass2[1].split == "validation"
+

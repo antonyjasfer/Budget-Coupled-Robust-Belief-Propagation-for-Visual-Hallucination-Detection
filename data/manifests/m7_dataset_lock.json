@@ -1,0 +1,30 @@
+{
+  "status": "PENDING_ANNOTATION",
+  "status_reason": "Ground-truth dataset not yet locked. Actual manifest images: 10/600, resolved claims: 0/15.",
+  "lock_timestamp": "2026-09-20T17:00:20.784365+00:00",
+  "git_commit": "e7c10fec1d1f2bbcd556ddac4b798cf1d62aa9e6",
+  "target_image_count": 600,
+  "actual_manifest_image_count": 10,
+  "total_claims_count": 15,
+  "ground_truth_records_count": 15,
+  "resolved_ground_truth_count": 0,
+  "unresolved_disputes_count": 0,
+  "all_real_evidence": true,
+  "split_leakage_free": true,
+  "checksums": {
+    "m7_manifest_sha256": "1133ea2f25230a336bcada022c64fa19e89dfb9135550ed271267b063ef4c229",
+    "m7_claims_sha256": "a2c94ea86221b4ed5e628ec9e3a0a73ceac4cb51ae756c5646212838ff0f7dc3",
+    "m7_ground_truth_sha256": "4978098602205b60eb7d8948fe340921e3bccf5326a9d950c45398e2c77356f6",
+    "annotator_a_sha256": null,
+    "annotator_b_sha256": null,
+    "adjudications_sha256": null
+  },
+  "file_paths": {
+    "manifest": "data\\manifests\\m7_image_manifest.json",
+    "claims": "data\\exports\\m7_claims.jsonl",
+    "ground_truth": "data\\exports\\m7_ground_truth.jsonl",
+    "annotator_a": "data\\annotations\\m7_annotator_A.jsonl",
+    "annotator_b": "data\\annotations\\m7_annotator_B.jsonl",
+    "adjudications": "data\\annotations\\m7_adjudications.jsonl"
+  }
+}

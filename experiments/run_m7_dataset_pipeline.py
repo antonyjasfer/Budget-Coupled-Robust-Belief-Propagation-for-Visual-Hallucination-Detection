@@ -31,6 +31,7 @@ from src.annotation.workflow import (
     load_adjudications_file,
     build_final_ground_truth_dataset,
     generate_quality_report,
+    generate_dataset_lock,
 )
 from src.annotation.agreement import compute_cohens_kappa
 
@@ -98,6 +99,14 @@ def cmd_export_templates(args):
 
     evidence_records = load_m6_evidence_file(evidence_path)
     claims = ingest_m6_evidence_to_m7_claims(evidence_records, manifest=None, allow_missing_images=True)
+
+    # Also persist internal M7 claims dataset
+    m7_claims_path = Path(args.claims_out)
+    m7_claims_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(m7_claims_path, "w", encoding="utf-8") as f:
+        for c in claims:
+            f.write(json.dumps(c.to_dict()) + "\n")
+    print(f"Persisted M7 claims dataset to: {m7_claims_path} ({len(claims)} records)")
 
     out_dir = Path(args.output_dir)
     tpl_a, tpl_b = export_masked_templates(claims, output_dir=out_dir)
@@ -182,12 +191,38 @@ def cmd_audit(args):
     print(f"Markdown report saved: {report_md_path}")
 
 
+def cmd_lock(args):
+    """Generate the M7 dataset lock record and checksums."""
+    lock_info = generate_dataset_lock(
+        manifest_path=args.manifest,
+        claims_path=args.claims_out,
+        ground_truth_path=args.output,
+        annotator_a_path=args.annotator_a,
+        annotator_b_path=args.annotator_b,
+        adjudications_path=args.adjudicated,
+        target_count=args.target_size,
+        lock_output_path=args.lock_out,
+    )
+    print("=" * 70)
+    print("M7 DATASET LOCK SUMMARY")
+    print("=" * 70)
+    print(f"Status: {lock_info['status']}")
+    print(f"Reason: {lock_info['status_reason']}")
+    print(f"Git Commit: {lock_info['git_commit']}")
+    print(f"Manifest Images: {lock_info['actual_manifest_image_count']}/{lock_info['target_image_count']}")
+    print(f"Claims Count: {lock_info['total_claims_count']}")
+    print(f"Resolved GT Claims: {lock_info['resolved_ground_truth_count']}/{lock_info['ground_truth_records_count']}")
+    print(f"Unresolved Disputes: {lock_info['unresolved_disputes_count']}")
+    print(f"Lock Record Written: {args.lock_out}")
+    print("=" * 70)
+
+
 def cmd_all(args):
     """Execute complete end-to-end M7 pipeline on available real data."""
     print("=== Step 1: Generating M7 Master Image Manifest ===")
     cmd_manifest(args)
 
-    print("\n=== Step 2: Exporting Masked Annotation Templates ===")
+    print("\n=== Step 2: Exporting Masked Annotation Templates & M7 Claims ===")
     cmd_export_templates(args)
 
     print("\n=== Step 3: Merging Dataset & Annotations ===")
@@ -195,6 +230,9 @@ def cmd_all(args):
 
     print("\n=== Step 4: Auditing Quality & Generating Reports ===")
     cmd_audit(args)
+
+    print("\n=== Step 5: Generating Dataset Lock Checksums ===")
+    cmd_lock(args)
 
 
 def main():
@@ -205,7 +243,8 @@ def main():
     common_parser = argparse.ArgumentParser(add_help=False)
     common_parser.add_argument("--evidence-file", default="data/exports/claim_level_evidence.jsonl", help="M6 evidence export")
     common_parser.add_argument("--manifest-out", default="data/manifests/m7_image_manifest.json", help="Manifest output path")
-    common_parser.add_argument("--manifest", default="data/manifests/m7_image_manifest.json", help="Manifest path for audit")
+    common_parser.add_argument("--manifest", default="data/manifests/m7_image_manifest.json", help="Manifest path for audit/lock")
+    common_parser.add_argument("--claims-out", default="data/exports/m7_claims.jsonl", help="M7 internal claims output path")
     common_parser.add_argument("--output-dir", default="data/annotations", help="Annotation templates output directory")
     common_parser.add_argument("--annotator-a", default="data/annotations/m7_annotator_A.jsonl", help="Annotator A completed file")
     common_parser.add_argument("--annotator-b", default="data/annotations/m7_annotator_B.jsonl", help="Annotator B completed file")
@@ -213,6 +252,7 @@ def main():
     common_parser.add_argument("--output", default="data/exports/m7_ground_truth.jsonl", help="Final ground truth output")
     common_parser.add_argument("--report-json", default="reports/m7_dataset_quality_report.json", help="Quality report JSON")
     common_parser.add_argument("--report-md", default="reports/m7_dataset_quality_report.md", help="Quality report Markdown")
+    common_parser.add_argument("--lock-out", default="data/manifests/m7_dataset_lock.json", help="Dataset lock output JSON")
     common_parser.add_argument("--target-size", type=int, default=600, help="Target benchmark image count")
     common_parser.add_argument("--seed", type=int, default=42, help="Random seed for splitting")
 
@@ -221,6 +261,7 @@ def main():
     subparsers.add_parser("export-templates", parents=[common_parser])
     subparsers.add_parser("merge", parents=[common_parser])
     subparsers.add_parser("audit", parents=[common_parser])
+    subparsers.add_parser("lock", parents=[common_parser])
     subparsers.add_parser("all", parents=[common_parser])
 
     args = parser.parse_args()
@@ -233,9 +274,12 @@ def main():
         cmd_merge(args)
     elif args.command == "audit":
         cmd_audit(args)
+    elif args.command == "lock":
+        cmd_lock(args)
     elif args.command == "all":
         cmd_all(args)
 
 
 if __name__ == "__main__":
     main()
+

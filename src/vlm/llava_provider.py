@@ -103,7 +103,7 @@ class LLaVA15Provider:
         except ImportError as e:
             raise RuntimeError(
                 f"Missing required VLM runtime dependencies: {e}. "
-                "Install with 'uv add torch transformers pillow bitsandbytes' or supply a local virtual environment with PyTorch and Transformers."
+                "Install with 'uv add torch transformers pillow bitsandbytes accelerate' or supply a local virtual environment with PyTorch and Transformers."
             ) from e
 
         if self.load_in_4bit:
@@ -112,6 +112,13 @@ class LLaVA15Provider:
                     "4-bit inference using bitsandbytes requires an active CUDA GPU runtime. "
                     "torch.cuda.is_available() returned False."
                 )
+            try:
+                import accelerate
+            except ImportError as err:
+                raise RuntimeError(
+                    "4-bit inference using device_map='auto' requires 'accelerate'. "
+                    "Install with 'uv add --optional vlm accelerate'."
+                ) from err
             try:
                 from transformers import BitsAndBytesConfig
             except ImportError as err:

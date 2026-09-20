@@ -256,3 +256,18 @@ def test_4bit_loading_path_configures_bitsandbytes():
         mock_model.eval.assert_called_once()
         for p in mock_model.parameters():
             assert p.requires_grad is False
+
+
+def test_vlm_optional_dependencies_specification():
+    """Verify that pyproject.toml [project.optional-dependencies] vlm includes accelerate>=1.15.0."""
+    import tomllib
+    pyproject_path = Path(__file__).resolve().parent.parent / "pyproject.toml"
+    with open(pyproject_path, "rb") as f:
+        data = tomllib.load(f)
+    vlm_deps = data["project"]["optional-dependencies"]["vlm"]
+    assert any("accelerate" in dep for dep in vlm_deps), "accelerate missing from vlm optional dependencies"
+    accelerate_dep = next(dep for dep in vlm_deps if "accelerate" in dep)
+    assert "accelerate>=1.15.0" in accelerate_dep or "accelerate>=" in accelerate_dep
+    assert any("bitsandbytes" in dep for dep in vlm_deps)
+    assert any("torch" in dep for dep in vlm_deps)
+    assert any("transformers" in dep for dep in vlm_deps)

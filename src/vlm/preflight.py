@@ -89,6 +89,7 @@ def check_runtime_packages() -> Dict[str, Any]:
         "transformers": {"installed": False, "version": None},
         "PIL": {"installed": False, "version": None},
         "bitsandbytes": {"installed": False, "version": None},
+        "accelerate": {"installed": False, "version": None},
     }
 
     try:
@@ -119,6 +120,13 @@ def check_runtime_packages() -> Dict[str, Any]:
         import bitsandbytes
         packages["bitsandbytes"]["installed"] = True
         packages["bitsandbytes"]["version"] = str(getattr(bitsandbytes, "__version__", "unknown"))
+    except (ImportError, Exception):
+        pass
+
+    try:
+        import accelerate
+        packages["accelerate"]["installed"] = True
+        packages["accelerate"]["version"] = str(getattr(accelerate, "__version__", "unknown"))
     except (ImportError, Exception):
         pass
 
@@ -481,6 +489,7 @@ def run_preflight(
     cuda_req = gen_config.device.startswith("cuda")
     cuda_avail = env_info["packages"]["torch"]["cuda_available"]
     bnb_installed = env_info["packages"].get("bitsandbytes", {}).get("installed", False)
+    accel_installed = env_info["packages"].get("accelerate", {}).get("installed", False)
     load_in_4bit = getattr(gen_config, "load_in_4bit", False)
 
     if load_in_4bit:
@@ -502,17 +511,27 @@ def run_preflight(
                 details={"load_in_4bit": True, "bitsandbytes_installed": False},
             )
             blockers.append(g9.message)
+        elif not accel_installed:
+            g9 = PreflightGateResult(
+                gate_name="9_device_dtype_compat",
+                passed=False,
+                status="BLOCKED",
+                message="4-bit quantization with device_map='auto' requires accelerate. Install via 'uv add --optional vlm accelerate'.",
+                details={"load_in_4bit": True, "accelerate_installed": False},
+            )
+            blockers.append(g9.message)
         else:
             g9 = PreflightGateResult(
                 gate_name="9_device_dtype_compat",
                 passed=True,
                 status="OK",
-                message="4-bit NF4 bitsandbytes quantization configuration verified for CUDA runtime.",
+                message="4-bit NF4 bitsandbytes quantization and accelerate configuration verified for CUDA runtime.",
                 details={
                     "load_in_4bit": True,
                     "quantization_type": getattr(gen_config, "quantization_type", "nf4"),
                     "compute_dtype": getattr(gen_config, "compute_dtype", "float16"),
                     "device_map": getattr(gen_config, "device_map", "auto"),
+                    "accelerate_installed": True,
                 },
             )
         gates.append(g9)

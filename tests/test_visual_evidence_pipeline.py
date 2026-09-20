@@ -7,6 +7,8 @@ import json
 import pytest
 import tempfile
 import math
+from unittest.mock import patch
+import torch
 
 from src.data.schemas import (
     DatasetManifest,
@@ -386,5 +388,79 @@ def test_pipeline_provenance_and_source_propagation(tmp_path):
     records_2, _ = pipe.run(manifest)
     assert len(records_2) == 1
     assert records_2[0].vlm_generation_source == "cache"
+
+
+def test_independent_device_configuration_argparse():
+    """Verify that --device (VLM) and --evidence-device can be configured independently."""
+    from experiments.run_full_evidence_pipeline import parse_args
+
+    # 1. Defaults: --evidence-device defaults to 'cpu', --device follows torch.cuda.is_available()
+    with patch("sys.argv", ["run_full_evidence_pipeline.py"]):
+        args = parse_args()
+        assert args.evidence_device == "cpu"
+        expected_vlm_device = "cuda:0" if torch.cuda.is_available() else "cpu"
+        assert args.device == expected_vlm_device
+
+    # 2. Independent configuration: VLM on cuda:0, evidence on cpu
+    with patch("sys.argv", ["run_full_evidence_pipeline.py", "--device", "cuda:0", "--evidence-device", "cpu"]):
+        args = parse_args()
+        assert args.device == "cuda:0"
+        assert args.evidence_device == "cpu"
+
+    # 3. Independent configuration: VLM on cuda:1, evidence on cuda:0
+    with patch("sys.argv", ["run_full_evidence_pipeline.py", "--device", "cuda:1", "--evidence-device", "cuda:0"]):
+        args = parse_args()
+        assert args.device == "cuda:1"
+        assert args.evidence_device == "cuda:0"
+
+
+def test_evidence_providers_and_claim_records_device_provenance(tmp_path):
+    """
+    Verify HuggingFaceDetectorProvider and TransformersCLIPProvider preserve
+    independent device assignments in their configuration/provenance payloads,
+    and that ClaimLevelEvidenceRecord records them faithfully.
+    """
+    # 1. Detector device provenance
+    det_cpu = HuggingFaceDetectorProvider(model_name="google/owlvit-base-patch32", model_revision="test_rev", device="cpu")
+    assert det_cpu.device == "cpu"
+    res_det_cpu = det_cpu.detect_category(tmp_path / "nonexistent.jpg", "dog")
+    assert res_det_cpu.configuration["device"] == "cpu"
+
+    det_cuda = HuggingFaceDetectorProvider(model_name="google/owlvit-base-patch32", model_revision="test_rev", device="cuda:0")
+    assert det_cuda.device == "cuda:0"
+    res_det_cuda = det_cuda.detect_category(tmp_path / "nonexistent.jpg", "dog")
+    assert res_det_cuda.configuration["device"] == "cuda:0"
+
+    # 2. CLIP device provenance
+    clip_cpu = TransformersCLIPProvider(model_name="openai/clip-vit-base-patch32", model_revision="test_rev", device="cpu")
+    assert clip_cpu.device == "cpu"
+    res_clip_cpu = clip_cpu.compute_similarity(tmp_path / "nonexistent.jpg", "dog")
+    assert res_clip_cpu.preprocessing_configuration["device"] == "cpu"
+
+    clip_cuda = TransformersCLIPProvider(model_name="openai/clip-vit-base-patch32", model_revision="test_rev", device="cuda:0")
+    assert clip_cuda.device == "cuda:0"
+    res_clip_cuda = clip_cuda.compute_similarity(tmp_path / "nonexistent.jpg", "dog")
+    assert res_clip_cuda.preprocessing_configuration["device"] == "cuda:0"
+
+    # 3. ClaimLevelEvidenceRecord captures independent device provenance
+    rec = ClaimLevelEvidenceRecord(
+        claim_id="claim_test_dev",
+        image_id="coco_test_01",
+        object_category="dog",
+        detector_score=0.75,
+        detector_available=True,
+        detector_model="google/owlvit-base-patch32",
+        detector_configuration={"device": "cpu", "prompt_template": "a photo of a {category}"},
+        clip_score=0.45,
+        similarity_available=True,
+        clip_model="openai/clip-vit-base-patch32",
+        preprocessing_configuration={"device": "cpu", "normalization": "l2"},
+        metadata={"vlm_device": "cuda:0", "vlm_provider_kind": "llava_15_hf"},
+    )
+    rec.validate()
+    d = rec.to_dict()
+    assert d["detector_configuration"]["device"] == "cpu"
+    assert d["preprocessing_configuration"]["device"] == "cpu"
+    assert d["metadata"]["vlm_device"] == "cuda:0"
 
 

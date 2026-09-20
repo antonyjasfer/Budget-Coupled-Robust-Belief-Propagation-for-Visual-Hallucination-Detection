@@ -213,12 +213,13 @@ On GPUs with $\le 16\text{ GB}$ VRAM (e.g., Google Colab Tesla T4), loading the 
 
 #### Exact Colab Command for T4 4-Bit Run:
 ```bash
-python experiments/run_full_evidence_pipeline.py --load-in-4bit --dtype float16 --allow-download
+python experiments/run_full_evidence_pipeline.py --device cuda:0 --load-in-4bit --dtype float16 --evidence-device cpu --allow-download
 ```
+*(Note: `--evidence-device cpu` is the default, ensuring that the 15 GB Tesla T4 VRAM is strictly dedicated to LLaVA-1.5, while detector and CLIP evidence models run safely on host CPU without VRAM contention).*
 
 #### Standard FP16 Run (For GPUs with $\ge 24\text{ GB}$ VRAM):
 ```bash
-python experiments/run_full_evidence_pipeline.py --device cuda:0 --dtype float16 --allow-download
+python experiments/run_full_evidence_pipeline.py --device cuda:0 --dtype float16 --evidence-device cuda:0 --allow-download
 ```
 
 ### Reproducibility & Provenance Tracking

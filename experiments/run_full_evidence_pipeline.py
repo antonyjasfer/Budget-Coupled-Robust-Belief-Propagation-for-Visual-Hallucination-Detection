@@ -102,7 +102,8 @@ def parse_args():
     default_device = "cuda:0" if torch.cuda.is_available() else "cpu"
     default_dtype = "float16" if torch.cuda.is_available() else "float32"
 
-    parser.add_argument("--device", type=str, default=default_device, help="Compute device (e.g. cuda:0 or cpu)")
+    parser.add_argument("--device", type=str, default=default_device, help="Compute device for VLM (e.g. cuda:0 or cpu)")
+    parser.add_argument("--evidence-device", type=str, default="cpu", help="Compute device for detector and CLIP evidence models (default: cpu)")
     parser.add_argument("--dtype", type=str, default=default_dtype, help="Model dtype (e.g. float16, float32, bfloat16)")
     parser.add_argument("--model-name", type=str, default="llava-hf/llava-1.5-7b-hf", help="LLaVA HuggingFace model ID")
     parser.add_argument("--detector-model", type=str, default="google/owlvit-base-patch32", help="Detector model ID")
@@ -123,7 +124,8 @@ def run_pipeline_demonstration():
     print("MILESTONE 6: REAL VISUAL EVIDENCE PIPELINE (ACTUAL LLaVA-1.5 INFERENCE)")
     print("=" * 80)
     print(f"  Configuration:")
-    print(f"    Target Device    : {args.device}")
+    print(f"    VLM Device       : {args.device}")
+    print(f"    Evidence Device  : {args.evidence_device}")
     print(f"    Target Dtype     : {args.dtype}")
     print(f"    4-bit Quantized  : {args.load_in_4bit} (device_map={device_map})")
     print(f"    CUDA Available   : {torch.cuda.is_available()}")
@@ -194,17 +196,17 @@ def run_pipeline_demonstration():
 
     # 4. Initialize Real Detector and Real CLIP Providers
     print("\n3. Initializing Real Neural Evidence Extractors...")
-    print(f"   - Object Detector: {args.detector_model} (open-vocabulary zero-shot)")
+    print(f"   - Object Detector: {args.detector_model} (open-vocabulary zero-shot on {args.evidence_device})")
     detector_provider = HuggingFaceDetectorProvider(
         model_name=args.detector_model,
-        device=args.device,
+        device=args.evidence_device,
     )
     print(f"     Detector revision: {detector_provider.resolve_revision()}")
 
-    print(f"   - Image-Text Similarity: {args.clip_model} (cosine similarity)")
+    print(f"   - Image-Text Similarity: {args.clip_model} (cosine similarity on {args.evidence_device})")
     clip_provider = TransformersCLIPProvider(
         model_name=args.clip_model,
-        device=args.device,
+        device=args.evidence_device,
     )
     print(f"     CLIP revision: {clip_provider.resolve_revision()}")
 

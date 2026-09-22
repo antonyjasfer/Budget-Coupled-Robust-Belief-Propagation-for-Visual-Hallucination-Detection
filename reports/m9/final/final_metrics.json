@@ -1,0 +1,80 @@
+{
+  "evidence_point": {
+    "total_claims": 375,
+    "evaluated_claims": 0,
+    "supported_gt_count": 0,
+    "hallucinated_gt_count": 0,
+    "unknown_gt_count": 0,
+    "unannotated_gt_count": 375,
+    "abstained_count": 0,
+    "coverage_rate": 0.0,
+    "accuracy": null,
+    "precision": null,
+    "recall": null,
+    "f1": null,
+    "roc_auc": null,
+    "pr_auc": null,
+    "confusion_matrix": {
+      "tp": 0,
+      "tn": 0,
+      "fp": 0,
+      "fn": 0
+    },
+    "decision_threshold": 0.5,
+    "method_name": "evidence_point",
+    "condition": "main_evaluation",
+    "diagnostics": {}
+  },
+  "standard_bp": {
+    "total_claims": 375,
+    "evaluated_claims": 0,
+    "supported_gt_count": 0,
+    "hallucinated_gt_count": 0,
+    "unknown_gt_count": 0,
+    "unannotated_gt_count": 375,
+    "abstained_count": 0,
+    "coverage_rate": 0.0,
+    "accuracy": null,
+    "precision": null,
+    "recall": null,
+    "f1": null,
+    "roc_auc": null,
+    "pr_auc": null,
+    "confusion_matrix": {
+      "tp": 0,
+      "tn": 0,
+      "fp": 0,
+      "fn": 0
+    },
+    "decision_threshold": 0.5,
+    "method_name": "standard_bp",
+    "condition": "main_evaluation",
+    "diagnostics": {}
+  },
+  "robust_bp": {
+    "total_claims": 375,
+    "evaluated_claims": 0,
+    "supported_gt_count": 0,
+    "hallucinated_gt_count": 0,
+    "unknown_gt_count": 0,
+    "unannotated_gt_count": 375,
+    "abstained_count": 0,
+    "coverage_rate": 0.0,
+    "accuracy": null,
+    "precision": null,
+    "recall": null,
+    "f1": null,
+    "roc_auc": null,
+    "pr_auc": null,
+    "confusion_matrix": {
+      "tp": 0,
+      "tn": 0,
+      "fp": 0,
+      "fn": 0
+    },
+    "decision_threshold": 0.5,
+    "method_name": "robust_bp",
+    "condition": "main_evaluation",
+    "diagnostics": {}
+  }
+}

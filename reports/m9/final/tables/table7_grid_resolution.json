@@ -1,0 +1,42 @@
+[
+  {
+    "Grid Steps (K)": "10",
+    "Claims": 15,
+    "Mean Width": "0.275",
+    "Median Width": "0.291",
+    "Std Width": "0.182",
+    "Mean Runtime per Claim (ms)": "2.89"
+  },
+  {
+    "Grid Steps (K)": "25",
+    "Claims": 15,
+    "Mean Width": "0.275",
+    "Median Width": "0.291",
+    "Std Width": "0.182",
+    "Mean Runtime per Claim (ms)": "4.52"
+  },
+  {
+    "Grid Steps (K)": "50",
+    "Claims": 15,
+    "Mean Width": "0.275",
+    "Median Width": "0.291",
+    "Std Width": "0.182",
+    "Mean Runtime per Claim (ms)": "8.12"
+  },
+  {
+    "Grid Steps (K)": "100",
+    "Claims": 315,
+    "Mean Width": "0.204",
+    "Median Width": "0.173",
+    "Std Width": "0.188",
+    "Mean Runtime per Claim (ms)": "11.23"
+  },
+  {
+    "Grid Steps (K)": "200",
+    "Claims": 15,
+    "Mean Width": "0.275",
+    "Median Width": "0.291",
+    "Std Width": "0.182",
+    "Mean Runtime per Claim (ms)": "25.07"
+  }
+]

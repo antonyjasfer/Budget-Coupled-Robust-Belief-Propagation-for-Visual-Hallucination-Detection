@@ -1,0 +1,26 @@
+[
+  {
+    "Parameter": "Total Images Evaluated",
+    "Value": "10"
+  },
+  {
+    "Parameter": "Total Claims Evaluated",
+    "Value": "30"
+  },
+  {
+    "Parameter": "Robust Grid Resolution K",
+    "Value": "100"
+  },
+  {
+    "Parameter": "Mean Runtime per Claim (ms)",
+    "Value": "21.32 ms"
+  },
+  {
+    "Parameter": "Mean Runtime per Image (ms)",
+    "Value": "63.95 ms"
+  },
+  {
+    "Parameter": "Total Inference Time (s)",
+    "Value": "0.639 s"
+  }
+]

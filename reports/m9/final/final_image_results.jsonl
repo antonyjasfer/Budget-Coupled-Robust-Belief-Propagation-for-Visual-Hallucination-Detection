@@ -1,0 +1,10 @@
+{"image_id": "coco_000000000009", "num_claims": 100, "standard_bp_acc": null, "robust_bp_acc": null, "mean_interval_width": 0.040773203217056284}
+{"image_id": "coco_000000000025", "num_claims": 25, "standard_bp_acc": null, "robust_bp_acc": null, "mean_interval_width": 0.2509417370010631}
+{"image_id": "coco_000000000030", "num_claims": 25, "standard_bp_acc": null, "robust_bp_acc": null, "mean_interval_width": 0.37755412065345856}
+{"image_id": "coco_000000000034", "num_claims": 25, "standard_bp_acc": null, "robust_bp_acc": null, "mean_interval_width": 0.13079568931091787}
+{"image_id": "coco_000000000036", "num_claims": 50, "standard_bp_acc": null, "robust_bp_acc": null, "mean_interval_width": 0.30813860870919174}
+{"image_id": "coco_000000000042", "num_claims": 25, "standard_bp_acc": null, "robust_bp_acc": null, "mean_interval_width": 0.3795919221289208}
+{"image_id": "coco_000000000049", "num_claims": 50, "standard_bp_acc": null, "robust_bp_acc": null, "mean_interval_width": 0.1580711695995346}
+{"image_id": "coco_000000000061", "num_claims": 25, "standard_bp_acc": null, "robust_bp_acc": null, "mean_interval_width": 0.3712396123740371}
+{"image_id": "coco_000000000064", "num_claims": 25, "standard_bp_acc": null, "robust_bp_acc": null, "mean_interval_width": 0.3817885257444108}
+{"image_id": "coco_000000000071", "num_claims": 25, "standard_bp_acc": null, "robust_bp_acc": null, "mean_interval_width": 0.2472304718922368}

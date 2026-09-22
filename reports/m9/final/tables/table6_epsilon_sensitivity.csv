@@ -1,0 +1,6 @@
+Epsilon Scale (alpha),Claims,Mean Width,F1 (Selective),ROC-AUC,Evidence-Sensitive Rate,Mean Runtime (ms)
+0.00,15,0.003,N/A,N/A,0.0%,7.01
+0.50,15,0.153,N/A,N/A,33.3%,17.38
+1.00,315,0.223,N/A,N/A,28.9%,10.64
+1.50,15,0.275,N/A,N/A,33.3%,15.46
+2.00,15,0.275,N/A,N/A,33.3%,13.08

@@ -1,0 +1,11 @@
+[
+  {
+    "Corruption Type": "none",
+    "Severity": "clean",
+    "Claims": 375,
+    "Std BP Accuracy": "N/A",
+    "Rob BP (Selective) Acc": "N/A",
+    "Mean Interval Width": "0.216",
+    "Evidence-Sensitive Rate": "28.3%"
+  }
+]

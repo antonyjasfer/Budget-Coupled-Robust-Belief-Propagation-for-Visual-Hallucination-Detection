@@ -1,0 +1,42 @@
+[
+  {
+    "Split": "CALIBRATION",
+    "Images": 2,
+    "Claims": 4,
+    "Supported (GT)": 0,
+    "Hallucinated (GT)": 0,
+    "Unknown (GT)": 4
+  },
+  {
+    "Split": "TEST",
+    "Images": 1,
+    "Claims": 2,
+    "Supported (GT)": 0,
+    "Hallucinated (GT)": 0,
+    "Unknown (GT)": 2
+  },
+  {
+    "Split": "TRAIN",
+    "Images": 5,
+    "Claims": 18,
+    "Supported (GT)": 0,
+    "Hallucinated (GT)": 0,
+    "Unknown (GT)": 18
+  },
+  {
+    "Split": "VALIDATION",
+    "Images": 2,
+    "Claims": 6,
+    "Supported (GT)": 0,
+    "Hallucinated (GT)": 0,
+    "Unknown (GT)": 6
+  },
+  {
+    "Split": "TOTAL",
+    "Images": 10,
+    "Claims": 30,
+    "Supported (GT)": 0,
+    "Hallucinated (GT)": 0,
+    "Unknown (GT)": 30
+  }
+]

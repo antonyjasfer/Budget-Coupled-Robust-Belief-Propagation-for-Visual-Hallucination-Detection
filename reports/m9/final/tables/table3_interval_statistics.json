@@ -1,0 +1,66 @@
+[
+  {
+    "Statistic": "Total Evaluated Claims",
+    "Value": "30"
+  },
+  {
+    "Statistic": "Mean Interval Width",
+    "Value": "0.275"
+  },
+  {
+    "Statistic": "Median Interval Width",
+    "Value": "0.291"
+  },
+  {
+    "Statistic": "Std Dev Interval Width",
+    "Value": "0.182"
+  },
+  {
+    "Statistic": "Min Interval Width",
+    "Value": "0.007"
+  },
+  {
+    "Statistic": "Max Interval Width",
+    "Value": "0.500"
+  },
+  {
+    "Statistic": "25th Percentile Width",
+    "Value": "0.121"
+  },
+  {
+    "Statistic": "75th Percentile Width",
+    "Value": "0.492"
+  },
+  {
+    "Statistic": "90th Percentile Width",
+    "Value": "0.499"
+  },
+  {
+    "Statistic": "Mean Width (Supported GT)",
+    "Value": "N/A"
+  },
+  {
+    "Statistic": "Mean Width (Hallucinated GT)",
+    "Value": "N/A"
+  },
+  {
+    "Statistic": "Mean Width (BP Correct)",
+    "Value": "N/A"
+  },
+  {
+    "Statistic": "Mean Width (BP Wrong)",
+    "Value": "N/A"
+  },
+  {
+    "Statistic": "Evidence-Sensitive Rate",
+    "Value": "33.3%"
+  },
+  {
+    "Statistic": "Robustly Supported Fraction",
+    "Value": "13.3%"
+  },
+  {
+    "Statistic": "Robustly Hallucinated Fraction",
+    "Value": "53.3%"
+  }
+]

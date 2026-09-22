@@ -1,0 +1,40 @@
+{
+  "total_claims": 375,
+  "mean_width": 0.21564362990604816,
+  "median_width": 0.17685806218338107,
+  "std_width": 0.18880917886689386,
+  "min_width": 0.0,
+  "max_width": 0.5866738384070589,
+  "quantiles": {
+    "p25": 0.01686731308892453,
+    "p50": 0.17685806218338107,
+    "p75": 0.3638000624273841,
+    "p90": 0.4962150370538417
+  },
+  "mean_width_supported": null,
+  "mean_width_hallucinated": null,
+  "mean_width_unknown": null,
+  "mean_width_correct_bp": null,
+  "mean_width_wrong_bp": null,
+  "evidence_sensitive_fraction": 0.2826666666666667,
+  "robustly_supported_fraction": 0.17866666666666667,
+  "robustly_hallucinated_fraction": 0.5386666666666666,
+  "decision_threshold": 0.5,
+  "pearson_corr_width_error": null,
+  "pearson_p_value": null,
+  "spearman_corr_width_error": null,
+  "spearman_p_value": null,
+  "corr_width_evidence_conflict": -0.6245770652939935,
+  "binned_error_rates": {},
+  "sample_counts": {
+    "supported": 0,
+    "hallucinated": 0,
+    "unknown": 0,
+    "correct_bp": 0,
+    "wrong_bp": 0
+  },
+  "diagnostics": {
+    "annotated_eval_count": 0,
+    "is_smoke_sample": false
+  }
+}

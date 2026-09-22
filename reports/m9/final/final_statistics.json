@@ -1,0 +1,38 @@
+{
+  "paired_bootstrap": {},
+  "correlations": {
+    "width_vs_detector_clip_conflict": {
+      "signal_name": "width_vs_detector_clip_conflict",
+      "sample_size": 375,
+      "pearson_r": -0.6245770652939935,
+      "pearson_p": 5.883215616933647e-42,
+      "spearman_rho": -0.5437368647046572,
+      "spearman_p": 3.0922404912358017e-30,
+      "interpretation": "Tests whether visual-semantic evidence conflicts expand the robust perturbation envelope."
+    }
+  },
+  "error_categories": {
+    "ERR_03_EVIDENCE_CONFLICT": {
+      "category_name": "Evidence Conflict",
+      "count": 14,
+      "sample_claim_ids": [
+        "claim_resp_4a42737a947ef125_apple",
+        "claim_resp_4a42737a947ef125_banana",
+        "claim_resp_4a42737a947ef125_dining table",
+        "claim_resp_22bb468c4429202d_person",
+        "claim_resp_3abdad6658819b1c_horse"
+      ]
+    },
+    "ERR_05_WIDE_EVIDENCE_SENSITIVE": {
+      "category_name": "Wide Evidence-Sensitive",
+      "count": 10,
+      "sample_claim_ids": [
+        "claim_resp_e331640b648181fe_vase",
+        "claim_resp_22bb468c4429202d_umbrella",
+        "claim_resp_2b29b9232c32f7cd_dog",
+        "claim_resp_0f82a355fac57d00_elephant",
+        "claim_resp_52fdd0eff98e9aa0_clock"
+      ]
+    }
+  }
+}

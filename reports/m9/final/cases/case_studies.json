@@ -1,0 +1,18 @@
+[
+  {
+    "category_id": "CASE_C",
+    "category_name": "Evidence-Sensitive Threshold Crossing Claim",
+    "claim_id": "claim_resp_22bb468c4429202d_umbrella",
+    "image_id": "coco_000000000036",
+    "object_category": "umbrella",
+    "ground_truth": null,
+    "standard_posterior": 0.48567717802057286,
+    "standard_prediction": "supported",
+    "robust_lower": 0.23940956838217703,
+    "robust_upper": 0.7391017903994261,
+    "interval_width": 0.4996922220172491,
+    "robust_prediction": "abstain",
+    "is_evidence_sensitive": true,
+    "explanation": "Interval [0.239, 0.739] straddles threshold tau=0.50, demonstrating sensitivity to evidence perturbations."
+  }
+]

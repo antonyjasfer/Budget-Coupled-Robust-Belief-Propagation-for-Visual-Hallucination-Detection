@@ -1,0 +1,9 @@
+### Table 10: Risk-Coverage and Evidence-Sensitive Abstention Trade-Off
+
+| Threshold (tau) | Evaluated Claims | Evidence-Sensitive Count | Abstention Rate | Full Standard BP Acc | Selective Acc (Non-Abstaining) | Selective Accuracy Gain |
+| --- | --- | --- | --- | --- | --- | --- |
+| 0.30 | 30 | 12 | 40.0% | N/A | N/A | +0.0% |
+| 0.40 | 30 | 10 | 33.3% | N/A | N/A | +0.0% |
+| 0.50 | 30 | 10 | 33.3% | N/A | N/A | +0.0% |
+| 0.60 | 30 | 10 | 33.3% | N/A | N/A | +0.0% |
+| 0.70 | 30 | 10 | 33.3% | N/A | N/A | +0.0% |

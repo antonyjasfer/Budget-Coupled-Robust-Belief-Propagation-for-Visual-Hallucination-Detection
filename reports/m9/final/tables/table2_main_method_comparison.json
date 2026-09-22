@@ -1,0 +1,42 @@
+[
+  {
+    "Method": "Evidence Point Baseline",
+    "Accuracy": "N/A",
+    "Precision": "N/A",
+    "Recall": "N/A",
+    "F1 Score": "N/A",
+    "ROC-AUC": "N/A",
+    "Coverage": "0.0%",
+    "Abstentions": 0
+  },
+  {
+    "Method": "Standard BP (Point Posterior)",
+    "Accuracy": "N/A",
+    "Precision": "N/A",
+    "Recall": "N/A",
+    "F1 Score": "N/A",
+    "ROC-AUC": "N/A",
+    "Coverage": "0.0%",
+    "Abstentions": 0
+  },
+  {
+    "Method": "Robust BP (Full / Midpoint)",
+    "Accuracy": "N/A",
+    "Precision": "N/A",
+    "Recall": "N/A",
+    "F1 Score": "N/A",
+    "ROC-AUC": "N/A",
+    "Coverage": "0.0%",
+    "Abstentions": 0
+  },
+  {
+    "Method": "Robust BP (Selective / Non-Abstained)",
+    "Accuracy": "N/A",
+    "Precision": "N/A",
+    "Recall": "N/A",
+    "F1 Score": "N/A",
+    "ROC-AUC": "N/A",
+    "Coverage": "0.0%",
+    "Abstentions": 0
+  }
+]

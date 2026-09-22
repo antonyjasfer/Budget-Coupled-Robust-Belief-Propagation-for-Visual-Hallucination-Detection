@@ -1,0 +1,9 @@
+### Table 7: Discrete-Budget Grid Approximation Analysis ($K$ steps)
+
+| Grid Steps (K) | Claims | Mean Width | Median Width | Std Width | Mean Runtime per Claim (ms) |
+| --- | --- | --- | --- | --- | --- |
+| 10 | 15 | 0.275 | 0.291 | 0.182 | 2.89 |
+| 25 | 15 | 0.275 | 0.291 | 0.182 | 4.52 |
+| 50 | 15 | 0.275 | 0.291 | 0.182 | 8.12 |
+| 100 | 315 | 0.204 | 0.173 | 0.188 | 11.23 |
+| 200 | 15 | 0.275 | 0.291 | 0.182 | 25.07 |

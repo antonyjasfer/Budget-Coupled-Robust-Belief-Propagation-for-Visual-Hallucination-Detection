@@ -1,0 +1,10 @@
+### Table 9: Computational Runtime and Resource Analysis
+
+| Parameter | Value |
+| --- | --- |
+| Total Images Evaluated | 10 |
+| Total Claims Evaluated | 30 |
+| Robust Grid Resolution K | 100 |
+| Mean Runtime per Claim (ms) | 21.32 ms |
+| Mean Runtime per Image (ms) | 63.95 ms |
+| Total Inference Time (s) | 0.639 s |

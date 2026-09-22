@@ -1,0 +1,47 @@
+[
+  {
+    "Epsilon Scale (alpha)": "0.00",
+    "Claims": 15,
+    "Mean Width": "0.003",
+    "F1 (Selective)": "N/A",
+    "ROC-AUC": "N/A",
+    "Evidence-Sensitive Rate": "0.0%",
+    "Mean Runtime (ms)": "7.01"
+  },
+  {
+    "Epsilon Scale (alpha)": "0.50",
+    "Claims": 15,
+    "Mean Width": "0.153",
+    "F1 (Selective)": "N/A",
+    "ROC-AUC": "N/A",
+    "Evidence-Sensitive Rate": "33.3%",
+    "Mean Runtime (ms)": "17.38"
+  },
+  {
+    "Epsilon Scale (alpha)": "1.00",
+    "Claims": 315,
+    "Mean Width": "0.223",
+    "F1 (Selective)": "N/A",
+    "ROC-AUC": "N/A",
+    "Evidence-Sensitive Rate": "28.9%",
+    "Mean Runtime (ms)": "10.64"
+  },
+  {
+    "Epsilon Scale (alpha)": "1.50",
+    "Claims": 15,
+    "Mean Width": "0.275",
+    "F1 (Selective)": "N/A",
+    "ROC-AUC": "N/A",
+    "Evidence-Sensitive Rate": "33.3%",
+    "Mean Runtime (ms)": "15.46"
+  },
+  {
+    "Epsilon Scale (alpha)": "2.00",
+    "Claims": 15,
+    "Mean Width": "0.275",
+    "F1 (Selective)": "N/A",
+    "ROC-AUC": "N/A",
+    "Evidence-Sensitive Rate": "33.3%",
+    "Mean Runtime (ms)": "13.08"
+  }
+]

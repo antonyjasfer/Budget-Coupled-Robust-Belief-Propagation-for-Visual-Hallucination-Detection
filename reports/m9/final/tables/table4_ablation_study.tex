@@ -1,0 +1,37 @@
+% Table 4: Ablation Analysis (Coupling, Budget, Uncertainty Constraints)
+\begin{table}[htbp]
+\centering
+\caption{Table 4: Ablation Analysis (Coupling, Budget, Uncertainty Constraints)}
+\label{tab:table4_ablation_study}
+\begin{tabular}{lcccccc}
+\hline
+Condition & Claims & Accuracy & F1 Score & ROC-AUC & Mean Width & Evidence-Sensitive Rate \\
+\hline
+ablation\_independent\_box & 15 & N/A & N/A & N/A & 0.302 & 33.3\% \\
+ablation\_j0 & 15 & N/A & N/A & N/A & 0.312 & 40.0\% \\
+baseline & 15 & N/A & N/A & N/A & 0.000 & 0.0\% \\
+budget\_sweep\_b\_0.00 & 15 & N/A & N/A & N/A & 0.000 & 0.0\% \\
+budget\_sweep\_b\_0.25 & 15 & N/A & N/A & N/A & 0.071 & 26.7\% \\
+budget\_sweep\_b\_0.50 & 15 & N/A & N/A & N/A & 0.141 & 33.3\% \\
+budget\_sweep\_b\_0.75 & 15 & N/A & N/A & N/A & 0.209 & 33.3\% \\
+budget\_sweep\_b\_1.00 & 15 & N/A & N/A & N/A & 0.275 & 33.3\% \\
+budget\_sweep\_b\_1.50 & 15 & N/A & N/A & N/A & 0.285 & 33.3\% \\
+budget\_sweep\_b\_2.00 & 15 & N/A & N/A & N/A & 0.301 & 33.3\% \\
+epsilon\_sweep\_alpha\_0.00 & 15 & N/A & N/A & N/A & 0.003 & 0.0\% \\
+epsilon\_sweep\_alpha\_0.50 & 15 & N/A & N/A & N/A & 0.153 & 33.3\% \\
+epsilon\_sweep\_alpha\_1.00 & 15 & N/A & N/A & N/A & 0.275 & 33.3\% \\
+epsilon\_sweep\_alpha\_1.50 & 15 & N/A & N/A & N/A & 0.275 & 33.3\% \\
+epsilon\_sweep\_alpha\_2.00 & 15 & N/A & N/A & N/A & 0.275 & 33.3\% \\
+grid\_sweep\_k\_10 & 15 & N/A & N/A & N/A & 0.275 & 33.3\% \\
+grid\_sweep\_k\_100 & 15 & N/A & N/A & N/A & 0.275 & 33.3\% \\
+grid\_sweep\_k\_200 & 15 & N/A & N/A & N/A & 0.275 & 33.3\% \\
+grid\_sweep\_k\_25 & 15 & N/A & N/A & N/A & 0.275 & 33.3\% \\
+grid\_sweep\_k\_50 & 15 & N/A & N/A & N/A & 0.275 & 33.3\% \\
+main\_evaluation & 15 & N/A & N/A & N/A & 0.275 & 33.3\% \\
+robust\_bp\_b0 & 15 & N/A & N/A & N/A & 0.000 & 0.0\% \\
+robust\_bp\_no\_coupling & 15 & N/A & N/A & N/A & 0.312 & 40.0\% \\
+robust\_bp\_proposed & 15 & N/A & N/A & N/A & 0.275 & 33.3\% \\
+standard\_bp & 15 & N/A & N/A & N/A & 0.275 & 33.3\% \\
+\hline
+\end{tabular}
+\end{table}

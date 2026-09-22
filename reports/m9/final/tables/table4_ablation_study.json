@@ -1,0 +1,227 @@
+[
+  {
+    "Condition": "ablation_independent_box",
+    "Claims": 15,
+    "Accuracy": "N/A",
+    "F1 Score": "N/A",
+    "ROC-AUC": "N/A",
+    "Mean Width": "0.302",
+    "Evidence-Sensitive Rate": "33.3%"
+  },
+  {
+    "Condition": "ablation_j0",
+    "Claims": 15,
+    "Accuracy": "N/A",
+    "F1 Score": "N/A",
+    "ROC-AUC": "N/A",
+    "Mean Width": "0.312",
+    "Evidence-Sensitive Rate": "40.0%"
+  },
+  {
+    "Condition": "baseline",
+    "Claims": 15,
+    "Accuracy": "N/A",
+    "F1 Score": "N/A",
+    "ROC-AUC": "N/A",
+    "Mean Width": "0.000",
+    "Evidence-Sensitive Rate": "0.0%"
+  },
+  {
+    "Condition": "budget_sweep_b_0.00",
+    "Claims": 15,
+    "Accuracy": "N/A",
+    "F1 Score": "N/A",
+    "ROC-AUC": "N/A",
+    "Mean Width": "0.000",
+    "Evidence-Sensitive Rate": "0.0%"
+  },
+  {
+    "Condition": "budget_sweep_b_0.25",
+    "Claims": 15,
+    "Accuracy": "N/A",
+    "F1 Score": "N/A",
+    "ROC-AUC": "N/A",
+    "Mean Width": "0.071",
+    "Evidence-Sensitive Rate": "26.7%"
+  },
+  {
+    "Condition": "budget_sweep_b_0.50",
+    "Claims": 15,
+    "Accuracy": "N/A",
+    "F1 Score": "N/A",
+    "ROC-AUC": "N/A",
+    "Mean Width": "0.141",
+    "Evidence-Sensitive Rate": "33.3%"
+  },
+  {
+    "Condition": "budget_sweep_b_0.75",
+    "Claims": 15,
+    "Accuracy": "N/A",
+    "F1 Score": "N/A",
+    "ROC-AUC": "N/A",
+    "Mean Width": "0.209",
+    "Evidence-Sensitive Rate": "33.3%"
+  },
+  {
+    "Condition": "budget_sweep_b_1.00",
+    "Claims": 15,
+    "Accuracy": "N/A",
+    "F1 Score": "N/A",
+    "ROC-AUC": "N/A",
+    "Mean Width": "0.275",
+    "Evidence-Sensitive Rate": "33.3%"
+  },
+  {
+    "Condition": "budget_sweep_b_1.50",
+    "Claims": 15,
+    "Accuracy": "N/A",
+    "F1 Score": "N/A",
+    "ROC-AUC": "N/A",
+    "Mean Width": "0.285",
+    "Evidence-Sensitive Rate": "33.3%"
+  },
+  {
+    "Condition": "budget_sweep_b_2.00",
+    "Claims": 15,
+    "Accuracy": "N/A",
+    "F1 Score": "N/A",
+    "ROC-AUC": "N/A",
+    "Mean Width": "0.301",
+    "Evidence-Sensitive Rate": "33.3%"
+  },
+  {
+    "Condition": "epsilon_sweep_alpha_0.00",
+    "Claims": 15,
+    "Accuracy": "N/A",
+    "F1 Score": "N/A",
+    "ROC-AUC": "N/A",
+    "Mean Width": "0.003",
+    "Evidence-Sensitive Rate": "0.0%"
+  },
+  {
+    "Condition": "epsilon_sweep_alpha_0.50",
+    "Claims": 15,
+    "Accuracy": "N/A",
+    "F1 Score": "N/A",
+    "ROC-AUC": "N/A",
+    "Mean Width": "0.153",
+    "Evidence-Sensitive Rate": "33.3%"
+  },
+  {
+    "Condition": "epsilon_sweep_alpha_1.00",
+    "Claims": 15,
+    "Accuracy": "N/A",
+    "F1 Score": "N/A",
+    "ROC-AUC": "N/A",
+    "Mean Width": "0.275",
+    "Evidence-Sensitive Rate": "33.3%"
+  },
+  {
+    "Condition": "epsilon_sweep_alpha_1.50",
+    "Claims": 15,
+    "Accuracy": "N/A",
+    "F1 Score": "N/A",
+    "ROC-AUC": "N/A",
+    "Mean Width": "0.275",
+    "Evidence-Sensitive Rate": "33.3%"
+  },
+  {
+    "Condition": "epsilon_sweep_alpha_2.00",
+    "Claims": 15,
+    "Accuracy": "N/A",
+    "F1 Score": "N/A",
+    "ROC-AUC": "N/A",
+    "Mean Width": "0.275",
+    "Evidence-Sensitive Rate": "33.3%"
+  },
+  {
+    "Condition": "grid_sweep_k_10",
+    "Claims": 15,
+    "Accuracy": "N/A",
+    "F1 Score": "N/A",
+    "ROC-AUC": "N/A",
+    "Mean Width": "0.275",
+    "Evidence-Sensitive Rate": "33.3%"
+  },
+  {
+    "Condition": "grid_sweep_k_100",
+    "Claims": 15,
+    "Accuracy": "N/A",
+    "F1 Score": "N/A",
+    "ROC-AUC": "N/A",
+    "Mean Width": "0.275",
+    "Evidence-Sensitive Rate": "33.3%"
+  },
+  {
+    "Condition": "grid_sweep_k_200",
+    "Claims": 15,
+    "Accuracy": "N/A",
+    "F1 Score": "N/A",
+    "ROC-AUC": "N/A",
+    "Mean Width": "0.275",
+    "Evidence-Sensitive Rate": "33.3%"
+  },
+  {
+    "Condition": "grid_sweep_k_25",
+    "Claims": 15,
+    "Accuracy": "N/A",
+    "F1 Score": "N/A",
+    "ROC-AUC": "N/A",
+    "Mean Width": "0.275",
+    "Evidence-Sensitive Rate": "33.3%"
+  },
+  {
+    "Condition": "grid_sweep_k_50",
+    "Claims": 15,
+    "Accuracy": "N/A",
+    "F1 Score": "N/A",
+    "ROC-AUC": "N/A",
+    "Mean Width": "0.275",
+    "Evidence-Sensitive Rate": "33.3%"
+  },
+  {
+    "Condition": "main_evaluation",
+    "Claims": 15,
+    "Accuracy": "N/A",
+    "F1 Score": "N/A",
+    "ROC-AUC": "N/A",
+    "Mean Width": "0.275",
+    "Evidence-Sensitive Rate": "33.3%"
+  },
+  {
+    "Condition": "robust_bp_b0",
+    "Claims": 15,
+    "Accuracy": "N/A",
+    "F1 Score": "N/A",
+    "ROC-AUC": "N/A",
+    "Mean Width": "0.000",
+    "Evidence-Sensitive Rate": "0.0%"
+  },
+  {
+    "Condition": "robust_bp_no_coupling",
+    "Claims": 15,
+    "Accuracy": "N/A",
+    "F1 Score": "N/A",
+    "ROC-AUC": "N/A",
+    "Mean Width": "0.312",
+    "Evidence-Sensitive Rate": "40.0%"
+  },
+  {
+    "Condition": "robust_bp_proposed",
+    "Claims": 15,
+    "Accuracy": "N/A",
+    "F1 Score": "N/A",
+    "ROC-AUC": "N/A",
+    "Mean Width": "0.275",
+    "Evidence-Sensitive Rate": "33.3%"
+  },
+  {
+    "Condition": "standard_bp",
+    "Claims": 15,
+    "Accuracy": "N/A",
+    "F1 Score": "N/A",
+    "ROC-AUC": "N/A",
+    "Mean Width": "0.275",
+    "Evidence-Sensitive Rate": "33.3%"
+  }
+]

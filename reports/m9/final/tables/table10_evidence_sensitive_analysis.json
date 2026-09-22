@@ -1,0 +1,47 @@
+[
+  {
+    "Threshold (tau)": "0.30",
+    "Evaluated Claims": 30,
+    "Evidence-Sensitive Count": 12,
+    "Abstention Rate": "40.0%",
+    "Full Standard BP Acc": "N/A",
+    "Selective Acc (Non-Abstaining)": "N/A",
+    "Selective Accuracy Gain": "+0.0%"
+  },
+  {
+    "Threshold (tau)": "0.40",
+    "Evaluated Claims": 30,
+    "Evidence-Sensitive Count": 10,
+    "Abstention Rate": "33.3%",
+    "Full Standard BP Acc": "N/A",
+    "Selective Acc (Non-Abstaining)": "N/A",
+    "Selective Accuracy Gain": "+0.0%"
+  },
+  {
+    "Threshold (tau)": "0.50",
+    "Evaluated Claims": 30,
+    "Evidence-Sensitive Count": 10,
+    "Abstention Rate": "33.3%",
+    "Full Standard BP Acc": "N/A",
+    "Selective Acc (Non-Abstaining)": "N/A",
+    "Selective Accuracy Gain": "+0.0%"
+  },
+  {
+    "Threshold (tau)": "0.60",
+    "Evaluated Claims": 30,
+    "Evidence-Sensitive Count": 10,
+    "Abstention Rate": "33.3%",
+    "Full Standard BP Acc": "N/A",
+    "Selective Acc (Non-Abstaining)": "N/A",
+    "Selective Accuracy Gain": "+0.0%"
+  },
+  {
+    "Threshold (tau)": "0.70",
+    "Evaluated Claims": 30,
+    "Evidence-Sensitive Count": 10,
+    "Abstention Rate": "33.3%",
+    "Full Standard BP Acc": "N/A",
+    "Selective Acc (Non-Abstaining)": "N/A",
+    "Selective Accuracy Gain": "+0.0%"
+  }
+]

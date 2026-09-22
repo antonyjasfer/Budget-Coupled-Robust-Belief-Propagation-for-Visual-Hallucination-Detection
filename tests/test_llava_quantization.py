@@ -229,6 +229,7 @@ def test_4bit_loading_path_configures_bitsandbytes():
     LLaVA15Provider._loaded_quantization = None
 
     with patch("torch.cuda.is_available", return_value=True), \
+         patch.dict("sys.modules", {"accelerate": MagicMock()}), \
          patch("transformers.AutoProcessor.from_pretrained", return_value=mock_processor) as mock_proc_load, \
          patch("transformers.LlavaForConditionalGeneration.from_pretrained", return_value=mock_model) as mock_model_load, \
          patch("transformers.BitsAndBytesConfig", mock_bnb_config_cls):

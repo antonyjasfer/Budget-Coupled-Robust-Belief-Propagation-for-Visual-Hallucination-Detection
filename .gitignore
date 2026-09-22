@@ -45,5 +45,7 @@ htmlcov/
 .DS_Store
 Thumbs.db
 
-# Data caches
+# Data caches and experiment outputs
 data/cache/
+reports/m8_smoke/
+reports/m8_dev/

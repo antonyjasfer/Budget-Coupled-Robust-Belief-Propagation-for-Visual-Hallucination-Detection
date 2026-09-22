@@ -1,0 +1,85 @@
+experiment_id: m8_smoke_synthetic_evaluation
+description: "Fast synthetic smoke experiment for CI and rapid verification"
+mode: smoke
+eval_splits:
+  - test
+  - train
+seed: 42
+
+manifest_path: data/manifests/m7_image_manifest.json
+claims_path: data/exports/m7_claims.jsonl
+ground_truth_path: data/exports/m7_ground_truth.jsonl
+evidence_path: data/exports/claim_level_evidence.jsonl
+image_base_dir: data/real_images
+dataset_lock_path: data/manifests/m7_dataset_lock.json
+
+resume: false
+force: false
+subset_size: 10
+
+pgm:
+  unary_detector_weight: 1.0
+  unary_clip_weight: 0.0
+  theta_clip_max: 5.0
+  base_coupling_j: 0.5493061443340549
+  base_epsilon: 0.5493061443340549
+  epsilon_scale: 1.0
+  uncertainty_discrepancy_weight: 0.0
+  min_epsilon: 0.01
+  budget_ratio: 1.0
+  fixed_budget: null
+  decision_threshold: 0.5
+  grid_steps: 20
+  lipschitz_const: 1.0
+  topology: chain
+
+ablations:
+  run_standard_bp: true
+  run_robust_bp: true
+  run_robust_b0: true
+  run_no_coupling: true
+  run_independent_box: true
+  run_evidence_point_baseline: true
+  run_budget_sweep: true
+  run_epsilon_sweep: true
+  run_grid_sweep: true
+  run_corruption_sweep: true
+  budget_sweep_multipliers:
+    - 0.0
+    - 0.5
+    - 1.0
+  epsilon_scale_values:
+    - 0.5
+    - 1.0
+  grid_step_values:
+    - 10
+    - 20
+
+corruption:
+  enabled: true
+  corruption_types:
+    - gaussian_blur
+    - jpeg_compression
+  severities:
+    - clean
+    - light
+
+bootstrap:
+  enabled: true
+  n_resamples: 50
+  confidence_level: 0.95
+  resampling_unit: image
+  seed: 42
+
+output:
+  output_dir: reports/m8_smoke
+  cache_dir: data/cache/m8_smoke
+  save_plots: true
+  save_tables: true
+  plot_formats:
+    - png
+  raw_results_filename: raw_claim_results.jsonl
+  raw_results_csv: raw_claim_results.csv
+  manifest_filename: experiment_manifest.json
+  summary_md_filename: summary.md
+  summary_json_filename: summary.json

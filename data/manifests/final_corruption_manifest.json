@@ -1,0 +1,4221 @@
+{
+  "schema_version": "1.0.0",
+  "total_corrupted_variants": 600,
+  "source_images_count": 30,
+  "families": [
+    "gaussian_noise",
+    "gaussian_blur",
+    "jpeg_compression",
+    "contrast_reduction"
+  ],
+  "severities": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "entries": [
+    {
+      "source_image_id": "coco_000000020169",
+      "corruption_family": "contrast_reduction",
+      "severity": 1,
+      "derived_image_id": "coco_000000020169_contrast_reduction_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000020169",
+      "corruption_family": "contrast_reduction",
+      "severity": 2,
+      "derived_image_id": "coco_000000020169_contrast_reduction_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000020169",
+      "corruption_family": "contrast_reduction",
+      "severity": 3,
+      "derived_image_id": "coco_000000020169_contrast_reduction_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000020169",
+      "corruption_family": "contrast_reduction",
+      "severity": 4,
+      "derived_image_id": "coco_000000020169_contrast_reduction_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000020169",
+      "corruption_family": "contrast_reduction",
+      "severity": 5,
+      "derived_image_id": "coco_000000020169_contrast_reduction_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000020169",
+      "corruption_family": "gaussian_blur",
+      "severity": 1,
+      "derived_image_id": "coco_000000020169_gaussian_blur_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000020169",
+      "corruption_family": "gaussian_blur",
+      "severity": 2,
+      "derived_image_id": "coco_000000020169_gaussian_blur_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000020169",
+      "corruption_family": "gaussian_blur",
+      "severity": 3,
+      "derived_image_id": "coco_000000020169_gaussian_blur_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000020169",
+      "corruption_family": "gaussian_blur",
+      "severity": 4,
+      "derived_image_id": "coco_000000020169_gaussian_blur_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000020169",
+      "corruption_family": "gaussian_blur",
+      "severity": 5,
+      "derived_image_id": "coco_000000020169_gaussian_blur_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000020169",
+      "corruption_family": "gaussian_noise",
+      "severity": 1,
+      "derived_image_id": "coco_000000020169_gaussian_noise_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000020169",
+      "corruption_family": "gaussian_noise",
+      "severity": 2,
+      "derived_image_id": "coco_000000020169_gaussian_noise_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000020169",
+      "corruption_family": "gaussian_noise",
+      "severity": 3,
+      "derived_image_id": "coco_000000020169_gaussian_noise_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000020169",
+      "corruption_family": "gaussian_noise",
+      "severity": 4,
+      "derived_image_id": "coco_000000020169_gaussian_noise_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000020169",
+      "corruption_family": "gaussian_noise",
+      "severity": 5,
+      "derived_image_id": "coco_000000020169_gaussian_noise_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000020169",
+      "corruption_family": "jpeg_compression",
+      "severity": 1,
+      "derived_image_id": "coco_000000020169_jpeg_compression_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000020169",
+      "corruption_family": "jpeg_compression",
+      "severity": 2,
+      "derived_image_id": "coco_000000020169_jpeg_compression_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000020169",
+      "corruption_family": "jpeg_compression",
+      "severity": 3,
+      "derived_image_id": "coco_000000020169_jpeg_compression_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000020169",
+      "corruption_family": "jpeg_compression",
+      "severity": 4,
+      "derived_image_id": "coco_000000020169_jpeg_compression_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000020169",
+      "corruption_family": "jpeg_compression",
+      "severity": 5,
+      "derived_image_id": "coco_000000020169_jpeg_compression_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000026367",
+      "corruption_family": "contrast_reduction",
+      "severity": 1,
+      "derived_image_id": "coco_000000026367_contrast_reduction_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000026367",
+      "corruption_family": "contrast_reduction",
+      "severity": 2,
+      "derived_image_id": "coco_000000026367_contrast_reduction_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000026367",
+      "corruption_family": "contrast_reduction",
+      "severity": 3,
+      "derived_image_id": "coco_000000026367_contrast_reduction_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000026367",
+      "corruption_family": "contrast_reduction",
+      "severity": 4,
+      "derived_image_id": "coco_000000026367_contrast_reduction_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000026367",
+      "corruption_family": "contrast_reduction",
+      "severity": 5,
+      "derived_image_id": "coco_000000026367_contrast_reduction_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000026367",
+      "corruption_family": "gaussian_blur",
+      "severity": 1,
+      "derived_image_id": "coco_000000026367_gaussian_blur_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000026367",
+      "corruption_family": "gaussian_blur",
+      "severity": 2,
+      "derived_image_id": "coco_000000026367_gaussian_blur_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000026367",
+      "corruption_family": "gaussian_blur",
+      "severity": 3,
+      "derived_image_id": "coco_000000026367_gaussian_blur_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000026367",
+      "corruption_family": "gaussian_blur",
+      "severity": 4,
+      "derived_image_id": "coco_000000026367_gaussian_blur_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000026367",
+      "corruption_family": "gaussian_blur",
+      "severity": 5,
+      "derived_image_id": "coco_000000026367_gaussian_blur_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000026367",
+      "corruption_family": "gaussian_noise",
+      "severity": 1,
+      "derived_image_id": "coco_000000026367_gaussian_noise_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000026367",
+      "corruption_family": "gaussian_noise",
+      "severity": 2,
+      "derived_image_id": "coco_000000026367_gaussian_noise_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000026367",
+      "corruption_family": "gaussian_noise",
+      "severity": 3,
+      "derived_image_id": "coco_000000026367_gaussian_noise_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000026367",
+      "corruption_family": "gaussian_noise",
+      "severity": 4,
+      "derived_image_id": "coco_000000026367_gaussian_noise_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000026367",
+      "corruption_family": "gaussian_noise",
+      "severity": 5,
+      "derived_image_id": "coco_000000026367_gaussian_noise_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000026367",
+      "corruption_family": "jpeg_compression",
+      "severity": 1,
+      "derived_image_id": "coco_000000026367_jpeg_compression_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000026367",
+      "corruption_family": "jpeg_compression",
+      "severity": 2,
+      "derived_image_id": "coco_000000026367_jpeg_compression_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000026367",
+      "corruption_family": "jpeg_compression",
+      "severity": 3,
+      "derived_image_id": "coco_000000026367_jpeg_compression_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000026367",
+      "corruption_family": "jpeg_compression",
+      "severity": 4,
+      "derived_image_id": "coco_000000026367_jpeg_compression_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000026367",
+      "corruption_family": "jpeg_compression",
+      "severity": 5,
+      "derived_image_id": "coco_000000026367_jpeg_compression_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000036921",
+      "corruption_family": "contrast_reduction",
+      "severity": 1,
+      "derived_image_id": "coco_000000036921_contrast_reduction_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000036921",
+      "corruption_family": "contrast_reduction",
+      "severity": 2,
+      "derived_image_id": "coco_000000036921_contrast_reduction_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000036921",
+      "corruption_family": "contrast_reduction",
+      "severity": 3,
+      "derived_image_id": "coco_000000036921_contrast_reduction_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000036921",
+      "corruption_family": "contrast_reduction",
+      "severity": 4,
+      "derived_image_id": "coco_000000036921_contrast_reduction_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000036921",
+      "corruption_family": "contrast_reduction",
+      "severity": 5,
+      "derived_image_id": "coco_000000036921_contrast_reduction_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000036921",
+      "corruption_family": "gaussian_blur",
+      "severity": 1,
+      "derived_image_id": "coco_000000036921_gaussian_blur_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000036921",
+      "corruption_family": "gaussian_blur",
+      "severity": 2,
+      "derived_image_id": "coco_000000036921_gaussian_blur_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000036921",
+      "corruption_family": "gaussian_blur",
+      "severity": 3,
+      "derived_image_id": "coco_000000036921_gaussian_blur_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000036921",
+      "corruption_family": "gaussian_blur",
+      "severity": 4,
+      "derived_image_id": "coco_000000036921_gaussian_blur_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000036921",
+      "corruption_family": "gaussian_blur",
+      "severity": 5,
+      "derived_image_id": "coco_000000036921_gaussian_blur_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000036921",
+      "corruption_family": "gaussian_noise",
+      "severity": 1,
+      "derived_image_id": "coco_000000036921_gaussian_noise_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000036921",
+      "corruption_family": "gaussian_noise",
+      "severity": 2,
+      "derived_image_id": "coco_000000036921_gaussian_noise_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000036921",
+      "corruption_family": "gaussian_noise",
+      "severity": 3,
+      "derived_image_id": "coco_000000036921_gaussian_noise_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000036921",
+      "corruption_family": "gaussian_noise",
+      "severity": 4,
+      "derived_image_id": "coco_000000036921_gaussian_noise_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000036921",
+      "corruption_family": "gaussian_noise",
+      "severity": 5,
+      "derived_image_id": "coco_000000036921_gaussian_noise_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000036921",
+      "corruption_family": "jpeg_compression",
+      "severity": 1,
+      "derived_image_id": "coco_000000036921_jpeg_compression_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000036921",
+      "corruption_family": "jpeg_compression",
+      "severity": 2,
+      "derived_image_id": "coco_000000036921_jpeg_compression_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000036921",
+      "corruption_family": "jpeg_compression",
+      "severity": 3,
+      "derived_image_id": "coco_000000036921_jpeg_compression_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000036921",
+      "corruption_family": "jpeg_compression",
+      "severity": 4,
+      "derived_image_id": "coco_000000036921_jpeg_compression_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000036921",
+      "corruption_family": "jpeg_compression",
+      "severity": 5,
+      "derived_image_id": "coco_000000036921_jpeg_compression_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000051131",
+      "corruption_family": "contrast_reduction",
+      "severity": 1,
+      "derived_image_id": "coco_000000051131_contrast_reduction_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000051131",
+      "corruption_family": "contrast_reduction",
+      "severity": 2,
+      "derived_image_id": "coco_000000051131_contrast_reduction_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000051131",
+      "corruption_family": "contrast_reduction",
+      "severity": 3,
+      "derived_image_id": "coco_000000051131_contrast_reduction_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000051131",
+      "corruption_family": "contrast_reduction",
+      "severity": 4,
+      "derived_image_id": "coco_000000051131_contrast_reduction_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000051131",
+      "corruption_family": "contrast_reduction",
+      "severity": 5,
+      "derived_image_id": "coco_000000051131_contrast_reduction_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000051131",
+      "corruption_family": "gaussian_blur",
+      "severity": 1,
+      "derived_image_id": "coco_000000051131_gaussian_blur_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000051131",
+      "corruption_family": "gaussian_blur",
+      "severity": 2,
+      "derived_image_id": "coco_000000051131_gaussian_blur_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000051131",
+      "corruption_family": "gaussian_blur",
+      "severity": 3,
+      "derived_image_id": "coco_000000051131_gaussian_blur_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000051131",
+      "corruption_family": "gaussian_blur",
+      "severity": 4,
+      "derived_image_id": "coco_000000051131_gaussian_blur_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000051131",
+      "corruption_family": "gaussian_blur",
+      "severity": 5,
+      "derived_image_id": "coco_000000051131_gaussian_blur_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000051131",
+      "corruption_family": "gaussian_noise",
+      "severity": 1,
+      "derived_image_id": "coco_000000051131_gaussian_noise_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000051131",
+      "corruption_family": "gaussian_noise",
+      "severity": 2,
+      "derived_image_id": "coco_000000051131_gaussian_noise_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000051131",
+      "corruption_family": "gaussian_noise",
+      "severity": 3,
+      "derived_image_id": "coco_000000051131_gaussian_noise_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000051131",
+      "corruption_family": "gaussian_noise",
+      "severity": 4,
+      "derived_image_id": "coco_000000051131_gaussian_noise_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000051131",
+      "corruption_family": "gaussian_noise",
+      "severity": 5,
+      "derived_image_id": "coco_000000051131_gaussian_noise_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000051131",
+      "corruption_family": "jpeg_compression",
+      "severity": 1,
+      "derived_image_id": "coco_000000051131_jpeg_compression_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000051131",
+      "corruption_family": "jpeg_compression",
+      "severity": 2,
+      "derived_image_id": "coco_000000051131_jpeg_compression_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000051131",
+      "corruption_family": "jpeg_compression",
+      "severity": 3,
+      "derived_image_id": "coco_000000051131_jpeg_compression_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000051131",
+      "corruption_family": "jpeg_compression",
+      "severity": 4,
+      "derived_image_id": "coco_000000051131_jpeg_compression_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000051131",
+      "corruption_family": "jpeg_compression",
+      "severity": 5,
+      "derived_image_id": "coco_000000051131_jpeg_compression_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000085232",
+      "corruption_family": "contrast_reduction",
+      "severity": 1,
+      "derived_image_id": "coco_000000085232_contrast_reduction_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000085232",
+      "corruption_family": "contrast_reduction",
+      "severity": 2,
+      "derived_image_id": "coco_000000085232_contrast_reduction_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000085232",
+      "corruption_family": "contrast_reduction",
+      "severity": 3,
+      "derived_image_id": "coco_000000085232_contrast_reduction_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000085232",
+      "corruption_family": "contrast_reduction",
+      "severity": 4,
+      "derived_image_id": "coco_000000085232_contrast_reduction_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000085232",
+      "corruption_family": "contrast_reduction",
+      "severity": 5,
+      "derived_image_id": "coco_000000085232_contrast_reduction_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000085232",
+      "corruption_family": "gaussian_blur",
+      "severity": 1,
+      "derived_image_id": "coco_000000085232_gaussian_blur_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000085232",
+      "corruption_family": "gaussian_blur",
+      "severity": 2,
+      "derived_image_id": "coco_000000085232_gaussian_blur_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000085232",
+      "corruption_family": "gaussian_blur",
+      "severity": 3,
+      "derived_image_id": "coco_000000085232_gaussian_blur_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000085232",
+      "corruption_family": "gaussian_blur",
+      "severity": 4,
+      "derived_image_id": "coco_000000085232_gaussian_blur_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000085232",
+      "corruption_family": "gaussian_blur",
+      "severity": 5,
+      "derived_image_id": "coco_000000085232_gaussian_blur_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000085232",
+      "corruption_family": "gaussian_noise",
+      "severity": 1,
+      "derived_image_id": "coco_000000085232_gaussian_noise_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000085232",
+      "corruption_family": "gaussian_noise",
+      "severity": 2,
+      "derived_image_id": "coco_000000085232_gaussian_noise_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000085232",
+      "corruption_family": "gaussian_noise",
+      "severity": 3,
+      "derived_image_id": "coco_000000085232_gaussian_noise_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000085232",
+      "corruption_family": "gaussian_noise",
+      "severity": 4,
+      "derived_image_id": "coco_000000085232_gaussian_noise_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000085232",
+      "corruption_family": "gaussian_noise",
+      "severity": 5,
+      "derived_image_id": "coco_000000085232_gaussian_noise_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000085232",
+      "corruption_family": "jpeg_compression",
+      "severity": 1,
+      "derived_image_id": "coco_000000085232_jpeg_compression_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000085232",
+      "corruption_family": "jpeg_compression",
+      "severity": 2,
+      "derived_image_id": "coco_000000085232_jpeg_compression_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000085232",
+      "corruption_family": "jpeg_compression",
+      "severity": 3,
+      "derived_image_id": "coco_000000085232_jpeg_compression_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000085232",
+      "corruption_family": "jpeg_compression",
+      "severity": 4,
+      "derived_image_id": "coco_000000085232_jpeg_compression_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000085232",
+      "corruption_family": "jpeg_compression",
+      "severity": 5,
+      "derived_image_id": "coco_000000085232_jpeg_compression_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000086212",
+      "corruption_family": "contrast_reduction",
+      "severity": 1,
+      "derived_image_id": "coco_000000086212_contrast_reduction_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000086212",
+      "corruption_family": "contrast_reduction",
+      "severity": 2,
+      "derived_image_id": "coco_000000086212_contrast_reduction_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000086212",
+      "corruption_family": "contrast_reduction",
+      "severity": 3,
+      "derived_image_id": "coco_000000086212_contrast_reduction_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000086212",
+      "corruption_family": "contrast_reduction",
+      "severity": 4,
+      "derived_image_id": "coco_000000086212_contrast_reduction_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000086212",
+      "corruption_family": "contrast_reduction",
+      "severity": 5,
+      "derived_image_id": "coco_000000086212_contrast_reduction_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000086212",
+      "corruption_family": "gaussian_blur",
+      "severity": 1,
+      "derived_image_id": "coco_000000086212_gaussian_blur_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000086212",
+      "corruption_family": "gaussian_blur",
+      "severity": 2,
+      "derived_image_id": "coco_000000086212_gaussian_blur_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000086212",
+      "corruption_family": "gaussian_blur",
+      "severity": 3,
+      "derived_image_id": "coco_000000086212_gaussian_blur_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000086212",
+      "corruption_family": "gaussian_blur",
+      "severity": 4,
+      "derived_image_id": "coco_000000086212_gaussian_blur_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000086212",
+      "corruption_family": "gaussian_blur",
+      "severity": 5,
+      "derived_image_id": "coco_000000086212_gaussian_blur_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000086212",
+      "corruption_family": "gaussian_noise",
+      "severity": 1,
+      "derived_image_id": "coco_000000086212_gaussian_noise_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000086212",
+      "corruption_family": "gaussian_noise",
+      "severity": 2,
+      "derived_image_id": "coco_000000086212_gaussian_noise_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000086212",
+      "corruption_family": "gaussian_noise",
+      "severity": 3,
+      "derived_image_id": "coco_000000086212_gaussian_noise_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000086212",
+      "corruption_family": "gaussian_noise",
+      "severity": 4,
+      "derived_image_id": "coco_000000086212_gaussian_noise_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000086212",
+      "corruption_family": "gaussian_noise",
+      "severity": 5,
+      "derived_image_id": "coco_000000086212_gaussian_noise_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000086212",
+      "corruption_family": "jpeg_compression",
+      "severity": 1,
+      "derived_image_id": "coco_000000086212_jpeg_compression_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000086212",
+      "corruption_family": "jpeg_compression",
+      "severity": 2,
+      "derived_image_id": "coco_000000086212_jpeg_compression_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000086212",
+      "corruption_family": "jpeg_compression",
+      "severity": 3,
+      "derived_image_id": "coco_000000086212_jpeg_compression_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000086212",
+      "corruption_family": "jpeg_compression",
+      "severity": 4,
+      "derived_image_id": "coco_000000086212_jpeg_compression_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000086212",
+      "corruption_family": "jpeg_compression",
+      "severity": 5,
+      "derived_image_id": "coco_000000086212_jpeg_compression_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000122021",
+      "corruption_family": "contrast_reduction",
+      "severity": 1,
+      "derived_image_id": "coco_000000122021_contrast_reduction_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000122021",
+      "corruption_family": "contrast_reduction",
+      "severity": 2,
+      "derived_image_id": "coco_000000122021_contrast_reduction_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000122021",
+      "corruption_family": "contrast_reduction",
+      "severity": 3,
+      "derived_image_id": "coco_000000122021_contrast_reduction_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000122021",
+      "corruption_family": "contrast_reduction",
+      "severity": 4,
+      "derived_image_id": "coco_000000122021_contrast_reduction_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000122021",
+      "corruption_family": "contrast_reduction",
+      "severity": 5,
+      "derived_image_id": "coco_000000122021_contrast_reduction_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000122021",
+      "corruption_family": "gaussian_blur",
+      "severity": 1,
+      "derived_image_id": "coco_000000122021_gaussian_blur_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000122021",
+      "corruption_family": "gaussian_blur",
+      "severity": 2,
+      "derived_image_id": "coco_000000122021_gaussian_blur_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000122021",
+      "corruption_family": "gaussian_blur",
+      "severity": 3,
+      "derived_image_id": "coco_000000122021_gaussian_blur_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000122021",
+      "corruption_family": "gaussian_blur",
+      "severity": 4,
+      "derived_image_id": "coco_000000122021_gaussian_blur_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000122021",
+      "corruption_family": "gaussian_blur",
+      "severity": 5,
+      "derived_image_id": "coco_000000122021_gaussian_blur_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000122021",
+      "corruption_family": "gaussian_noise",
+      "severity": 1,
+      "derived_image_id": "coco_000000122021_gaussian_noise_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000122021",
+      "corruption_family": "gaussian_noise",
+      "severity": 2,
+      "derived_image_id": "coco_000000122021_gaussian_noise_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000122021",
+      "corruption_family": "gaussian_noise",
+      "severity": 3,
+      "derived_image_id": "coco_000000122021_gaussian_noise_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000122021",
+      "corruption_family": "gaussian_noise",
+      "severity": 4,
+      "derived_image_id": "coco_000000122021_gaussian_noise_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000122021",
+      "corruption_family": "gaussian_noise",
+      "severity": 5,
+      "derived_image_id": "coco_000000122021_gaussian_noise_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000122021",
+      "corruption_family": "jpeg_compression",
+      "severity": 1,
+      "derived_image_id": "coco_000000122021_jpeg_compression_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000122021",
+      "corruption_family": "jpeg_compression",
+      "severity": 2,
+      "derived_image_id": "coco_000000122021_jpeg_compression_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000122021",
+      "corruption_family": "jpeg_compression",
+      "severity": 3,
+      "derived_image_id": "coco_000000122021_jpeg_compression_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000122021",
+      "corruption_family": "jpeg_compression",
+      "severity": 4,
+      "derived_image_id": "coco_000000122021_jpeg_compression_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000122021",
+      "corruption_family": "jpeg_compression",
+      "severity": 5,
+      "derived_image_id": "coco_000000122021_jpeg_compression_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000156117",
+      "corruption_family": "contrast_reduction",
+      "severity": 1,
+      "derived_image_id": "coco_000000156117_contrast_reduction_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000156117",
+      "corruption_family": "contrast_reduction",
+      "severity": 2,
+      "derived_image_id": "coco_000000156117_contrast_reduction_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000156117",
+      "corruption_family": "contrast_reduction",
+      "severity": 3,
+      "derived_image_id": "coco_000000156117_contrast_reduction_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000156117",
+      "corruption_family": "contrast_reduction",
+      "severity": 4,
+      "derived_image_id": "coco_000000156117_contrast_reduction_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000156117",
+      "corruption_family": "contrast_reduction",
+      "severity": 5,
+      "derived_image_id": "coco_000000156117_contrast_reduction_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000156117",
+      "corruption_family": "gaussian_blur",
+      "severity": 1,
+      "derived_image_id": "coco_000000156117_gaussian_blur_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000156117",
+      "corruption_family": "gaussian_blur",
+      "severity": 2,
+      "derived_image_id": "coco_000000156117_gaussian_blur_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000156117",
+      "corruption_family": "gaussian_blur",
+      "severity": 3,
+      "derived_image_id": "coco_000000156117_gaussian_blur_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000156117",
+      "corruption_family": "gaussian_blur",
+      "severity": 4,
+      "derived_image_id": "coco_000000156117_gaussian_blur_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000156117",
+      "corruption_family": "gaussian_blur",
+      "severity": 5,
+      "derived_image_id": "coco_000000156117_gaussian_blur_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000156117",
+      "corruption_family": "gaussian_noise",
+      "severity": 1,
+      "derived_image_id": "coco_000000156117_gaussian_noise_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000156117",
+      "corruption_family": "gaussian_noise",
+      "severity": 2,
+      "derived_image_id": "coco_000000156117_gaussian_noise_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000156117",
+      "corruption_family": "gaussian_noise",
+      "severity": 3,
+      "derived_image_id": "coco_000000156117_gaussian_noise_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000156117",
+      "corruption_family": "gaussian_noise",
+      "severity": 4,
+      "derived_image_id": "coco_000000156117_gaussian_noise_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000156117",
+      "corruption_family": "gaussian_noise",
+      "severity": 5,
+      "derived_image_id": "coco_000000156117_gaussian_noise_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000156117",
+      "corruption_family": "jpeg_compression",
+      "severity": 1,
+      "derived_image_id": "coco_000000156117_jpeg_compression_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000156117",
+      "corruption_family": "jpeg_compression",
+      "severity": 2,
+      "derived_image_id": "coco_000000156117_jpeg_compression_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000156117",
+      "corruption_family": "jpeg_compression",
+      "severity": 3,
+      "derived_image_id": "coco_000000156117_jpeg_compression_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000156117",
+      "corruption_family": "jpeg_compression",
+      "severity": 4,
+      "derived_image_id": "coco_000000156117_jpeg_compression_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000156117",
+      "corruption_family": "jpeg_compression",
+      "severity": 5,
+      "derived_image_id": "coco_000000156117_jpeg_compression_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000181278",
+      "corruption_family": "contrast_reduction",
+      "severity": 1,
+      "derived_image_id": "coco_000000181278_contrast_reduction_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000181278",
+      "corruption_family": "contrast_reduction",
+      "severity": 2,
+      "derived_image_id": "coco_000000181278_contrast_reduction_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000181278",
+      "corruption_family": "contrast_reduction",
+      "severity": 3,
+      "derived_image_id": "coco_000000181278_contrast_reduction_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000181278",
+      "corruption_family": "contrast_reduction",
+      "severity": 4,
+      "derived_image_id": "coco_000000181278_contrast_reduction_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000181278",
+      "corruption_family": "contrast_reduction",
+      "severity": 5,
+      "derived_image_id": "coco_000000181278_contrast_reduction_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000181278",
+      "corruption_family": "gaussian_blur",
+      "severity": 1,
+      "derived_image_id": "coco_000000181278_gaussian_blur_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000181278",
+      "corruption_family": "gaussian_blur",
+      "severity": 2,
+      "derived_image_id": "coco_000000181278_gaussian_blur_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000181278",
+      "corruption_family": "gaussian_blur",
+      "severity": 3,
+      "derived_image_id": "coco_000000181278_gaussian_blur_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000181278",
+      "corruption_family": "gaussian_blur",
+      "severity": 4,
+      "derived_image_id": "coco_000000181278_gaussian_blur_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000181278",
+      "corruption_family": "gaussian_blur",
+      "severity": 5,
+      "derived_image_id": "coco_000000181278_gaussian_blur_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000181278",
+      "corruption_family": "gaussian_noise",
+      "severity": 1,
+      "derived_image_id": "coco_000000181278_gaussian_noise_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000181278",
+      "corruption_family": "gaussian_noise",
+      "severity": 2,
+      "derived_image_id": "coco_000000181278_gaussian_noise_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000181278",
+      "corruption_family": "gaussian_noise",
+      "severity": 3,
+      "derived_image_id": "coco_000000181278_gaussian_noise_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000181278",
+      "corruption_family": "gaussian_noise",
+      "severity": 4,
+      "derived_image_id": "coco_000000181278_gaussian_noise_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000181278",
+      "corruption_family": "gaussian_noise",
+      "severity": 5,
+      "derived_image_id": "coco_000000181278_gaussian_noise_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000181278",
+      "corruption_family": "jpeg_compression",
+      "severity": 1,
+      "derived_image_id": "coco_000000181278_jpeg_compression_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000181278",
+      "corruption_family": "jpeg_compression",
+      "severity": 2,
+      "derived_image_id": "coco_000000181278_jpeg_compression_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000181278",
+      "corruption_family": "jpeg_compression",
+      "severity": 3,
+      "derived_image_id": "coco_000000181278_jpeg_compression_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000181278",
+      "corruption_family": "jpeg_compression",
+      "severity": 4,
+      "derived_image_id": "coco_000000181278_jpeg_compression_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000181278",
+      "corruption_family": "jpeg_compression",
+      "severity": 5,
+      "derived_image_id": "coco_000000181278_jpeg_compression_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000190677",
+      "corruption_family": "contrast_reduction",
+      "severity": 1,
+      "derived_image_id": "coco_000000190677_contrast_reduction_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000190677",
+      "corruption_family": "contrast_reduction",
+      "severity": 2,
+      "derived_image_id": "coco_000000190677_contrast_reduction_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000190677",
+      "corruption_family": "contrast_reduction",
+      "severity": 3,
+      "derived_image_id": "coco_000000190677_contrast_reduction_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000190677",
+      "corruption_family": "contrast_reduction",
+      "severity": 4,
+      "derived_image_id": "coco_000000190677_contrast_reduction_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000190677",
+      "corruption_family": "contrast_reduction",
+      "severity": 5,
+      "derived_image_id": "coco_000000190677_contrast_reduction_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000190677",
+      "corruption_family": "gaussian_blur",
+      "severity": 1,
+      "derived_image_id": "coco_000000190677_gaussian_blur_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000190677",
+      "corruption_family": "gaussian_blur",
+      "severity": 2,
+      "derived_image_id": "coco_000000190677_gaussian_blur_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000190677",
+      "corruption_family": "gaussian_blur",
+      "severity": 3,
+      "derived_image_id": "coco_000000190677_gaussian_blur_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000190677",
+      "corruption_family": "gaussian_blur",
+      "severity": 4,
+      "derived_image_id": "coco_000000190677_gaussian_blur_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000190677",
+      "corruption_family": "gaussian_blur",
+      "severity": 5,
+      "derived_image_id": "coco_000000190677_gaussian_blur_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000190677",
+      "corruption_family": "gaussian_noise",
+      "severity": 1,
+      "derived_image_id": "coco_000000190677_gaussian_noise_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000190677",
+      "corruption_family": "gaussian_noise",
+      "severity": 2,
+      "derived_image_id": "coco_000000190677_gaussian_noise_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000190677",
+      "corruption_family": "gaussian_noise",
+      "severity": 3,
+      "derived_image_id": "coco_000000190677_gaussian_noise_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000190677",
+      "corruption_family": "gaussian_noise",
+      "severity": 4,
+      "derived_image_id": "coco_000000190677_gaussian_noise_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000190677",
+      "corruption_family": "gaussian_noise",
+      "severity": 5,
+      "derived_image_id": "coco_000000190677_gaussian_noise_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000190677",
+      "corruption_family": "jpeg_compression",
+      "severity": 1,
+      "derived_image_id": "coco_000000190677_jpeg_compression_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000190677",
+      "corruption_family": "jpeg_compression",
+      "severity": 2,
+      "derived_image_id": "coco_000000190677_jpeg_compression_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000190677",
+      "corruption_family": "jpeg_compression",
+      "severity": 3,
+      "derived_image_id": "coco_000000190677_jpeg_compression_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000190677",
+      "corruption_family": "jpeg_compression",
+      "severity": 4,
+      "derived_image_id": "coco_000000190677_jpeg_compression_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000190677",
+      "corruption_family": "jpeg_compression",
+      "severity": 5,
+      "derived_image_id": "coco_000000190677_jpeg_compression_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000191693",
+      "corruption_family": "contrast_reduction",
+      "severity": 1,
+      "derived_image_id": "coco_000000191693_contrast_reduction_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000191693",
+      "corruption_family": "contrast_reduction",
+      "severity": 2,
+      "derived_image_id": "coco_000000191693_contrast_reduction_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000191693",
+      "corruption_family": "contrast_reduction",
+      "severity": 3,
+      "derived_image_id": "coco_000000191693_contrast_reduction_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000191693",
+      "corruption_family": "contrast_reduction",
+      "severity": 4,
+      "derived_image_id": "coco_000000191693_contrast_reduction_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000191693",
+      "corruption_family": "contrast_reduction",
+      "severity": 5,
+      "derived_image_id": "coco_000000191693_contrast_reduction_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000191693",
+      "corruption_family": "gaussian_blur",
+      "severity": 1,
+      "derived_image_id": "coco_000000191693_gaussian_blur_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000191693",
+      "corruption_family": "gaussian_blur",
+      "severity": 2,
+      "derived_image_id": "coco_000000191693_gaussian_blur_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000191693",
+      "corruption_family": "gaussian_blur",
+      "severity": 3,
+      "derived_image_id": "coco_000000191693_gaussian_blur_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000191693",
+      "corruption_family": "gaussian_blur",
+      "severity": 4,
+      "derived_image_id": "coco_000000191693_gaussian_blur_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000191693",
+      "corruption_family": "gaussian_blur",
+      "severity": 5,
+      "derived_image_id": "coco_000000191693_gaussian_blur_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000191693",
+      "corruption_family": "gaussian_noise",
+      "severity": 1,
+      "derived_image_id": "coco_000000191693_gaussian_noise_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000191693",
+      "corruption_family": "gaussian_noise",
+      "severity": 2,
+      "derived_image_id": "coco_000000191693_gaussian_noise_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000191693",
+      "corruption_family": "gaussian_noise",
+      "severity": 3,
+      "derived_image_id": "coco_000000191693_gaussian_noise_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000191693",
+      "corruption_family": "gaussian_noise",
+      "severity": 4,
+      "derived_image_id": "coco_000000191693_gaussian_noise_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000191693",
+      "corruption_family": "gaussian_noise",
+      "severity": 5,
+      "derived_image_id": "coco_000000191693_gaussian_noise_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000191693",
+      "corruption_family": "jpeg_compression",
+      "severity": 1,
+      "derived_image_id": "coco_000000191693_jpeg_compression_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000191693",
+      "corruption_family": "jpeg_compression",
+      "severity": 2,
+      "derived_image_id": "coco_000000191693_jpeg_compression_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000191693",
+      "corruption_family": "jpeg_compression",
+      "severity": 3,
+      "derived_image_id": "coco_000000191693_jpeg_compression_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000191693",
+      "corruption_family": "jpeg_compression",
+      "severity": 4,
+      "derived_image_id": "coco_000000191693_jpeg_compression_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000191693",
+      "corruption_family": "jpeg_compression",
+      "severity": 5,
+      "derived_image_id": "coco_000000191693_jpeg_compression_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000207000",
+      "corruption_family": "contrast_reduction",
+      "severity": 1,
+      "derived_image_id": "coco_000000207000_contrast_reduction_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000207000",
+      "corruption_family": "contrast_reduction",
+      "severity": 2,
+      "derived_image_id": "coco_000000207000_contrast_reduction_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000207000",
+      "corruption_family": "contrast_reduction",
+      "severity": 3,
+      "derived_image_id": "coco_000000207000_contrast_reduction_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000207000",
+      "corruption_family": "contrast_reduction",
+      "severity": 4,
+      "derived_image_id": "coco_000000207000_contrast_reduction_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000207000",
+      "corruption_family": "contrast_reduction",
+      "severity": 5,
+      "derived_image_id": "coco_000000207000_contrast_reduction_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000207000",
+      "corruption_family": "gaussian_blur",
+      "severity": 1,
+      "derived_image_id": "coco_000000207000_gaussian_blur_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000207000",
+      "corruption_family": "gaussian_blur",
+      "severity": 2,
+      "derived_image_id": "coco_000000207000_gaussian_blur_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000207000",
+      "corruption_family": "gaussian_blur",
+      "severity": 3,
+      "derived_image_id": "coco_000000207000_gaussian_blur_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000207000",
+      "corruption_family": "gaussian_blur",
+      "severity": 4,
+      "derived_image_id": "coco_000000207000_gaussian_blur_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000207000",
+      "corruption_family": "gaussian_blur",
+      "severity": 5,
+      "derived_image_id": "coco_000000207000_gaussian_blur_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000207000",
+      "corruption_family": "gaussian_noise",
+      "severity": 1,
+      "derived_image_id": "coco_000000207000_gaussian_noise_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000207000",
+      "corruption_family": "gaussian_noise",
+      "severity": 2,
+      "derived_image_id": "coco_000000207000_gaussian_noise_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000207000",
+      "corruption_family": "gaussian_noise",
+      "severity": 3,
+      "derived_image_id": "coco_000000207000_gaussian_noise_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000207000",
+      "corruption_family": "gaussian_noise",
+      "severity": 4,
+      "derived_image_id": "coco_000000207000_gaussian_noise_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000207000",
+      "corruption_family": "gaussian_noise",
+      "severity": 5,
+      "derived_image_id": "coco_000000207000_gaussian_noise_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000207000",
+      "corruption_family": "jpeg_compression",
+      "severity": 1,
+      "derived_image_id": "coco_000000207000_jpeg_compression_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000207000",
+      "corruption_family": "jpeg_compression",
+      "severity": 2,
+      "derived_image_id": "coco_000000207000_jpeg_compression_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000207000",
+      "corruption_family": "jpeg_compression",
+      "severity": 3,
+      "derived_image_id": "coco_000000207000_jpeg_compression_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000207000",
+      "corruption_family": "jpeg_compression",
+      "severity": 4,
+      "derived_image_id": "coco_000000207000_jpeg_compression_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000207000",
+      "corruption_family": "jpeg_compression",
+      "severity": 5,
+      "derived_image_id": "coco_000000207000_jpeg_compression_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000213828",
+      "corruption_family": "contrast_reduction",
+      "severity": 1,
+      "derived_image_id": "coco_000000213828_contrast_reduction_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000213828",
+      "corruption_family": "contrast_reduction",
+      "severity": 2,
+      "derived_image_id": "coco_000000213828_contrast_reduction_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000213828",
+      "corruption_family": "contrast_reduction",
+      "severity": 3,
+      "derived_image_id": "coco_000000213828_contrast_reduction_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000213828",
+      "corruption_family": "contrast_reduction",
+      "severity": 4,
+      "derived_image_id": "coco_000000213828_contrast_reduction_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000213828",
+      "corruption_family": "contrast_reduction",
+      "severity": 5,
+      "derived_image_id": "coco_000000213828_contrast_reduction_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000213828",
+      "corruption_family": "gaussian_blur",
+      "severity": 1,
+      "derived_image_id": "coco_000000213828_gaussian_blur_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000213828",
+      "corruption_family": "gaussian_blur",
+      "severity": 2,
+      "derived_image_id": "coco_000000213828_gaussian_blur_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000213828",
+      "corruption_family": "gaussian_blur",
+      "severity": 3,
+      "derived_image_id": "coco_000000213828_gaussian_blur_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000213828",
+      "corruption_family": "gaussian_blur",
+      "severity": 4,
+      "derived_image_id": "coco_000000213828_gaussian_blur_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000213828",
+      "corruption_family": "gaussian_blur",
+      "severity": 5,
+      "derived_image_id": "coco_000000213828_gaussian_blur_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000213828",
+      "corruption_family": "gaussian_noise",
+      "severity": 1,
+      "derived_image_id": "coco_000000213828_gaussian_noise_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000213828",
+      "corruption_family": "gaussian_noise",
+      "severity": 2,
+      "derived_image_id": "coco_000000213828_gaussian_noise_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000213828",
+      "corruption_family": "gaussian_noise",
+      "severity": 3,
+      "derived_image_id": "coco_000000213828_gaussian_noise_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000213828",
+      "corruption_family": "gaussian_noise",
+      "severity": 4,
+      "derived_image_id": "coco_000000213828_gaussian_noise_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000213828",
+      "corruption_family": "gaussian_noise",
+      "severity": 5,
+      "derived_image_id": "coco_000000213828_gaussian_noise_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000213828",
+      "corruption_family": "jpeg_compression",
+      "severity": 1,
+      "derived_image_id": "coco_000000213828_jpeg_compression_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000213828",
+      "corruption_family": "jpeg_compression",
+      "severity": 2,
+      "derived_image_id": "coco_000000213828_jpeg_compression_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000213828",
+      "corruption_family": "jpeg_compression",
+      "severity": 3,
+      "derived_image_id": "coco_000000213828_jpeg_compression_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000213828",
+      "corruption_family": "jpeg_compression",
+      "severity": 4,
+      "derived_image_id": "coco_000000213828_jpeg_compression_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000213828",
+      "corruption_family": "jpeg_compression",
+      "severity": 5,
+      "derived_image_id": "coco_000000213828_jpeg_compression_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000247400",
+      "corruption_family": "contrast_reduction",
+      "severity": 1,
+      "derived_image_id": "coco_000000247400_contrast_reduction_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000247400",
+      "corruption_family": "contrast_reduction",
+      "severity": 2,
+      "derived_image_id": "coco_000000247400_contrast_reduction_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000247400",
+      "corruption_family": "contrast_reduction",
+      "severity": 3,
+      "derived_image_id": "coco_000000247400_contrast_reduction_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000247400",
+      "corruption_family": "contrast_reduction",
+      "severity": 4,
+      "derived_image_id": "coco_000000247400_contrast_reduction_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000247400",
+      "corruption_family": "contrast_reduction",
+      "severity": 5,
+      "derived_image_id": "coco_000000247400_contrast_reduction_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000247400",
+      "corruption_family": "gaussian_blur",
+      "severity": 1,
+      "derived_image_id": "coco_000000247400_gaussian_blur_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000247400",
+      "corruption_family": "gaussian_blur",
+      "severity": 2,
+      "derived_image_id": "coco_000000247400_gaussian_blur_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000247400",
+      "corruption_family": "gaussian_blur",
+      "severity": 3,
+      "derived_image_id": "coco_000000247400_gaussian_blur_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000247400",
+      "corruption_family": "gaussian_blur",
+      "severity": 4,
+      "derived_image_id": "coco_000000247400_gaussian_blur_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000247400",
+      "corruption_family": "gaussian_blur",
+      "severity": 5,
+      "derived_image_id": "coco_000000247400_gaussian_blur_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000247400",
+      "corruption_family": "gaussian_noise",
+      "severity": 1,
+      "derived_image_id": "coco_000000247400_gaussian_noise_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000247400",
+      "corruption_family": "gaussian_noise",
+      "severity": 2,
+      "derived_image_id": "coco_000000247400_gaussian_noise_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000247400",
+      "corruption_family": "gaussian_noise",
+      "severity": 3,
+      "derived_image_id": "coco_000000247400_gaussian_noise_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000247400",
+      "corruption_family": "gaussian_noise",
+      "severity": 4,
+      "derived_image_id": "coco_000000247400_gaussian_noise_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000247400",
+      "corruption_family": "gaussian_noise",
+      "severity": 5,
+      "derived_image_id": "coco_000000247400_gaussian_noise_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000247400",
+      "corruption_family": "jpeg_compression",
+      "severity": 1,
+      "derived_image_id": "coco_000000247400_jpeg_compression_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000247400",
+      "corruption_family": "jpeg_compression",
+      "severity": 2,
+      "derived_image_id": "coco_000000247400_jpeg_compression_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000247400",
+      "corruption_family": "jpeg_compression",
+      "severity": 3,
+      "derived_image_id": "coco_000000247400_jpeg_compression_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000247400",
+      "corruption_family": "jpeg_compression",
+      "severity": 4,
+      "derived_image_id": "coco_000000247400_jpeg_compression_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000247400",
+      "corruption_family": "jpeg_compression",
+      "severity": 5,
+      "derived_image_id": "coco_000000247400_jpeg_compression_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000248847",
+      "corruption_family": "contrast_reduction",
+      "severity": 1,
+      "derived_image_id": "coco_000000248847_contrast_reduction_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000248847",
+      "corruption_family": "contrast_reduction",
+      "severity": 2,
+      "derived_image_id": "coco_000000248847_contrast_reduction_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000248847",
+      "corruption_family": "contrast_reduction",
+      "severity": 3,
+      "derived_image_id": "coco_000000248847_contrast_reduction_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000248847",
+      "corruption_family": "contrast_reduction",
+      "severity": 4,
+      "derived_image_id": "coco_000000248847_contrast_reduction_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000248847",
+      "corruption_family": "contrast_reduction",
+      "severity": 5,
+      "derived_image_id": "coco_000000248847_contrast_reduction_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000248847",
+      "corruption_family": "gaussian_blur",
+      "severity": 1,
+      "derived_image_id": "coco_000000248847_gaussian_blur_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000248847",
+      "corruption_family": "gaussian_blur",
+      "severity": 2,
+      "derived_image_id": "coco_000000248847_gaussian_blur_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000248847",
+      "corruption_family": "gaussian_blur",
+      "severity": 3,
+      "derived_image_id": "coco_000000248847_gaussian_blur_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000248847",
+      "corruption_family": "gaussian_blur",
+      "severity": 4,
+      "derived_image_id": "coco_000000248847_gaussian_blur_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000248847",
+      "corruption_family": "gaussian_blur",
+      "severity": 5,
+      "derived_image_id": "coco_000000248847_gaussian_blur_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000248847",
+      "corruption_family": "gaussian_noise",
+      "severity": 1,
+      "derived_image_id": "coco_000000248847_gaussian_noise_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000248847",
+      "corruption_family": "gaussian_noise",
+      "severity": 2,
+      "derived_image_id": "coco_000000248847_gaussian_noise_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000248847",
+      "corruption_family": "gaussian_noise",
+      "severity": 3,
+      "derived_image_id": "coco_000000248847_gaussian_noise_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000248847",
+      "corruption_family": "gaussian_noise",
+      "severity": 4,
+      "derived_image_id": "coco_000000248847_gaussian_noise_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000248847",
+      "corruption_family": "gaussian_noise",
+      "severity": 5,
+      "derived_image_id": "coco_000000248847_gaussian_noise_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000248847",
+      "corruption_family": "jpeg_compression",
+      "severity": 1,
+      "derived_image_id": "coco_000000248847_jpeg_compression_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000248847",
+      "corruption_family": "jpeg_compression",
+      "severity": 2,
+      "derived_image_id": "coco_000000248847_jpeg_compression_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000248847",
+      "corruption_family": "jpeg_compression",
+      "severity": 3,
+      "derived_image_id": "coco_000000248847_jpeg_compression_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000248847",
+      "corruption_family": "jpeg_compression",
+      "severity": 4,
+      "derived_image_id": "coco_000000248847_jpeg_compression_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000248847",
+      "corruption_family": "jpeg_compression",
+      "severity": 5,
+      "derived_image_id": "coco_000000248847_jpeg_compression_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000255162",
+      "corruption_family": "contrast_reduction",
+      "severity": 1,
+      "derived_image_id": "coco_000000255162_contrast_reduction_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000255162",
+      "corruption_family": "contrast_reduction",
+      "severity": 2,
+      "derived_image_id": "coco_000000255162_contrast_reduction_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000255162",
+      "corruption_family": "contrast_reduction",
+      "severity": 3,
+      "derived_image_id": "coco_000000255162_contrast_reduction_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000255162",
+      "corruption_family": "contrast_reduction",
+      "severity": 4,
+      "derived_image_id": "coco_000000255162_contrast_reduction_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000255162",
+      "corruption_family": "contrast_reduction",
+      "severity": 5,
+      "derived_image_id": "coco_000000255162_contrast_reduction_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000255162",
+      "corruption_family": "gaussian_blur",
+      "severity": 1,
+      "derived_image_id": "coco_000000255162_gaussian_blur_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000255162",
+      "corruption_family": "gaussian_blur",
+      "severity": 2,
+      "derived_image_id": "coco_000000255162_gaussian_blur_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000255162",
+      "corruption_family": "gaussian_blur",
+      "severity": 3,
+      "derived_image_id": "coco_000000255162_gaussian_blur_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000255162",
+      "corruption_family": "gaussian_blur",
+      "severity": 4,
+      "derived_image_id": "coco_000000255162_gaussian_blur_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000255162",
+      "corruption_family": "gaussian_blur",
+      "severity": 5,
+      "derived_image_id": "coco_000000255162_gaussian_blur_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000255162",
+      "corruption_family": "gaussian_noise",
+      "severity": 1,
+      "derived_image_id": "coco_000000255162_gaussian_noise_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000255162",
+      "corruption_family": "gaussian_noise",
+      "severity": 2,
+      "derived_image_id": "coco_000000255162_gaussian_noise_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000255162",
+      "corruption_family": "gaussian_noise",
+      "severity": 3,
+      "derived_image_id": "coco_000000255162_gaussian_noise_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000255162",
+      "corruption_family": "gaussian_noise",
+      "severity": 4,
+      "derived_image_id": "coco_000000255162_gaussian_noise_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000255162",
+      "corruption_family": "gaussian_noise",
+      "severity": 5,
+      "derived_image_id": "coco_000000255162_gaussian_noise_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000255162",
+      "corruption_family": "jpeg_compression",
+      "severity": 1,
+      "derived_image_id": "coco_000000255162_jpeg_compression_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000255162",
+      "corruption_family": "jpeg_compression",
+      "severity": 2,
+      "derived_image_id": "coco_000000255162_jpeg_compression_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000255162",
+      "corruption_family": "jpeg_compression",
+      "severity": 3,
+      "derived_image_id": "coco_000000255162_jpeg_compression_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000255162",
+      "corruption_family": "jpeg_compression",
+      "severity": 4,
+      "derived_image_id": "coco_000000255162_jpeg_compression_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000255162",
+      "corruption_family": "jpeg_compression",
+      "severity": 5,
+      "derived_image_id": "coco_000000255162_jpeg_compression_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000275223",
+      "corruption_family": "contrast_reduction",
+      "severity": 1,
+      "derived_image_id": "coco_000000275223_contrast_reduction_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000275223",
+      "corruption_family": "contrast_reduction",
+      "severity": 2,
+      "derived_image_id": "coco_000000275223_contrast_reduction_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000275223",
+      "corruption_family": "contrast_reduction",
+      "severity": 3,
+      "derived_image_id": "coco_000000275223_contrast_reduction_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000275223",
+      "corruption_family": "contrast_reduction",
+      "severity": 4,
+      "derived_image_id": "coco_000000275223_contrast_reduction_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000275223",
+      "corruption_family": "contrast_reduction",
+      "severity": 5,
+      "derived_image_id": "coco_000000275223_contrast_reduction_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000275223",
+      "corruption_family": "gaussian_blur",
+      "severity": 1,
+      "derived_image_id": "coco_000000275223_gaussian_blur_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000275223",
+      "corruption_family": "gaussian_blur",
+      "severity": 2,
+      "derived_image_id": "coco_000000275223_gaussian_blur_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000275223",
+      "corruption_family": "gaussian_blur",
+      "severity": 3,
+      "derived_image_id": "coco_000000275223_gaussian_blur_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000275223",
+      "corruption_family": "gaussian_blur",
+      "severity": 4,
+      "derived_image_id": "coco_000000275223_gaussian_blur_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000275223",
+      "corruption_family": "gaussian_blur",
+      "severity": 5,
+      "derived_image_id": "coco_000000275223_gaussian_blur_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000275223",
+      "corruption_family": "gaussian_noise",
+      "severity": 1,
+      "derived_image_id": "coco_000000275223_gaussian_noise_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000275223",
+      "corruption_family": "gaussian_noise",
+      "severity": 2,
+      "derived_image_id": "coco_000000275223_gaussian_noise_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000275223",
+      "corruption_family": "gaussian_noise",
+      "severity": 3,
+      "derived_image_id": "coco_000000275223_gaussian_noise_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000275223",
+      "corruption_family": "gaussian_noise",
+      "severity": 4,
+      "derived_image_id": "coco_000000275223_gaussian_noise_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000275223",
+      "corruption_family": "gaussian_noise",
+      "severity": 5,
+      "derived_image_id": "coco_000000275223_gaussian_noise_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000275223",
+      "corruption_family": "jpeg_compression",
+      "severity": 1,
+      "derived_image_id": "coco_000000275223_jpeg_compression_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000275223",
+      "corruption_family": "jpeg_compression",
+      "severity": 2,
+      "derived_image_id": "coco_000000275223_jpeg_compression_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000275223",
+      "corruption_family": "jpeg_compression",
+      "severity": 3,
+      "derived_image_id": "coco_000000275223_jpeg_compression_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000275223",
+      "corruption_family": "jpeg_compression",
+      "severity": 4,
+      "derived_image_id": "coco_000000275223_jpeg_compression_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000275223",
+      "corruption_family": "jpeg_compression",
+      "severity": 5,
+      "derived_image_id": "coco_000000275223_jpeg_compression_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000309373",
+      "corruption_family": "contrast_reduction",
+      "severity": 1,
+      "derived_image_id": "coco_000000309373_contrast_reduction_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000309373",
+      "corruption_family": "contrast_reduction",
+      "severity": 2,
+      "derived_image_id": "coco_000000309373_contrast_reduction_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000309373",
+      "corruption_family": "contrast_reduction",
+      "severity": 3,
+      "derived_image_id": "coco_000000309373_contrast_reduction_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000309373",
+      "corruption_family": "contrast_reduction",
+      "severity": 4,
+      "derived_image_id": "coco_000000309373_contrast_reduction_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000309373",
+      "corruption_family": "contrast_reduction",
+      "severity": 5,
+      "derived_image_id": "coco_000000309373_contrast_reduction_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000309373",
+      "corruption_family": "gaussian_blur",
+      "severity": 1,
+      "derived_image_id": "coco_000000309373_gaussian_blur_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000309373",
+      "corruption_family": "gaussian_blur",
+      "severity": 2,
+      "derived_image_id": "coco_000000309373_gaussian_blur_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000309373",
+      "corruption_family": "gaussian_blur",
+      "severity": 3,
+      "derived_image_id": "coco_000000309373_gaussian_blur_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000309373",
+      "corruption_family": "gaussian_blur",
+      "severity": 4,
+      "derived_image_id": "coco_000000309373_gaussian_blur_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000309373",
+      "corruption_family": "gaussian_blur",
+      "severity": 5,
+      "derived_image_id": "coco_000000309373_gaussian_blur_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000309373",
+      "corruption_family": "gaussian_noise",
+      "severity": 1,
+      "derived_image_id": "coco_000000309373_gaussian_noise_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000309373",
+      "corruption_family": "gaussian_noise",
+      "severity": 2,
+      "derived_image_id": "coco_000000309373_gaussian_noise_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000309373",
+      "corruption_family": "gaussian_noise",
+      "severity": 3,
+      "derived_image_id": "coco_000000309373_gaussian_noise_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000309373",
+      "corruption_family": "gaussian_noise",
+      "severity": 4,
+      "derived_image_id": "coco_000000309373_gaussian_noise_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000309373",
+      "corruption_family": "gaussian_noise",
+      "severity": 5,
+      "derived_image_id": "coco_000000309373_gaussian_noise_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000309373",
+      "corruption_family": "jpeg_compression",
+      "severity": 1,
+      "derived_image_id": "coco_000000309373_jpeg_compression_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000309373",
+      "corruption_family": "jpeg_compression",
+      "severity": 2,
+      "derived_image_id": "coco_000000309373_jpeg_compression_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000309373",
+      "corruption_family": "jpeg_compression",
+      "severity": 3,
+      "derived_image_id": "coco_000000309373_jpeg_compression_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000309373",
+      "corruption_family": "jpeg_compression",
+      "severity": 4,
+      "derived_image_id": "coco_000000309373_jpeg_compression_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000309373",
+      "corruption_family": "jpeg_compression",
+      "severity": 5,
+      "derived_image_id": "coco_000000309373_jpeg_compression_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000339991",
+      "corruption_family": "contrast_reduction",
+      "severity": 1,
+      "derived_image_id": "coco_000000339991_contrast_reduction_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000339991",
+      "corruption_family": "contrast_reduction",
+      "severity": 2,
+      "derived_image_id": "coco_000000339991_contrast_reduction_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000339991",
+      "corruption_family": "contrast_reduction",
+      "severity": 3,
+      "derived_image_id": "coco_000000339991_contrast_reduction_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000339991",
+      "corruption_family": "contrast_reduction",
+      "severity": 4,
+      "derived_image_id": "coco_000000339991_contrast_reduction_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000339991",
+      "corruption_family": "contrast_reduction",
+      "severity": 5,
+      "derived_image_id": "coco_000000339991_contrast_reduction_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000339991",
+      "corruption_family": "gaussian_blur",
+      "severity": 1,
+      "derived_image_id": "coco_000000339991_gaussian_blur_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000339991",
+      "corruption_family": "gaussian_blur",
+      "severity": 2,
+      "derived_image_id": "coco_000000339991_gaussian_blur_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000339991",
+      "corruption_family": "gaussian_blur",
+      "severity": 3,
+      "derived_image_id": "coco_000000339991_gaussian_blur_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000339991",
+      "corruption_family": "gaussian_blur",
+      "severity": 4,
+      "derived_image_id": "coco_000000339991_gaussian_blur_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000339991",
+      "corruption_family": "gaussian_blur",
+      "severity": 5,
+      "derived_image_id": "coco_000000339991_gaussian_blur_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000339991",
+      "corruption_family": "gaussian_noise",
+      "severity": 1,
+      "derived_image_id": "coco_000000339991_gaussian_noise_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000339991",
+      "corruption_family": "gaussian_noise",
+      "severity": 2,
+      "derived_image_id": "coco_000000339991_gaussian_noise_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000339991",
+      "corruption_family": "gaussian_noise",
+      "severity": 3,
+      "derived_image_id": "coco_000000339991_gaussian_noise_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000339991",
+      "corruption_family": "gaussian_noise",
+      "severity": 4,
+      "derived_image_id": "coco_000000339991_gaussian_noise_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000339991",
+      "corruption_family": "gaussian_noise",
+      "severity": 5,
+      "derived_image_id": "coco_000000339991_gaussian_noise_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000339991",
+      "corruption_family": "jpeg_compression",
+      "severity": 1,
+      "derived_image_id": "coco_000000339991_jpeg_compression_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000339991",
+      "corruption_family": "jpeg_compression",
+      "severity": 2,
+      "derived_image_id": "coco_000000339991_jpeg_compression_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000339991",
+      "corruption_family": "jpeg_compression",
+      "severity": 3,
+      "derived_image_id": "coco_000000339991_jpeg_compression_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000339991",
+      "corruption_family": "jpeg_compression",
+      "severity": 4,
+      "derived_image_id": "coco_000000339991_jpeg_compression_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000339991",
+      "corruption_family": "jpeg_compression",
+      "severity": 5,
+      "derived_image_id": "coco_000000339991_jpeg_compression_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000380853",
+      "corruption_family": "contrast_reduction",
+      "severity": 1,
+      "derived_image_id": "coco_000000380853_contrast_reduction_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000380853",
+      "corruption_family": "contrast_reduction",
+      "severity": 2,
+      "derived_image_id": "coco_000000380853_contrast_reduction_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000380853",
+      "corruption_family": "contrast_reduction",
+      "severity": 3,
+      "derived_image_id": "coco_000000380853_contrast_reduction_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000380853",
+      "corruption_family": "contrast_reduction",
+      "severity": 4,
+      "derived_image_id": "coco_000000380853_contrast_reduction_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000380853",
+      "corruption_family": "contrast_reduction",
+      "severity": 5,
+      "derived_image_id": "coco_000000380853_contrast_reduction_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000380853",
+      "corruption_family": "gaussian_blur",
+      "severity": 1,
+      "derived_image_id": "coco_000000380853_gaussian_blur_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000380853",
+      "corruption_family": "gaussian_blur",
+      "severity": 2,
+      "derived_image_id": "coco_000000380853_gaussian_blur_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000380853",
+      "corruption_family": "gaussian_blur",
+      "severity": 3,
+      "derived_image_id": "coco_000000380853_gaussian_blur_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000380853",
+      "corruption_family": "gaussian_blur",
+      "severity": 4,
+      "derived_image_id": "coco_000000380853_gaussian_blur_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000380853",
+      "corruption_family": "gaussian_blur",
+      "severity": 5,
+      "derived_image_id": "coco_000000380853_gaussian_blur_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000380853",
+      "corruption_family": "gaussian_noise",
+      "severity": 1,
+      "derived_image_id": "coco_000000380853_gaussian_noise_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000380853",
+      "corruption_family": "gaussian_noise",
+      "severity": 2,
+      "derived_image_id": "coco_000000380853_gaussian_noise_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000380853",
+      "corruption_family": "gaussian_noise",
+      "severity": 3,
+      "derived_image_id": "coco_000000380853_gaussian_noise_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000380853",
+      "corruption_family": "gaussian_noise",
+      "severity": 4,
+      "derived_image_id": "coco_000000380853_gaussian_noise_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000380853",
+      "corruption_family": "gaussian_noise",
+      "severity": 5,
+      "derived_image_id": "coco_000000380853_gaussian_noise_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000380853",
+      "corruption_family": "jpeg_compression",
+      "severity": 1,
+      "derived_image_id": "coco_000000380853_jpeg_compression_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000380853",
+      "corruption_family": "jpeg_compression",
+      "severity": 2,
+      "derived_image_id": "coco_000000380853_jpeg_compression_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000380853",
+      "corruption_family": "jpeg_compression",
+      "severity": 3,
+      "derived_image_id": "coco_000000380853_jpeg_compression_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000380853",
+      "corruption_family": "jpeg_compression",
+      "severity": 4,
+      "derived_image_id": "coco_000000380853_jpeg_compression_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000380853",
+      "corruption_family": "jpeg_compression",
+      "severity": 5,
+      "derived_image_id": "coco_000000380853_jpeg_compression_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000395960",
+      "corruption_family": "contrast_reduction",
+      "severity": 1,
+      "derived_image_id": "coco_000000395960_contrast_reduction_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000395960",
+      "corruption_family": "contrast_reduction",
+      "severity": 2,
+      "derived_image_id": "coco_000000395960_contrast_reduction_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000395960",
+      "corruption_family": "contrast_reduction",
+      "severity": 3,
+      "derived_image_id": "coco_000000395960_contrast_reduction_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000395960",
+      "corruption_family": "contrast_reduction",
+      "severity": 4,
+      "derived_image_id": "coco_000000395960_contrast_reduction_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000395960",
+      "corruption_family": "contrast_reduction",
+      "severity": 5,
+      "derived_image_id": "coco_000000395960_contrast_reduction_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000395960",
+      "corruption_family": "gaussian_blur",
+      "severity": 1,
+      "derived_image_id": "coco_000000395960_gaussian_blur_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000395960",
+      "corruption_family": "gaussian_blur",
+      "severity": 2,
+      "derived_image_id": "coco_000000395960_gaussian_blur_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000395960",
+      "corruption_family": "gaussian_blur",
+      "severity": 3,
+      "derived_image_id": "coco_000000395960_gaussian_blur_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000395960",
+      "corruption_family": "gaussian_blur",
+      "severity": 4,
+      "derived_image_id": "coco_000000395960_gaussian_blur_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000395960",
+      "corruption_family": "gaussian_blur",
+      "severity": 5,
+      "derived_image_id": "coco_000000395960_gaussian_blur_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000395960",
+      "corruption_family": "gaussian_noise",
+      "severity": 1,
+      "derived_image_id": "coco_000000395960_gaussian_noise_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000395960",
+      "corruption_family": "gaussian_noise",
+      "severity": 2,
+      "derived_image_id": "coco_000000395960_gaussian_noise_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000395960",
+      "corruption_family": "gaussian_noise",
+      "severity": 3,
+      "derived_image_id": "coco_000000395960_gaussian_noise_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000395960",
+      "corruption_family": "gaussian_noise",
+      "severity": 4,
+      "derived_image_id": "coco_000000395960_gaussian_noise_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000395960",
+      "corruption_family": "gaussian_noise",
+      "severity": 5,
+      "derived_image_id": "coco_000000395960_gaussian_noise_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000395960",
+      "corruption_family": "jpeg_compression",
+      "severity": 1,
+      "derived_image_id": "coco_000000395960_jpeg_compression_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000395960",
+      "corruption_family": "jpeg_compression",
+      "severity": 2,
+      "derived_image_id": "coco_000000395960_jpeg_compression_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000395960",
+      "corruption_family": "jpeg_compression",
+      "severity": 3,
+      "derived_image_id": "coco_000000395960_jpeg_compression_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000395960",
+      "corruption_family": "jpeg_compression",
+      "severity": 4,
+      "derived_image_id": "coco_000000395960_jpeg_compression_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000395960",
+      "corruption_family": "jpeg_compression",
+      "severity": 5,
+      "derived_image_id": "coco_000000395960_jpeg_compression_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000411187",
+      "corruption_family": "contrast_reduction",
+      "severity": 1,
+      "derived_image_id": "coco_000000411187_contrast_reduction_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000411187",
+      "corruption_family": "contrast_reduction",
+      "severity": 2,
+      "derived_image_id": "coco_000000411187_contrast_reduction_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000411187",
+      "corruption_family": "contrast_reduction",
+      "severity": 3,
+      "derived_image_id": "coco_000000411187_contrast_reduction_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000411187",
+      "corruption_family": "contrast_reduction",
+      "severity": 4,
+      "derived_image_id": "coco_000000411187_contrast_reduction_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000411187",
+      "corruption_family": "contrast_reduction",
+      "severity": 5,
+      "derived_image_id": "coco_000000411187_contrast_reduction_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000411187",
+      "corruption_family": "gaussian_blur",
+      "severity": 1,
+      "derived_image_id": "coco_000000411187_gaussian_blur_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000411187",
+      "corruption_family": "gaussian_blur",
+      "severity": 2,
+      "derived_image_id": "coco_000000411187_gaussian_blur_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000411187",
+      "corruption_family": "gaussian_blur",
+      "severity": 3,
+      "derived_image_id": "coco_000000411187_gaussian_blur_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000411187",
+      "corruption_family": "gaussian_blur",
+      "severity": 4,
+      "derived_image_id": "coco_000000411187_gaussian_blur_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000411187",
+      "corruption_family": "gaussian_blur",
+      "severity": 5,
+      "derived_image_id": "coco_000000411187_gaussian_blur_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000411187",
+      "corruption_family": "gaussian_noise",
+      "severity": 1,
+      "derived_image_id": "coco_000000411187_gaussian_noise_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000411187",
+      "corruption_family": "gaussian_noise",
+      "severity": 2,
+      "derived_image_id": "coco_000000411187_gaussian_noise_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000411187",
+      "corruption_family": "gaussian_noise",
+      "severity": 3,
+      "derived_image_id": "coco_000000411187_gaussian_noise_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000411187",
+      "corruption_family": "gaussian_noise",
+      "severity": 4,
+      "derived_image_id": "coco_000000411187_gaussian_noise_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000411187",
+      "corruption_family": "gaussian_noise",
+      "severity": 5,
+      "derived_image_id": "coco_000000411187_gaussian_noise_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000411187",
+      "corruption_family": "jpeg_compression",
+      "severity": 1,
+      "derived_image_id": "coco_000000411187_jpeg_compression_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000411187",
+      "corruption_family": "jpeg_compression",
+      "severity": 2,
+      "derived_image_id": "coco_000000411187_jpeg_compression_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000411187",
+      "corruption_family": "jpeg_compression",
+      "severity": 3,
+      "derived_image_id": "coco_000000411187_jpeg_compression_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000411187",
+      "corruption_family": "jpeg_compression",
+      "severity": 4,
+      "derived_image_id": "coco_000000411187_jpeg_compression_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000411187",
+      "corruption_family": "jpeg_compression",
+      "severity": 5,
+      "derived_image_id": "coco_000000411187_jpeg_compression_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000421776",
+      "corruption_family": "contrast_reduction",
+      "severity": 1,
+      "derived_image_id": "coco_000000421776_contrast_reduction_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000421776",
+      "corruption_family": "contrast_reduction",
+      "severity": 2,
+      "derived_image_id": "coco_000000421776_contrast_reduction_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000421776",
+      "corruption_family": "contrast_reduction",
+      "severity": 3,
+      "derived_image_id": "coco_000000421776_contrast_reduction_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000421776",
+      "corruption_family": "contrast_reduction",
+      "severity": 4,
+      "derived_image_id": "coco_000000421776_contrast_reduction_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000421776",
+      "corruption_family": "contrast_reduction",
+      "severity": 5,
+      "derived_image_id": "coco_000000421776_contrast_reduction_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000421776",
+      "corruption_family": "gaussian_blur",
+      "severity": 1,
+      "derived_image_id": "coco_000000421776_gaussian_blur_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000421776",
+      "corruption_family": "gaussian_blur",
+      "severity": 2,
+      "derived_image_id": "coco_000000421776_gaussian_blur_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000421776",
+      "corruption_family": "gaussian_blur",
+      "severity": 3,
+      "derived_image_id": "coco_000000421776_gaussian_blur_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000421776",
+      "corruption_family": "gaussian_blur",
+      "severity": 4,
+      "derived_image_id": "coco_000000421776_gaussian_blur_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000421776",
+      "corruption_family": "gaussian_blur",
+      "severity": 5,
+      "derived_image_id": "coco_000000421776_gaussian_blur_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000421776",
+      "corruption_family": "gaussian_noise",
+      "severity": 1,
+      "derived_image_id": "coco_000000421776_gaussian_noise_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000421776",
+      "corruption_family": "gaussian_noise",
+      "severity": 2,
+      "derived_image_id": "coco_000000421776_gaussian_noise_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000421776",
+      "corruption_family": "gaussian_noise",
+      "severity": 3,
+      "derived_image_id": "coco_000000421776_gaussian_noise_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000421776",
+      "corruption_family": "gaussian_noise",
+      "severity": 4,
+      "derived_image_id": "coco_000000421776_gaussian_noise_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000421776",
+      "corruption_family": "gaussian_noise",
+      "severity": 5,
+      "derived_image_id": "coco_000000421776_gaussian_noise_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000421776",
+      "corruption_family": "jpeg_compression",
+      "severity": 1,
+      "derived_image_id": "coco_000000421776_jpeg_compression_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000421776",
+      "corruption_family": "jpeg_compression",
+      "severity": 2,
+      "derived_image_id": "coco_000000421776_jpeg_compression_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000421776",
+      "corruption_family": "jpeg_compression",
+      "severity": 3,
+      "derived_image_id": "coco_000000421776_jpeg_compression_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000421776",
+      "corruption_family": "jpeg_compression",
+      "severity": 4,
+      "derived_image_id": "coco_000000421776_jpeg_compression_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000421776",
+      "corruption_family": "jpeg_compression",
+      "severity": 5,
+      "derived_image_id": "coco_000000421776_jpeg_compression_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000453556",
+      "corruption_family": "contrast_reduction",
+      "severity": 1,
+      "derived_image_id": "coco_000000453556_contrast_reduction_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000453556",
+      "corruption_family": "contrast_reduction",
+      "severity": 2,
+      "derived_image_id": "coco_000000453556_contrast_reduction_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000453556",
+      "corruption_family": "contrast_reduction",
+      "severity": 3,
+      "derived_image_id": "coco_000000453556_contrast_reduction_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000453556",
+      "corruption_family": "contrast_reduction",
+      "severity": 4,
+      "derived_image_id": "coco_000000453556_contrast_reduction_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000453556",
+      "corruption_family": "contrast_reduction",
+      "severity": 5,
+      "derived_image_id": "coco_000000453556_contrast_reduction_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000453556",
+      "corruption_family": "gaussian_blur",
+      "severity": 1,
+      "derived_image_id": "coco_000000453556_gaussian_blur_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000453556",
+      "corruption_family": "gaussian_blur",
+      "severity": 2,
+      "derived_image_id": "coco_000000453556_gaussian_blur_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000453556",
+      "corruption_family": "gaussian_blur",
+      "severity": 3,
+      "derived_image_id": "coco_000000453556_gaussian_blur_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000453556",
+      "corruption_family": "gaussian_blur",
+      "severity": 4,
+      "derived_image_id": "coco_000000453556_gaussian_blur_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000453556",
+      "corruption_family": "gaussian_blur",
+      "severity": 5,
+      "derived_image_id": "coco_000000453556_gaussian_blur_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000453556",
+      "corruption_family": "gaussian_noise",
+      "severity": 1,
+      "derived_image_id": "coco_000000453556_gaussian_noise_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000453556",
+      "corruption_family": "gaussian_noise",
+      "severity": 2,
+      "derived_image_id": "coco_000000453556_gaussian_noise_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000453556",
+      "corruption_family": "gaussian_noise",
+      "severity": 3,
+      "derived_image_id": "coco_000000453556_gaussian_noise_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000453556",
+      "corruption_family": "gaussian_noise",
+      "severity": 4,
+      "derived_image_id": "coco_000000453556_gaussian_noise_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000453556",
+      "corruption_family": "gaussian_noise",
+      "severity": 5,
+      "derived_image_id": "coco_000000453556_gaussian_noise_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000453556",
+      "corruption_family": "jpeg_compression",
+      "severity": 1,
+      "derived_image_id": "coco_000000453556_jpeg_compression_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000453556",
+      "corruption_family": "jpeg_compression",
+      "severity": 2,
+      "derived_image_id": "coco_000000453556_jpeg_compression_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000453556",
+      "corruption_family": "jpeg_compression",
+      "severity": 3,
+      "derived_image_id": "coco_000000453556_jpeg_compression_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000453556",
+      "corruption_family": "jpeg_compression",
+      "severity": 4,
+      "derived_image_id": "coco_000000453556_jpeg_compression_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000453556",
+      "corruption_family": "jpeg_compression",
+      "severity": 5,
+      "derived_image_id": "coco_000000453556_jpeg_compression_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000473631",
+      "corruption_family": "contrast_reduction",
+      "severity": 1,
+      "derived_image_id": "coco_000000473631_contrast_reduction_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000473631",
+      "corruption_family": "contrast_reduction",
+      "severity": 2,
+      "derived_image_id": "coco_000000473631_contrast_reduction_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000473631",
+      "corruption_family": "contrast_reduction",
+      "severity": 3,
+      "derived_image_id": "coco_000000473631_contrast_reduction_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000473631",
+      "corruption_family": "contrast_reduction",
+      "severity": 4,
+      "derived_image_id": "coco_000000473631_contrast_reduction_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000473631",
+      "corruption_family": "contrast_reduction",
+      "severity": 5,
+      "derived_image_id": "coco_000000473631_contrast_reduction_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000473631",
+      "corruption_family": "gaussian_blur",
+      "severity": 1,
+      "derived_image_id": "coco_000000473631_gaussian_blur_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000473631",
+      "corruption_family": "gaussian_blur",
+      "severity": 2,
+      "derived_image_id": "coco_000000473631_gaussian_blur_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000473631",
+      "corruption_family": "gaussian_blur",
+      "severity": 3,
+      "derived_image_id": "coco_000000473631_gaussian_blur_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000473631",
+      "corruption_family": "gaussian_blur",
+      "severity": 4,
+      "derived_image_id": "coco_000000473631_gaussian_blur_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000473631",
+      "corruption_family": "gaussian_blur",
+      "severity": 5,
+      "derived_image_id": "coco_000000473631_gaussian_blur_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000473631",
+      "corruption_family": "gaussian_noise",
+      "severity": 1,
+      "derived_image_id": "coco_000000473631_gaussian_noise_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000473631",
+      "corruption_family": "gaussian_noise",
+      "severity": 2,
+      "derived_image_id": "coco_000000473631_gaussian_noise_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000473631",
+      "corruption_family": "gaussian_noise",
+      "severity": 3,
+      "derived_image_id": "coco_000000473631_gaussian_noise_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000473631",
+      "corruption_family": "gaussian_noise",
+      "severity": 4,
+      "derived_image_id": "coco_000000473631_gaussian_noise_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000473631",
+      "corruption_family": "gaussian_noise",
+      "severity": 5,
+      "derived_image_id": "coco_000000473631_gaussian_noise_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000473631",
+      "corruption_family": "jpeg_compression",
+      "severity": 1,
+      "derived_image_id": "coco_000000473631_jpeg_compression_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000473631",
+      "corruption_family": "jpeg_compression",
+      "severity": 2,
+      "derived_image_id": "coco_000000473631_jpeg_compression_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000473631",
+      "corruption_family": "jpeg_compression",
+      "severity": 3,
+      "derived_image_id": "coco_000000473631_jpeg_compression_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000473631",
+      "corruption_family": "jpeg_compression",
+      "severity": 4,
+      "derived_image_id": "coco_000000473631_jpeg_compression_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000473631",
+      "corruption_family": "jpeg_compression",
+      "severity": 5,
+      "derived_image_id": "coco_000000473631_jpeg_compression_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000497180",
+      "corruption_family": "contrast_reduction",
+      "severity": 1,
+      "derived_image_id": "coco_000000497180_contrast_reduction_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000497180",
+      "corruption_family": "contrast_reduction",
+      "severity": 2,
+      "derived_image_id": "coco_000000497180_contrast_reduction_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000497180",
+      "corruption_family": "contrast_reduction",
+      "severity": 3,
+      "derived_image_id": "coco_000000497180_contrast_reduction_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000497180",
+      "corruption_family": "contrast_reduction",
+      "severity": 4,
+      "derived_image_id": "coco_000000497180_contrast_reduction_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000497180",
+      "corruption_family": "contrast_reduction",
+      "severity": 5,
+      "derived_image_id": "coco_000000497180_contrast_reduction_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000497180",
+      "corruption_family": "gaussian_blur",
+      "severity": 1,
+      "derived_image_id": "coco_000000497180_gaussian_blur_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000497180",
+      "corruption_family": "gaussian_blur",
+      "severity": 2,
+      "derived_image_id": "coco_000000497180_gaussian_blur_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000497180",
+      "corruption_family": "gaussian_blur",
+      "severity": 3,
+      "derived_image_id": "coco_000000497180_gaussian_blur_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000497180",
+      "corruption_family": "gaussian_blur",
+      "severity": 4,
+      "derived_image_id": "coco_000000497180_gaussian_blur_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000497180",
+      "corruption_family": "gaussian_blur",
+      "severity": 5,
+      "derived_image_id": "coco_000000497180_gaussian_blur_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000497180",
+      "corruption_family": "gaussian_noise",
+      "severity": 1,
+      "derived_image_id": "coco_000000497180_gaussian_noise_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000497180",
+      "corruption_family": "gaussian_noise",
+      "severity": 2,
+      "derived_image_id": "coco_000000497180_gaussian_noise_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000497180",
+      "corruption_family": "gaussian_noise",
+      "severity": 3,
+      "derived_image_id": "coco_000000497180_gaussian_noise_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000497180",
+      "corruption_family": "gaussian_noise",
+      "severity": 4,
+      "derived_image_id": "coco_000000497180_gaussian_noise_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000497180",
+      "corruption_family": "gaussian_noise",
+      "severity": 5,
+      "derived_image_id": "coco_000000497180_gaussian_noise_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000497180",
+      "corruption_family": "jpeg_compression",
+      "severity": 1,
+      "derived_image_id": "coco_000000497180_jpeg_compression_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000497180",
+      "corruption_family": "jpeg_compression",
+      "severity": 2,
+      "derived_image_id": "coco_000000497180_jpeg_compression_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000497180",
+      "corruption_family": "jpeg_compression",
+      "severity": 3,
+      "derived_image_id": "coco_000000497180_jpeg_compression_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000497180",
+      "corruption_family": "jpeg_compression",
+      "severity": 4,
+      "derived_image_id": "coco_000000497180_jpeg_compression_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000497180",
+      "corruption_family": "jpeg_compression",
+      "severity": 5,
+      "derived_image_id": "coco_000000497180_jpeg_compression_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000510507",
+      "corruption_family": "contrast_reduction",
+      "severity": 1,
+      "derived_image_id": "coco_000000510507_contrast_reduction_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000510507",
+      "corruption_family": "contrast_reduction",
+      "severity": 2,
+      "derived_image_id": "coco_000000510507_contrast_reduction_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000510507",
+      "corruption_family": "contrast_reduction",
+      "severity": 3,
+      "derived_image_id": "coco_000000510507_contrast_reduction_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000510507",
+      "corruption_family": "contrast_reduction",
+      "severity": 4,
+      "derived_image_id": "coco_000000510507_contrast_reduction_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000510507",
+      "corruption_family": "contrast_reduction",
+      "severity": 5,
+      "derived_image_id": "coco_000000510507_contrast_reduction_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000510507",
+      "corruption_family": "gaussian_blur",
+      "severity": 1,
+      "derived_image_id": "coco_000000510507_gaussian_blur_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000510507",
+      "corruption_family": "gaussian_blur",
+      "severity": 2,
+      "derived_image_id": "coco_000000510507_gaussian_blur_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000510507",
+      "corruption_family": "gaussian_blur",
+      "severity": 3,
+      "derived_image_id": "coco_000000510507_gaussian_blur_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000510507",
+      "corruption_family": "gaussian_blur",
+      "severity": 4,
+      "derived_image_id": "coco_000000510507_gaussian_blur_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000510507",
+      "corruption_family": "gaussian_blur",
+      "severity": 5,
+      "derived_image_id": "coco_000000510507_gaussian_blur_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000510507",
+      "corruption_family": "gaussian_noise",
+      "severity": 1,
+      "derived_image_id": "coco_000000510507_gaussian_noise_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000510507",
+      "corruption_family": "gaussian_noise",
+      "severity": 2,
+      "derived_image_id": "coco_000000510507_gaussian_noise_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000510507",
+      "corruption_family": "gaussian_noise",
+      "severity": 3,
+      "derived_image_id": "coco_000000510507_gaussian_noise_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000510507",
+      "corruption_family": "gaussian_noise",
+      "severity": 4,
+      "derived_image_id": "coco_000000510507_gaussian_noise_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000510507",
+      "corruption_family": "gaussian_noise",
+      "severity": 5,
+      "derived_image_id": "coco_000000510507_gaussian_noise_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000510507",
+      "corruption_family": "jpeg_compression",
+      "severity": 1,
+      "derived_image_id": "coco_000000510507_jpeg_compression_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000510507",
+      "corruption_family": "jpeg_compression",
+      "severity": 2,
+      "derived_image_id": "coco_000000510507_jpeg_compression_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000510507",
+      "corruption_family": "jpeg_compression",
+      "severity": 3,
+      "derived_image_id": "coco_000000510507_jpeg_compression_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000510507",
+      "corruption_family": "jpeg_compression",
+      "severity": 4,
+      "derived_image_id": "coco_000000510507_jpeg_compression_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000510507",
+      "corruption_family": "jpeg_compression",
+      "severity": 5,
+      "derived_image_id": "coco_000000510507_jpeg_compression_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000527338",
+      "corruption_family": "contrast_reduction",
+      "severity": 1,
+      "derived_image_id": "coco_000000527338_contrast_reduction_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000527338",
+      "corruption_family": "contrast_reduction",
+      "severity": 2,
+      "derived_image_id": "coco_000000527338_contrast_reduction_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000527338",
+      "corruption_family": "contrast_reduction",
+      "severity": 3,
+      "derived_image_id": "coco_000000527338_contrast_reduction_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000527338",
+      "corruption_family": "contrast_reduction",
+      "severity": 4,
+      "derived_image_id": "coco_000000527338_contrast_reduction_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000527338",
+      "corruption_family": "contrast_reduction",
+      "severity": 5,
+      "derived_image_id": "coco_000000527338_contrast_reduction_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000527338",
+      "corruption_family": "gaussian_blur",
+      "severity": 1,
+      "derived_image_id": "coco_000000527338_gaussian_blur_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000527338",
+      "corruption_family": "gaussian_blur",
+      "severity": 2,
+      "derived_image_id": "coco_000000527338_gaussian_blur_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000527338",
+      "corruption_family": "gaussian_blur",
+      "severity": 3,
+      "derived_image_id": "coco_000000527338_gaussian_blur_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000527338",
+      "corruption_family": "gaussian_blur",
+      "severity": 4,
+      "derived_image_id": "coco_000000527338_gaussian_blur_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000527338",
+      "corruption_family": "gaussian_blur",
+      "severity": 5,
+      "derived_image_id": "coco_000000527338_gaussian_blur_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000527338",
+      "corruption_family": "gaussian_noise",
+      "severity": 1,
+      "derived_image_id": "coco_000000527338_gaussian_noise_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000527338",
+      "corruption_family": "gaussian_noise",
+      "severity": 2,
+      "derived_image_id": "coco_000000527338_gaussian_noise_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000527338",
+      "corruption_family": "gaussian_noise",
+      "severity": 3,
+      "derived_image_id": "coco_000000527338_gaussian_noise_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000527338",
+      "corruption_family": "gaussian_noise",
+      "severity": 4,
+      "derived_image_id": "coco_000000527338_gaussian_noise_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000527338",
+      "corruption_family": "gaussian_noise",
+      "severity": 5,
+      "derived_image_id": "coco_000000527338_gaussian_noise_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000527338",
+      "corruption_family": "jpeg_compression",
+      "severity": 1,
+      "derived_image_id": "coco_000000527338_jpeg_compression_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000527338",
+      "corruption_family": "jpeg_compression",
+      "severity": 2,
+      "derived_image_id": "coco_000000527338_jpeg_compression_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000527338",
+      "corruption_family": "jpeg_compression",
+      "severity": 3,
+      "derived_image_id": "coco_000000527338_jpeg_compression_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000527338",
+      "corruption_family": "jpeg_compression",
+      "severity": 4,
+      "derived_image_id": "coco_000000527338_jpeg_compression_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000527338",
+      "corruption_family": "jpeg_compression",
+      "severity": 5,
+      "derived_image_id": "coco_000000527338_jpeg_compression_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000539325",
+      "corruption_family": "contrast_reduction",
+      "severity": 1,
+      "derived_image_id": "coco_000000539325_contrast_reduction_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000539325",
+      "corruption_family": "contrast_reduction",
+      "severity": 2,
+      "derived_image_id": "coco_000000539325_contrast_reduction_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000539325",
+      "corruption_family": "contrast_reduction",
+      "severity": 3,
+      "derived_image_id": "coco_000000539325_contrast_reduction_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000539325",
+      "corruption_family": "contrast_reduction",
+      "severity": 4,
+      "derived_image_id": "coco_000000539325_contrast_reduction_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000539325",
+      "corruption_family": "contrast_reduction",
+      "severity": 5,
+      "derived_image_id": "coco_000000539325_contrast_reduction_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000539325",
+      "corruption_family": "gaussian_blur",
+      "severity": 1,
+      "derived_image_id": "coco_000000539325_gaussian_blur_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000539325",
+      "corruption_family": "gaussian_blur",
+      "severity": 2,
+      "derived_image_id": "coco_000000539325_gaussian_blur_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000539325",
+      "corruption_family": "gaussian_blur",
+      "severity": 3,
+      "derived_image_id": "coco_000000539325_gaussian_blur_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000539325",
+      "corruption_family": "gaussian_blur",
+      "severity": 4,
+      "derived_image_id": "coco_000000539325_gaussian_blur_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000539325",
+      "corruption_family": "gaussian_blur",
+      "severity": 5,
+      "derived_image_id": "coco_000000539325_gaussian_blur_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000539325",
+      "corruption_family": "gaussian_noise",
+      "severity": 1,
+      "derived_image_id": "coco_000000539325_gaussian_noise_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000539325",
+      "corruption_family": "gaussian_noise",
+      "severity": 2,
+      "derived_image_id": "coco_000000539325_gaussian_noise_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000539325",
+      "corruption_family": "gaussian_noise",
+      "severity": 3,
+      "derived_image_id": "coco_000000539325_gaussian_noise_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000539325",
+      "corruption_family": "gaussian_noise",
+      "severity": 4,
+      "derived_image_id": "coco_000000539325_gaussian_noise_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000539325",
+      "corruption_family": "gaussian_noise",
+      "severity": 5,
+      "derived_image_id": "coco_000000539325_gaussian_noise_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000539325",
+      "corruption_family": "jpeg_compression",
+      "severity": 1,
+      "derived_image_id": "coco_000000539325_jpeg_compression_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000539325",
+      "corruption_family": "jpeg_compression",
+      "severity": 2,
+      "derived_image_id": "coco_000000539325_jpeg_compression_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000539325",
+      "corruption_family": "jpeg_compression",
+      "severity": 3,
+      "derived_image_id": "coco_000000539325_jpeg_compression_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000539325",
+      "corruption_family": "jpeg_compression",
+      "severity": 4,
+      "derived_image_id": "coco_000000539325_jpeg_compression_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000539325",
+      "corruption_family": "jpeg_compression",
+      "severity": 5,
+      "derived_image_id": "coco_000000539325_jpeg_compression_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000547409",
+      "corruption_family": "contrast_reduction",
+      "severity": 1,
+      "derived_image_id": "coco_000000547409_contrast_reduction_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000547409",
+      "corruption_family": "contrast_reduction",
+      "severity": 2,
+      "derived_image_id": "coco_000000547409_contrast_reduction_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000547409",
+      "corruption_family": "contrast_reduction",
+      "severity": 3,
+      "derived_image_id": "coco_000000547409_contrast_reduction_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000547409",
+      "corruption_family": "contrast_reduction",
+      "severity": 4,
+      "derived_image_id": "coco_000000547409_contrast_reduction_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000547409",
+      "corruption_family": "contrast_reduction",
+      "severity": 5,
+      "derived_image_id": "coco_000000547409_contrast_reduction_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000547409",
+      "corruption_family": "gaussian_blur",
+      "severity": 1,
+      "derived_image_id": "coco_000000547409_gaussian_blur_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000547409",
+      "corruption_family": "gaussian_blur",
+      "severity": 2,
+      "derived_image_id": "coco_000000547409_gaussian_blur_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000547409",
+      "corruption_family": "gaussian_blur",
+      "severity": 3,
+      "derived_image_id": "coco_000000547409_gaussian_blur_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000547409",
+      "corruption_family": "gaussian_blur",
+      "severity": 4,
+      "derived_image_id": "coco_000000547409_gaussian_blur_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000547409",
+      "corruption_family": "gaussian_blur",
+      "severity": 5,
+      "derived_image_id": "coco_000000547409_gaussian_blur_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000547409",
+      "corruption_family": "gaussian_noise",
+      "severity": 1,
+      "derived_image_id": "coco_000000547409_gaussian_noise_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000547409",
+      "corruption_family": "gaussian_noise",
+      "severity": 2,
+      "derived_image_id": "coco_000000547409_gaussian_noise_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000547409",
+      "corruption_family": "gaussian_noise",
+      "severity": 3,
+      "derived_image_id": "coco_000000547409_gaussian_noise_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000547409",
+      "corruption_family": "gaussian_noise",
+      "severity": 4,
+      "derived_image_id": "coco_000000547409_gaussian_noise_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000547409",
+      "corruption_family": "gaussian_noise",
+      "severity": 5,
+      "derived_image_id": "coco_000000547409_gaussian_noise_sev5",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000547409",
+      "corruption_family": "jpeg_compression",
+      "severity": 1,
+      "derived_image_id": "coco_000000547409_jpeg_compression_sev1",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000547409",
+      "corruption_family": "jpeg_compression",
+      "severity": 2,
+      "derived_image_id": "coco_000000547409_jpeg_compression_sev2",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000547409",
+      "corruption_family": "jpeg_compression",
+      "severity": 3,
+      "derived_image_id": "coco_000000547409_jpeg_compression_sev3",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000547409",
+      "corruption_family": "jpeg_compression",
+      "severity": 4,
+      "derived_image_id": "coco_000000547409_jpeg_compression_sev4",
+      "seed": 42
+    },
+    {
+      "source_image_id": "coco_000000547409",
+      "corruption_family": "jpeg_compression",
+      "severity": 5,
+      "derived_image_id": "coco_000000547409_jpeg_compression_sev5",
+      "seed": 42
+    }
+  ],
+  "manifest_hash": "ef3264a7d13a33da940bf9e5170a5abe66a25fb59fb1eb44e9fd12d5a7ad06f2"
+}

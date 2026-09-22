@@ -1,0 +1,30 @@
+{
+  "schema_version": "2.0.0",
+  "dataset_version": "v2",
+  "acquisition_version": "10A-R2",
+  "freeze_status": "PRE_GPU_PLACEHOLDER",
+  "pre_annotation_ready": false,
+  "human_tasks_ready": false,
+  "timestamp": "2026-09-22T20:01:03.187774+00:00",
+  "code_sha": "6510402d106eb1b8e0716d7d648a3a6fa1b03896",
+  "hashes": {
+    "candidate_universe_hash": "5f8700d1f59378abb95390917fd1bb5856210554b0f462d70d42ed2abdd3093f",
+    "sampling_manifest_hash": "2a1fd7f1f0510f4cd6e04722b262a1e4be9d9a204a2a90457ca72cb0af563d3a",
+    "source_image_audit_hash": "1618a6a1ccf8c25a67b878aed0cff924705e575cc8877c62036b39432a773be0",
+    "corruption_manifest_hash": "3feb647b19e3db4db77d77eb14b2447954846f694c533616a21f099d4f2db035",
+    "evidence_manifest_hash": "3506bf4509c16a88ed9d0630e093b6bb5bfbf67d398be70e65174b94151e5fe1",
+    "llava_generation_config_hash": "daf24c0c70b8f636d291d52218cc05d329d1732986592fd7f1f7016e24580d5c",
+    "claim_extraction_config_hash": "8e69e79feb9d49c55066197068873b525ef4afc79deda03a0eb1493326b3b166",
+    "task_claims_set_hash": "8ec93db080a177dec2151fc40b9e6ea8c1e63cb80f9ae252d7155b5491b7e826"
+  },
+  "splits": {
+    "train": 300,
+    "validation": 90,
+    "calibration": 90,
+    "test": 120
+  },
+  "total_source_images_verified": 600,
+  "annotation_tasks_ready": false,
+  "notes": "Cryptographic pre-annotation freeze sealing candidate universe, primary sampling manifest, source image verification audit, evidence manifest, generation configuration, and claim extractor.",
+  "freeze_hash": "df4caf28a3075b500a8dbba88105260f0d41071738c58e9ba79f541cd57cdea6"
+}

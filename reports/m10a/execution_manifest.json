@@ -1,0 +1,50 @@
+{
+  "execution_milestone": "PHASE_10A",
+  "timestamp": "2026-09-22T18:45:30.130141+00:00",
+  "git_commit_sha": "6510402d106eb1b8e0716d7d648a3a6fa1b03896",
+  "git_dirty_state": false,
+  "environment": {
+    "python_version": "3.12.6 (tags/v3.12.6:a4a2d2b, Sep  6 2024, 20:11:23) [MSC v.1940 64 bit (AMD64)]",
+    "cuda_available": false,
+    "device": "cpu",
+    "host_os": "Windows"
+  },
+  "hashes": {
+    "sampling_manifest_hash": "869bf58a15e22df4abebdd5c7b67e9780e8063a43b14ebf9087c46cf0ad4b808",
+    "evidence_manifest_hash": "dafb49b7f7985f4e1e1838ef5c8cb9720e54c1afab3f48fb105d8dc859c7c397",
+    "corruption_manifest_hash": "ef3264a7d13a33da940bf9e5170a5abe66a25fb59fb1eb44e9fd12d5a7ad06f2"
+  },
+  "frozen_models": {
+    "vlm_model": "llava-hf/llava-1.5-7b-hf",
+    "vlm_revision": "b234b804b114d9e37bb655e11cbbb5f5e971b7a9",
+    "detector_model": "google/owlvit-base-patch32",
+    "detector_revision": "cbc355fb364588351c5d51c7f74465e8e7ec6f72",
+    "clip_model": "openai/clip-vit-base-patch32",
+    "clip_revision": "3d74acf9a28c67741b2f4f2ea7635f0aaf6f0268",
+    "claim_extraction_version": "conservative_coco80_v1"
+  },
+  "counts": {
+    "requested_images": 600,
+    "verified_images": 93,
+    "missing_images": 507,
+    "total_claims": 90,
+    "multi_claim_images": 24,
+    "fully_available_claims": 90,
+    "documented_failures": 525,
+    "human_labels": 0
+  },
+  "runtime_seconds": 772.47,
+  "gates": {
+    "regression_suite": "378_PASSED",
+    "pilot_run": "PASSED",
+    "sampling_manifest": "VERIFIED",
+    "source_image_audit": "VERIFIED",
+    "model_revisions": "LOCKED",
+    "evidence_failures": "AUDITED_PREDECLARED",
+    "graph_testability": "MARGINAL",
+    "annotation_task_masking": "PASSED_ZERO_LEAKAGE",
+    "development_validation": "PASSED",
+    "dataset_lock": "NOT_LOCKED",
+    "final_experiment": "NOT_READY"
+  }
+}

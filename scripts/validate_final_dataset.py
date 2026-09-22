@@ -56,14 +56,14 @@ def validate_dataset(
         "summary": {},
     }
 
-    # 1. Check Sampling Manifest
-    sampling_path = manifest_dir / "sampling_manifest.json"
+    # 1. Check Sampling Manifest (prioritize v2)
+    sampling_path = manifest_dir / "final_sampling_manifest_v2.json"
     if not sampling_path.exists():
-        # Fallback to dev manifest if in development mode
-        dev_sampling = manifest_dir / "final_sampling_manifest.json"
-        if dev_sampling.exists():
-            sampling_path = dev_sampling
+        sampling_path = manifest_dir / "sampling_manifest.json"
+    if not sampling_path.exists():
+        sampling_path = manifest_dir / "final_sampling_manifest.json"
 
+    dataset_version = None
     if not sampling_path.exists():
         results["issues"].append(f"Sampling manifest not found at {sampling_path}")
         results["checks"]["sampling_manifest"] = "MISSING"
@@ -71,12 +71,22 @@ def validate_dataset(
         try:
             with open(sampling_path, "r", encoding="utf-8") as f:
                 s_data = json.load(f)
+            dataset_version = s_data.get("dataset_version", "v1")
+            
+            # Version compatibility check (Phase 10A-R2 Approval Correction 14)
+            if mode == ValidationMode.FINAL and dataset_version in ("v1", "10A_partial", "10A_recovery"):
+                results["issues"].append(
+                    f"FINAL REQUIREMENT: Obsolete dataset version '{dataset_version}' rejected. "
+                    "Phase 10A-R2 requires dataset_version 'v2'."
+                )
+
             img_ids = s_data.get("selected_image_ids", [])
             splits = s_data.get("split_assignments", {})
             counts = s_data.get("split_counts", {})
             results["checks"]["sampling_manifest"] = "VALID"
             results["summary"]["total_images"] = len(img_ids)
             results["summary"]["split_counts"] = counts
+            results["summary"]["dataset_version"] = dataset_version
             
             if mode == ValidationMode.FINAL:
                 if len(img_ids) != 600:
@@ -91,8 +101,10 @@ def validate_dataset(
             results["issues"].append(f"Error parsing sampling manifest: {err}")
             results["checks"]["sampling_manifest"] = "CORRUPT"
 
-    # 2. Check Evidence Manifest
-    evidence_path = manifest_dir / "evidence_manifest.json"
+    # 2. Check Evidence Manifest (prioritize v2)
+    evidence_path = manifest_dir / "final_evidence_manifest_v2.json"
+    if not evidence_path.exists():
+        evidence_path = manifest_dir / "evidence_manifest.json"
     evidence_records: List[Dict[str, Any]] = []
     if not evidence_path.exists():
         if mode == ValidationMode.FINAL:
@@ -102,6 +114,13 @@ def validate_dataset(
         try:
             with open(evidence_path, "r", encoding="utf-8") as f:
                 e_data = json.load(f)
+            
+            ev_version = e_data.get("dataset_version", "v1")
+            if dataset_version and ev_version != dataset_version:
+                results["issues"].append(
+                    f"VERSION MISMATCH: Sampling manifest is '{dataset_version}' but evidence manifest is '{ev_version}'."
+                )
+
             evidence_records = e_data.get("records", [])
             results["checks"]["evidence_manifest"] = "VALID"
             results["summary"]["total_evidence_claims"] = len(evidence_records)

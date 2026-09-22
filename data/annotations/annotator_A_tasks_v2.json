@@ -1,0 +1,11 @@
+{
+  "schema_version": "2.0.0",
+  "dataset_version": "v2",
+  "annotator_id": "ANNOTATOR_A",
+  "status": "PRE_GPU_PLACEHOLDER",
+  "human_tasks_ready": false,
+  "created_at": "2026-09-22T20:01:03.078636+00:00",
+  "evidence_manifest_hash": "3506bf4509c16a88ed9d0630e093b6bb5bfbf67d398be70e65174b94151e5fe1",
+  "tasks_count": 0,
+  "tasks": []
+}

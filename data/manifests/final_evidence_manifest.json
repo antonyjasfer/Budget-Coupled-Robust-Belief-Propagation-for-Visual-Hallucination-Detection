@@ -1,0 +1,28 @@
+{
+  "schema_version": "1.0.0",
+  "created_at": "2026-09-22T19:20:13.271715+00:00",
+  "sampling_manifest_hash": "869bf58a15e22df4abebdd5c7b67e9780e8063a43b14ebf9087c46cf0ad4b808",
+  "execution_sha": "6510402d106eb1b8e0716d7d648a3a6fa1b03896",
+  "frozen_models": {
+    "vlm_model": "llava-hf/llava-1.5-7b-hf",
+    "vlm_revision": "b234b804b114d9e37bb655e11cbbb5f5e971b7a9",
+    "detector_model": "google/owlvit-base-patch32",
+    "detector_revision": "cbc355fb364588351c5d51c7f74465e8e7ec6f72",
+    "clip_model": "openai/clip-vit-base-patch32",
+    "clip_revision": "3d74acf9a28c67741b2f4f2ea7635f0aaf6f0268",
+    "claim_extraction_version": "conservative_coco80_v1"
+  },
+  "total_cohort_images": 600,
+  "total_claims": 0,
+  "records": [],
+  "zero_claim_audit": {
+    "total_images": 600,
+    "genuine_zero_claim_images": 0,
+    "pipeline_failure_zero_claim_images": 600,
+    "breakdown": {
+      "PIPELINE_FAILURE_SOURCE_UNAVAILABLE": 269,
+      "PIPELINE_FAILURE_VLM_LOCAL_UNAVAILABLE": 331
+    }
+  },
+  "manifest_hash": "78ca2537bc13382be3e8a9e5bd34cea0cd0ba44bbb1e7c735f7f440400de9393"
+}

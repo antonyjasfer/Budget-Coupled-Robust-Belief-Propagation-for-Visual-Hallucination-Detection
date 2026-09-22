@@ -1,0 +1,1455 @@
+{
+  "schema_version": "1.0.0",
+  "task_set_id": "phase10a_human_annotation_set_A",
+  "annotator_id": "ANNOTATOR_A",
+  "created_at": "2026-09-22T18:45:30.120131+00:00",
+  "total_tasks": 90,
+  "sampling_manifest_hash": "869bf58a15e22df4abebdd5c7b67e9780e8063a43b14ebf9087c46cf0ad4b808",
+  "evidence_manifest_hash": "dafb49b7f7985f4e1e1838ef5c8cb9720e54c1afab3f48fb105d8dc859c7c397",
+  "instructions": "Inspect the referenced image and determine whether the object claim is visually SUPPORTED or HALLUCINATED (absent / unsupported). Record confidence from 1 to 5. Do NOT reference external automated detectors.",
+  "tasks": [
+    {
+      "claim_id": "claim_resp_coco_000000027235_teddy bear",
+      "image_id": "coco_000000027235",
+      "image_file": "coco_000000027235.jpg",
+      "claim_category": "teddy bear",
+      "claim_text_span": "teddy bear",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0001",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000163361_airplane",
+      "image_id": "coco_000000163361",
+      "image_file": "coco_000000163361.jpg",
+      "claim_category": "airplane",
+      "claim_text_span": "airplane",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0002",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000010920_car",
+      "image_id": "coco_000000010920",
+      "image_file": "coco_000000010920.jpg",
+      "claim_category": "car",
+      "claim_text_span": "car",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0003",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000017675_airplane",
+      "image_id": "coco_000000017675",
+      "image_file": "coco_000000017675.jpg",
+      "claim_category": "airplane",
+      "claim_text_span": "airplane",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0004",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000255992_person",
+      "image_id": "coco_000000255992",
+      "image_file": "coco_000000255992.jpg",
+      "claim_category": "person",
+      "claim_text_span": "man",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0005",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000111165_elephant",
+      "image_id": "coco_000000111165",
+      "image_file": "coco_000000111165.jpg",
+      "claim_category": "elephant",
+      "claim_text_span": "elephants",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0006",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000364467_cake",
+      "image_id": "coco_000000364467",
+      "image_file": "coco_000000364467.jpg",
+      "claim_category": "cake",
+      "claim_text_span": "cake",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0007",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000131450_skis",
+      "image_id": "coco_000000131450",
+      "image_file": "coco_000000131450.jpg",
+      "claim_category": "skis",
+      "claim_text_span": "skis",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0008",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000325939_bird",
+      "image_id": "coco_000000325939",
+      "image_file": "coco_000000325939.jpg",
+      "claim_category": "bird",
+      "claim_text_span": "bird",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0009",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000222970_car",
+      "image_id": "coco_000000222970",
+      "image_file": "coco_000000222970.jpg",
+      "claim_category": "car",
+      "claim_text_span": "cars",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0010",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000269866_oven",
+      "image_id": "coco_000000269866",
+      "image_file": "coco_000000269866.jpg",
+      "claim_category": "oven",
+      "claim_text_span": "oven",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0011",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000181571_zebra",
+      "image_id": "coco_000000181571",
+      "image_file": "coco_000000181571.jpg",
+      "claim_category": "zebra",
+      "claim_text_span": "zebras",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0012",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000158143_tie",
+      "image_id": "coco_000000158143",
+      "image_file": "coco_000000158143.jpg",
+      "claim_category": "tie",
+      "claim_text_span": "tie",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0013",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000090827_dog",
+      "image_id": "coco_000000090827",
+      "image_file": "coco_000000090827.jpg",
+      "claim_category": "dog",
+      "claim_text_span": "dog",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0014",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000167131_carrot",
+      "image_id": "coco_000000167131",
+      "image_file": "coco_000000167131.jpg",
+      "claim_category": "carrot",
+      "claim_text_span": "carrots",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0015",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000242547_train",
+      "image_id": "coco_000000242547",
+      "image_file": "coco_000000242547.jpg",
+      "claim_category": "train",
+      "claim_text_span": "train",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0016",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000027235_bed",
+      "image_id": "coco_000000027235",
+      "image_file": "coco_000000027235.jpg",
+      "claim_category": "bed",
+      "claim_text_span": "bed",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0017",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000115412_cell phone",
+      "image_id": "coco_000000115412",
+      "image_file": "coco_000000115412.jpg",
+      "claim_category": "cell phone",
+      "claim_text_span": "cell phone",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0018",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000026367_person",
+      "image_id": "coco_000000026367",
+      "image_file": "coco_000000026367.jpg",
+      "claim_category": "person",
+      "claim_text_span": "man",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0019",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000304741_book",
+      "image_id": "coco_000000304741",
+      "image_file": "coco_000000304741.jpg",
+      "claim_category": "book",
+      "claim_text_span": "book",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0020",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000010495_elephant",
+      "image_id": "coco_000000010495",
+      "image_file": "coco_000000010495.jpg",
+      "claim_category": "elephant",
+      "claim_text_span": "elephant",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0021",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000142649_cat",
+      "image_id": "coco_000000142649",
+      "image_file": "coco_000000142649.jpg",
+      "claim_category": "cat",
+      "claim_text_span": "cat",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0022",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000011205_cat",
+      "image_id": "coco_000000011205",
+      "image_file": "coco_000000011205.jpg",
+      "claim_category": "cat",
+      "claim_text_span": "cat",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0023",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000304741_dog",
+      "image_id": "coco_000000304741",
+      "image_file": "coco_000000304741.jpg",
+      "claim_category": "dog",
+      "claim_text_span": "dog",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0024",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000296106_elephant",
+      "image_id": "coco_000000296106",
+      "image_file": "coco_000000296106.jpg",
+      "claim_category": "elephant",
+      "claim_text_span": "elephants",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0025",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000167131_broccoli",
+      "image_id": "coco_000000167131",
+      "image_file": "coco_000000167131.jpg",
+      "claim_category": "broccoli",
+      "claim_text_span": "broccoli",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0026",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000028885_person",
+      "image_id": "coco_000000028885",
+      "image_file": "coco_000000028885.jpg",
+      "claim_category": "person",
+      "claim_text_span": "People",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0027",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000016531_truck",
+      "image_id": "coco_000000016531",
+      "image_file": "coco_000000016531.jpg",
+      "claim_category": "truck",
+      "claim_text_span": "trucks",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0028",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000118909_book",
+      "image_id": "coco_000000118909",
+      "image_file": "coco_000000118909.jpg",
+      "claim_category": "book",
+      "claim_text_span": "book",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0029",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000269866_microwave",
+      "image_id": "coco_000000269866",
+      "image_file": "coco_000000269866.jpg",
+      "claim_category": "microwave",
+      "claim_text_span": "microwave",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0030",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000095611_horse",
+      "image_id": "coco_000000095611",
+      "image_file": "coco_000000095611.jpg",
+      "claim_category": "horse",
+      "claim_text_span": "horses",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0031",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000056504_sheep",
+      "image_id": "coco_000000056504",
+      "image_file": "coco_000000056504.jpg",
+      "claim_category": "sheep",
+      "claim_text_span": "sheep",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0032",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000010407_broccoli",
+      "image_id": "coco_000000010407",
+      "image_file": "coco_000000010407.jpg",
+      "claim_category": "broccoli",
+      "claim_text_span": "broccoli",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0033",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000056504_person",
+      "image_id": "coco_000000056504",
+      "image_file": "coco_000000056504.jpg",
+      "claim_category": "person",
+      "claim_text_span": "people",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0034",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000349944_kite",
+      "image_id": "coco_000000349944",
+      "image_file": "coco_000000349944.jpg",
+      "claim_category": "kite",
+      "claim_text_span": "kite",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0035",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000095611_person",
+      "image_id": "coco_000000095611",
+      "image_file": "coco_000000095611.jpg",
+      "claim_category": "person",
+      "claim_text_span": "man",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0036",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000167131_knife",
+      "image_id": "coco_000000167131",
+      "image_file": "coco_000000167131.jpg",
+      "claim_category": "knife",
+      "claim_text_span": "knife",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0037",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000191693_chair",
+      "image_id": "coco_000000191693",
+      "image_file": "coco_000000191693.jpg",
+      "claim_category": "chair",
+      "claim_text_span": "chair",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0038",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000004968_car",
+      "image_id": "coco_000000004968",
+      "image_file": "coco_000000004968.jpg",
+      "claim_category": "car",
+      "claim_text_span": "car",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0039",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000068283_toilet",
+      "image_id": "coco_000000068283",
+      "image_file": "coco_000000068283.jpg",
+      "claim_category": "toilet",
+      "claim_text_span": "toilet",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0040",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000352899_bus",
+      "image_id": "coco_000000352899",
+      "image_file": "coco_000000352899.jpg",
+      "claim_category": "bus",
+      "claim_text_span": "bus",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0041",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000194407_train",
+      "image_id": "coco_000000194407",
+      "image_file": "coco_000000194407.jpg",
+      "claim_category": "train",
+      "claim_text_span": "train",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0042",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000352899_car",
+      "image_id": "coco_000000352899",
+      "image_file": "coco_000000352899.jpg",
+      "claim_category": "car",
+      "claim_text_span": "car",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0043",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000027157_person",
+      "image_id": "coco_000000027157",
+      "image_file": "coco_000000027157.jpg",
+      "claim_category": "person",
+      "claim_text_span": "child",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0044",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000255992_banana",
+      "image_id": "coco_000000255992",
+      "image_file": "coco_000000255992.jpg",
+      "claim_category": "banana",
+      "claim_text_span": "bananas",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0045",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000254266_surfboard",
+      "image_id": "coco_000000254266",
+      "image_file": "coco_000000254266.jpg",
+      "claim_category": "surfboard",
+      "claim_text_span": "surfboard",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0046",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000028885_giraffe",
+      "image_id": "coco_000000028885",
+      "image_file": "coco_000000028885.jpg",
+      "claim_category": "giraffe",
+      "claim_text_span": "giraffe",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0047",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000300267_train",
+      "image_id": "coco_000000300267",
+      "image_file": "coco_000000300267.jpg",
+      "claim_category": "train",
+      "claim_text_span": "train",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0048",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000044464_person",
+      "image_id": "coco_000000044464",
+      "image_file": "coco_000000044464.jpg",
+      "claim_category": "person",
+      "claim_text_span": "men",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0049",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000131450_person",
+      "image_id": "coco_000000131450",
+      "image_file": "coco_000000131450.jpg",
+      "claim_category": "person",
+      "claim_text_span": "woman",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0050",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000118909_teddy bear",
+      "image_id": "coco_000000118909",
+      "image_file": "coco_000000118909.jpg",
+      "claim_category": "teddy bear",
+      "claim_text_span": "teddy bears",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0051",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000335336_motorcycle",
+      "image_id": "coco_000000335336",
+      "image_file": "coco_000000335336.jpg",
+      "claim_category": "motorcycle",
+      "claim_text_span": "motorcycles",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0052",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000012284_umbrella",
+      "image_id": "coco_000000012284",
+      "image_file": "coco_000000012284.jpg",
+      "claim_category": "umbrella",
+      "claim_text_span": "umbrella",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0053",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000201907_horse",
+      "image_id": "coco_000000201907",
+      "image_file": "coco_000000201907.jpg",
+      "claim_category": "horse",
+      "claim_text_span": "horse",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0054",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000043288_hot dog",
+      "image_id": "coco_000000043288",
+      "image_file": "coco_000000043288.jpg",
+      "claim_category": "hot dog",
+      "claim_text_span": "hot dog",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0055",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000087052_person",
+      "image_id": "coco_000000087052",
+      "image_file": "coco_000000087052.jpg",
+      "claim_category": "person",
+      "claim_text_span": "man",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0056",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000349944_person",
+      "image_id": "coco_000000349944",
+      "image_file": "coco_000000349944.jpg",
+      "claim_category": "person",
+      "claim_text_span": "woman",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0057",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000010920_traffic light",
+      "image_id": "coco_000000010920",
+      "image_file": "coco_000000010920.jpg",
+      "claim_category": "traffic light",
+      "claim_text_span": "traffic light",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0058",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000026367_skateboard",
+      "image_id": "coco_000000026367",
+      "image_file": "coco_000000026367.jpg",
+      "claim_category": "skateboard",
+      "claim_text_span": "skateboard",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0059",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000325939_orange",
+      "image_id": "coco_000000325939",
+      "image_file": "coco_000000325939.jpg",
+      "claim_category": "orange",
+      "claim_text_span": "orange",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0060",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000068283_sink",
+      "image_id": "coco_000000068283",
+      "image_file": "coco_000000068283.jpg",
+      "claim_category": "sink",
+      "claim_text_span": "sink",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0061",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000164044_bus",
+      "image_id": "coco_000000164044",
+      "image_file": "coco_000000164044.jpg",
+      "claim_category": "bus",
+      "claim_text_span": "bus",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0062",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000125070_clock",
+      "image_id": "coco_000000125070",
+      "image_file": "coco_000000125070.jpg",
+      "claim_category": "clock",
+      "claim_text_span": "clock",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0063",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000090791_clock",
+      "image_id": "coco_000000090791",
+      "image_file": "coco_000000090791.jpg",
+      "claim_category": "clock",
+      "claim_text_span": "clock",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0064",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000131295_train",
+      "image_id": "coco_000000131295",
+      "image_file": "coco_000000131295.jpg",
+      "claim_category": "train",
+      "claim_text_span": "train",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0065",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000222970_bus",
+      "image_id": "coco_000000222970",
+      "image_file": "coco_000000222970.jpg",
+      "claim_category": "bus",
+      "claim_text_span": "bus",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0066",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000280249_toilet",
+      "image_id": "coco_000000280249",
+      "image_file": "coco_000000280249.jpg",
+      "claim_category": "toilet",
+      "claim_text_span": "toilet",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0067",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000134176_bicycle",
+      "image_id": "coco_000000134176",
+      "image_file": "coco_000000134176.jpg",
+      "claim_category": "bicycle",
+      "claim_text_span": "bicycles",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0068",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000268539_bicycle",
+      "image_id": "coco_000000268539",
+      "image_file": "coco_000000268539.jpg",
+      "claim_category": "bicycle",
+      "claim_text_span": "bike",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0069",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000300267_car",
+      "image_id": "coco_000000300267",
+      "image_file": "coco_000000300267.jpg",
+      "claim_category": "car",
+      "claim_text_span": "cars",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0070",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000017769_teddy bear",
+      "image_id": "coco_000000017769",
+      "image_file": "coco_000000017769.jpg",
+      "claim_category": "teddy bear",
+      "claim_text_span": "teddy bear",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0071",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000044464_frisbee",
+      "image_id": "coco_000000044464",
+      "image_file": "coco_000000044464.jpg",
+      "claim_category": "frisbee",
+      "claim_text_span": "frisbee",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0072",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000354575_person",
+      "image_id": "coco_000000354575",
+      "image_file": "coco_000000354575.jpg",
+      "claim_category": "person",
+      "claim_text_span": "man",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0073",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000093201_dog",
+      "image_id": "coco_000000093201",
+      "image_file": "coco_000000093201.jpg",
+      "claim_category": "dog",
+      "claim_text_span": "dog",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0074",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000017171_dog",
+      "image_id": "coco_000000017171",
+      "image_file": "coco_000000017171.jpg",
+      "claim_category": "dog",
+      "claim_text_span": "dog",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0075",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000191693_person",
+      "image_id": "coco_000000191693",
+      "image_file": "coco_000000191693.jpg",
+      "claim_category": "person",
+      "claim_text_span": "man",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0076",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000131450_parking meter",
+      "image_id": "coco_000000131450",
+      "image_file": "coco_000000131450.jpg",
+      "claim_category": "parking meter",
+      "claim_text_span": "parking meter",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0077",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000328200_dog",
+      "image_id": "coco_000000328200",
+      "image_file": "coco_000000328200.jpg",
+      "claim_category": "dog",
+      "claim_text_span": "dog",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0078",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000240405_dog",
+      "image_id": "coco_000000240405",
+      "image_file": "coco_000000240405.jpg",
+      "claim_category": "dog",
+      "claim_text_span": "dog",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0079",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000112289_horse",
+      "image_id": "coco_000000112289",
+      "image_file": "coco_000000112289.jpg",
+      "claim_category": "horse",
+      "claim_text_span": "horse",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0080",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000076250_donut",
+      "image_id": "coco_000000076250",
+      "image_file": "coco_000000076250.jpg",
+      "claim_category": "donut",
+      "claim_text_span": "donuts",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0081",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000301817_clock",
+      "image_id": "coco_000000301817",
+      "image_file": "coco_000000301817.jpg",
+      "claim_category": "clock",
+      "claim_text_span": "clock",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0082",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000075146_boat",
+      "image_id": "coco_000000075146",
+      "image_file": "coco_000000075146.jpg",
+      "claim_category": "boat",
+      "claim_text_span": "boat",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0083",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000254266_person",
+      "image_id": "coco_000000254266",
+      "image_file": "coco_000000254266.jpg",
+      "claim_category": "person",
+      "claim_text_span": "men",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0084",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000011205_motorcycle",
+      "image_id": "coco_000000011205",
+      "image_file": "coco_000000011205.jpg",
+      "claim_category": "motorcycle",
+      "claim_text_span": "motorcycle",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0085",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000217407_vase",
+      "image_id": "coco_000000217407",
+      "image_file": "coco_000000217407.jpg",
+      "claim_category": "vase",
+      "claim_text_span": "vase",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0086",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000133298_tennis racket",
+      "image_id": "coco_000000133298",
+      "image_file": "coco_000000133298.jpg",
+      "claim_category": "tennis racket",
+      "claim_text_span": "tennis racket",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0087",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000268539_person",
+      "image_id": "coco_000000268539",
+      "image_file": "coco_000000268539.jpg",
+      "claim_category": "person",
+      "claim_text_span": "man",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0088",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000060080_person",
+      "image_id": "coco_000000060080",
+      "image_file": "coco_000000060080.jpg",
+      "claim_category": "person",
+      "claim_text_span": "PERSON",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0089",
+      "annotator_id": "ANNOTATOR_A"
+    },
+    {
+      "claim_id": "claim_resp_coco_000000296106_person",
+      "image_id": "coco_000000296106",
+      "image_file": "coco_000000296106.jpg",
+      "claim_category": "person",
+      "claim_text_span": "People",
+      "annotation": {
+        "label": null,
+        "confidence": null,
+        "notes": null,
+        "annotator_id": null,
+        "timestamp": null
+      },
+      "task_id": "task_A_0090",
+      "annotator_id": "ANNOTATOR_A"
+    }
+  ],
+  "status": "SUPERSEDED_PARTIAL_ACQUISITION_DO_NOT_ANNOTATE",
+  "superseded_at": "2026-09-22T19:02:33.357473+00:00",
+  "superseded_reason": "Phase 10A acquisition was partial (93 images, COCO caption fallback instead of LLaVA)"
+}

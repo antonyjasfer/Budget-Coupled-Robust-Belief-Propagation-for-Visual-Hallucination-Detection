@@ -66,6 +66,7 @@ def test_final_mode_passes_when_all_criteria_met(tmp_path):
 
     s_path = tmp_path / "sampling_manifest.json"
     s_path.write_text(json.dumps({
+        "dataset_version": "v2",
         "selected_image_ids": img_ids,
         "split_assignments": splits,
         "split_counts": {"train": 300, "validation": 90, "calibration": 90, "test": 120},
@@ -85,7 +86,7 @@ def test_final_mode_passes_when_all_criteria_met(tmp_path):
         for i in range(600)
     ]
     e_path = tmp_path / "evidence_manifest.json"
-    e_path.write_text(json.dumps({"records": e_records}), encoding="utf-8")
+    e_path.write_text(json.dumps({"dataset_version": "v2", "records": e_records}), encoding="utf-8")
 
     # 3. Complete annotation manifest
     a_records = [

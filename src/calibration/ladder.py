@@ -160,7 +160,8 @@ def compute_binary_classification_metrics(
     sort_idx = np.argsort(rec_list)
     rec_sorted = np.array(rec_list)[sort_idx]
     prec_sorted = np.array(prec_list)[sort_idx]
-    pr_auc = float(np.trapz(prec_sorted, rec_sorted)) if pos_count > 0 else 0.0
+    _trapz_fn = getattr(np, "trapezoid", getattr(np, "trapz", None))
+    pr_auc = float(_trapz_fn(prec_sorted, rec_sorted)) if (pos_count > 0 and _trapz_fn is not None) else 0.0
 
     diag = compute_calibration_diagnostics(y, p)
 

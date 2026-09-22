@@ -13,8 +13,7 @@ from scipy.special import expit
 @dataclass
 class CertificateResult:
     """
-    Certified continuous confidence bounds for the target node marginal.
-
+    Certified continuous outer bounds (via Lipschitz discretization certificate) for the target node marginal.
     Attributes:
         lower_grid: Marginal probability on the discrete grid P_grid_min(h_target = +1).
         upper_grid: Marginal probability on the discrete grid P_grid_max(h_target = +1).

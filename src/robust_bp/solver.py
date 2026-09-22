@@ -1,8 +1,9 @@
 """
 Budget-Coupled Robust Belief Propagation solver for binary attractive tree models.
 
-Implements exact budget-indexed dynamic programming via max-plus and min-plus
-convolutions over trees, with dual continuous error certification and witness extraction.
+Implements exact budget-indexed dynamic programming (exact over the discretized
+uncertainty set) via max-plus and min-plus convolutions over trees, with continuous
+Lipschitz discretization certification and witness extraction.
 """
 
 from dataclasses import dataclass

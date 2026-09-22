@@ -45,8 +45,28 @@ htmlcov/
 .DS_Store
 Thumbs.db
 
-# Data caches and experiment outputs
+# Data caches, checkpoints, and experiment outputs
 data/cache/
 data/coco/
+data/checkpoints/
+checkpoints/
 reports/m8_smoke/
 reports/m8_dev/
+
+# Model weights & binary checkpoints
+*.pt
+*.pth
+*.bin
+*.safetensors
+*.onnx
+
+# Environment & secrets
+.env
+.env.*
+*.env
+
+# Notebooks & HuggingFace caches
+.ipynb_checkpoints/
+.cache/
+huggingface/
+

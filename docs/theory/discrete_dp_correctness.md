@@ -99,7 +99,7 @@ Since $\mathcal{U}_{\text{grid}}(B, \epsilon, K) \subset \mathcal{U}(B, \epsilon
 $$U_{r, \text{grid}} \le U_{r, \text{continuous}} \quad \text{and} \quad L_{r, \text{grid}} \ge L_{r, \text{continuous}}$$
 The grid interval $[L_{\text{grid}}, U_{\text{grid}}]$ is an **inner approximation** (sub-interval) of the true continuous robust interval.
 
-To guarantee continuous containment, the solver applies a Lipschitz discretization gap $\Delta \cdot L_{\text{lip}}$:
-$$L_{\text{certified}} = \sigma(2(\text{field}_{\text{lower, grid}} - \Delta)) \le L_{\text{continuous}}$$
-$$U_{\text{certified}} = \sigma(2(\text{field}_{\text{upper, grid}} + \Delta)) \ge U_{\text{continuous}}$$
-producing a rigorous **outer approximation** $[L_{\text{certified}}, U_{\text{certified}}]$.
+To guarantee continuous containment, the solver applies the rigorous discretization gap $G_{\text{cert}} = \min\left( B, \, \sum_{i \in \mathcal{V}} \gamma_i \min(\epsilon_i, \Delta) \right)$ (Theorem 3):
+$$L_{\text{certified}} = \sigma(2(\text{field}_{\text{lower, grid}} - G_{\text{cert}})) \le L_{\text{continuous}}$$
+$$U_{\text{certified}} = \sigma(2(\text{field}_{\text{upper, grid}} + G_{\text{cert}})) \ge U_{\text{continuous}}$$
+producing a rigorous **outer approximation** $[L_{\text{certified}}, U_{\text{certified}}]$ (see [`continuous_grid_certificate.md`](file:///c:/Users/anton/OneDrive/Desktop/Mths%20project/docs/theory/continuous_grid_certificate.md)).

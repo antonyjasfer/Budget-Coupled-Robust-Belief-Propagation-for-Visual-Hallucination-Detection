@@ -74,3 +74,37 @@ def test_grid_refinement_convergence():
     assert res_fine.field_cert_gap < res_coarse.field_cert_gap
     assert np.isclose(res_fine.lower_grid, res_fine.lower_certified, atol=0.01)
     assert np.isclose(res_fine.upper_grid, res_fine.upper_certified, atol=0.01)
+
+
+def test_sub_quantum_residual_accumulation_counterexample_guarded():
+    """
+    Regression test for M9B-0 audit:
+    When epsilon_i < Delta for multiple nodes, coordinate residuals accumulate.
+    The rigorous tree gap G_cert must strictly upper bound the continuous perturbation.
+    """
+    from src.pgm.tree_model import create_star_tree
+    from src.pgm.standard_bp import compute_rooted_total_field
+
+    num_leaves = 4
+    center_theta = 0.0
+    leaf_thetas = np.zeros(num_leaves)
+    couplings = np.ones(num_leaves) * 1.5
+    epsilon = np.full(5, 0.09)
+    budget = 0.36
+    K = 2  # Delta = 0.18 > eps_i
+
+    model = create_star_tree(num_leaves, center_theta, leaf_thetas, couplings, epsilon=epsilon)
+    target = 0
+
+    res = solve_robust_bp(model, target_node=target, budget=budget, num_grid_steps=K)
+
+    # Continuous perturbation vector setting delta_i = eps_i = 0.09 for all 4 leaves
+    delta_cont = np.array([0.0, 0.09, 0.09, 0.09, 0.09])
+    field_cont, prob_cont, _ = compute_rooted_total_field(model, root=target, delta=delta_cont)
+
+    # Continuous field must be strictly bounded by certified bounds!
+    assert res.field_lower_grid - res.field_cert_gap <= field_cont <= res.field_upper_grid + res.field_cert_gap
+    assert res.lower_certified <= prob_cont <= res.upper_certified
+    # Verify that grid alone missed the continuous perturbation, but certified bounds caught it
+    assert field_cont > res.field_upper_grid
+    assert prob_cont > res.upper_grid

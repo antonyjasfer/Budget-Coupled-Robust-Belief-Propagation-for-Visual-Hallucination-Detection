@@ -125,10 +125,10 @@ Detailed proof documented in [`docs/theory/discrete_dp_correctness.md`](file:///
 > - The grid bounds $[L_{\text{grid}}, U_{\text{grid}}]$ are exact **only over the discrete grid lattice** $\mathcal{U}_{\text{grid}}$.
 > - Because $\mathcal{U}_{\text{grid}} \subset \mathcal{U}$, the grid bounds form an **inner approximation**:
 >   $$L_{\text{continuous}} \le L_{\text{grid}} \le U_{\text{grid}} \le U_{\text{continuous}}$$
-> - Continuous outer bounds $[L_{\text{certified}}, U_{\text{certified}}]$ are obtained by expanding the effective field by the Lipschitz discretization bound $\Delta = B / K$:
->   $$L_{\text{certified}} = \sigma(2(\eta_{\text{lower, grid}} - \Delta)) \le L_{\text{continuous}}$$
->   $$U_{\text{certified}} = \sigma(2(\eta_{\text{upper, grid}} + \Delta)) \ge U_{\text{continuous}}$$
-> - As $K \to \infty$ ($\Delta \to 0$), both inner and outer bounds converge uniformly to the continuous optimum.
+> - Continuous outer bounds $[L_{\text{certified}}, U_{\text{certified}}]$ are obtained by expanding the effective field by the rigorous continuous certificate gap $G_{\text{cert}} = \min(B, \sum_{i \in \mathcal{V}} \gamma_i \min(\epsilon_i, \Delta))$ (Theorem 3, accounting for sub-quantum residual accumulation across coordinates):
+>   $$L_{\text{certified}} = \sigma(2(\eta_{\text{lower, grid}} - G_{\text{cert}})) \le L_{\text{continuous}}$$
+>   $$U_{\text{certified}} = \sigma(2(\eta_{\text{upper, grid}} + G_{\text{cert}})) \ge U_{\text{continuous}}$$
+> - As $K \to \infty$ ($\Delta \to 0$), both inner and outer bounds converge uniformly to the continuous optimum. Detailed proof, counterexample to naive $\Delta$ bound, and verification documented in [`docs/theory/continuous_grid_certificate.md`](file:///c:/Users/anton/OneDrive/Desktop/Mths%20project/docs/theory/continuous_grid_certificate.md).
 
 ---
 

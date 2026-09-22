@@ -14,7 +14,7 @@ from scipy.special import expit
 from src.pgm.tree_model import TreeModel
 from src.pgm.standard_bp import stable_f_J, compute_rooted_total_field
 from src.robust_bp.budget_convolution import max_plus_convolve, min_plus_convolve
-from src.robust_bp.certification import compute_continuous_certificate, CertificateResult
+from src.robust_bp.certification import compute_continuous_certificate, compute_tree_discretization_gap, CertificateResult
 from src.robust_bp.witness import trace_witness_perturbation, validate_witness, WitnessResult
 
 
@@ -237,11 +237,15 @@ def solve_robust_bp(
     # -------------------------------------------------------------
     # 3. CONTINUOUS CERTIFICATION
     # -------------------------------------------------------------
+    rigorous_gap = compute_tree_discretization_gap(
+        model, root=target_node, budget=budget, grid_step=grid_step
+    )
     cert = compute_continuous_certificate(
         field_lower_grid=field_lower_grid,
         field_upper_grid=field_upper_grid,
         grid_step=grid_step,
-        lipschitz_const=lipschitz_const
+        lipschitz_const=lipschitz_const,
+        cert_gap=rigorous_gap
     )
 
     return RobustBPResult(

@@ -5,7 +5,7 @@ Calculates rigorous continuous bounds accounting for grid discretization step De
 """
 
 from dataclasses import dataclass
-from typing import Tuple
+from typing import Tuple, Optional
 import numpy as np
 from scipy.special import expit
 
@@ -34,34 +34,89 @@ class CertificateResult:
     grid_step: float
 
 
+def compute_tree_discretization_gap(
+    model,
+    root: int,
+    budget: float,
+    grid_step: float
+) -> float:
+    """
+    Compute rigorous continuous discretization error certificate gap for target root on a tree model.
+
+    Mathematical Guarantee:
+        Let delta* in U(B, eps) be any continuous perturbation.
+        The floored vector delta_hat_i = floor(delta*_i / Delta) * Delta is feasible on the grid
+        U_grid(B, eps, K) where Delta = B / K.
+        Since the DP solver finds the global grid optimum:
+            eta_r(delta_hat*) >= eta_r(delta_hat).
+        By Mean Value Theorem and derivative non-negativity (M9A Theorem 1):
+            eta_r(delta*) - eta_r(delta_hat*) <= sum_{i in V} gamma_i * r_i
+        where r_i = delta*_i - delta_hat_i in [0, min(eps_i, Delta)], and
+            gamma_i = prod_{e in path(i -> root)} tanh(J_e) <= 1
+        is the exact upper bound on the partial derivative d eta_r / d delta_i.
+        Furthermore, since sum_i r_i <= sum_i delta*_i <= B:
+            gap = min(B, sum_{i in V} gamma_i * min(eps_i, Delta)).
+
+    Args:
+        model: TreeModel instance.
+        root: Target root node index.
+        budget: Total shared budget B.
+        grid_step: Discretization step Delta = B / K.
+
+    Returns:
+        Rigorous continuous discretization gap for the effective field.
+    """
+    if budget <= 1e-12 or grid_step <= 1e-12:
+        return 0.0
+
+    n = model.num_nodes
+    if n <= 1:
+        return float(min(budget, min(float(model.epsilon[0]), grid_step)))
+
+    gains = np.ones(n, dtype=np.float64)
+    _, _, children = model.get_rooted_tree(root=root)
+    queue = [root]
+    while queue:
+        u = queue.pop(0)
+        for c in children[u]:
+            J = model.get_coupling(u, c)
+            gains[c] = gains[u] * float(np.tanh(J))
+            queue.append(c)
+
+    coord_gaps = gains * np.minimum(model.epsilon, grid_step)
+    gap = float(min(budget, np.sum(coord_gaps)))
+    return gap
+
+
 def compute_continuous_certificate(
     field_lower_grid: float,
     field_upper_grid: float,
     grid_step: float,
-    lipschitz_const: float = 1.0
+    lipschitz_const: float = 1.0,
+    cert_gap: Optional[float] = None
 ) -> CertificateResult:
     """
     Compute certified continuous bounds from grid effective fields.
 
     Mathematical guarantee:
-        Because |d f_J(x)/dx| <= tanh(J) <= 1, the Lipschitz constant of effective field
-        with respect to any continuous perturbation under tree BP is bounded by 1.0.
-        Therefore, the discretization error in effective field for any continuous perturbation
-        rounding to the grid is at most Delta * lipschitz_const.
-
-        lower_field_cont >= field_lower_grid - field_cert_gap
-        upper_field_cont <= field_upper_grid + field_cert_gap
+        Account for continuous perturbation discretization residuals bounded by cert_gap:
+        lower_field_cont >= field_lower_grid - cert_gap
+        upper_field_cont <= field_upper_grid + cert_gap
 
     Args:
         field_lower_grid: Effective field from grid solver (lower).
         field_upper_grid: Effective field from grid solver (upper).
         grid_step: Discretization step Delta = B / K.
-        lipschitz_const: Lipschitz constant (default 1.0 for tree Ising model).
+        lipschitz_const: Fallback Lipschitz multiplier (default 1.0).
+        cert_gap: Optional rigorous continuous field gap. If None, defaults to grid_step * lipschitz_const.
 
     Returns:
         CertificateResult with separated grid and continuous certified bounds.
     """
-    cert_gap = float(grid_step * lipschitz_const)
+    if cert_gap is None:
+        cert_gap = float(grid_step * lipschitz_const)
+    else:
+        cert_gap = float(cert_gap)
 
     lower_grid_prob = float(expit(2.0 * field_lower_grid))
     upper_grid_prob = float(expit(2.0 * field_upper_grid))

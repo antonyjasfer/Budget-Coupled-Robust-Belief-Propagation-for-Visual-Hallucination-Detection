@@ -5,36 +5,39 @@ ONE-COMMAND runner for Google Colab. This is the ONLY authorized entry point
 for producing real multi-modal evidence from the frozen 600-image primary cohort.
 
 Usage in Colab:
-    !python scripts/run_phase10a_r2_colab.py
+    # 1. Dry run validation (no models loaded, no final artifacts written)
+    !python scripts/run_phase10a_r2_colab.py --dry-run
+
+    # 2. Pilot run (10 images, persistent Drive checkpoint, PILOT_ONLY status)
+    !python scripts/run_phase10a_r2_colab.py --pilot 10 --checkpoint-dir /content/drive/MyDrive/m10a_r2_checkpoints
+
+    # 3. Full scientific run (600 images, resumable, persistent Drive checkpoint)
+    !python scripts/run_phase10a_r2_colab.py --full --resume --checkpoint-dir /content/drive/MyDrive/m10a_r2_checkpoints
 
 Requirements:
     - NVIDIA GPU with CUDA (minimum T4 with 15GB VRAM for 4-bit LLaVA)
     - bitsandbytes, transformers, torch with CUDA
-    - All 600 source images in data/coco/images/
+    - All 600 source images in data/coco/images/ verified via source_image_audit_v2.json
 
 Execution Flow:
-    1. HARD CUDA GATE — abort immediately if no GPU
-    2. Load frozen sampling manifest v2 (verify hash)
-    3. Load or create GPU acquisition checkpoint
-    4. Resume from last checkpoint if partially complete
-    5. For each unprocessed image:
-       a. LLaVA forward inference → raw caption
-       b. Conservative claim extraction → atomic claims
-       c. OWL-ViT detection → raw detector scores
-       d. CLIP similarity → raw cosine similarities
-       e. Atomic checkpoint write (crash-safe)
-    6. Finalize evidence manifest v2
-    7. Populate annotation task packages v2 (N > 0 required)
-    8. Seal pre-annotation freeze v2
-    9. Advance artifact state machine to PRE_ANNOTATION_SEALED
-
-IMPORTANT:
-    - No model loading on CPU. Hard failure if CUDA unavailable.
-    - No synthetic, mock, or caption-sourced claims.
-    - All evidence values are raw (d_i ∈ [0,1], g_i ∈ [-1,1]).
-    - Predeclared failure policy applies to individual image failures.
+    1. CLI Argument Parsing & Strict Mode Selection (--dry-run | --pilot N | --full)
+    2. HARD CUDA GATE — abort immediately if no GPU (except mocked in unit tests)
+    3. Load & Verify Frozen Artifacts (manifest, candidate universe, source image audit)
+    4. Runtime Environment Capture & Fingerprint Verification
+    5. Load or Create Checkpoint (with strict provenance hash and pilot/full namespace isolation)
+    6. If --dry-run: report preflight success and exit cleanly without loading models
+    7. Load Models according to T4 Memory-Safe Policy:
+       - LLaVA-1.5-7B: CUDA, 4-bit NF4, fp16 compute
+       - OWL-ViT: CPU
+       - CLIP: CPU
+    8. Process Images with Bounded Retry Policy & Strict Genuine-Zero Semantics
+    9. GPU Complete Gate (attempted == 600 required for GPU_COMPLETE)
+    10. Final Evidence Manifest V2 with separated failure vs zero-claim graph metrics
+    11. Human Annotation Task Packages V2 (canonical field 'label': null)
+    12. Pre-Annotation Freeze V2 with comprehensive verification gates
 """
 
+import argparse
 from collections import Counter
 from datetime import datetime, timezone
 import hashlib
@@ -47,12 +50,15 @@ import shutil
 import sys
 import tempfile
 import time
-import traceback
-from typing import Dict, List, Optional, Any, Tuple
+from typing import Dict, List, Optional, Any, Tuple, Set
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
+
+from src.data.artifact_state import (
+    validate_annotation_task_readiness,
+)
 
 logging.basicConfig(
     level=logging.INFO,
@@ -103,6 +109,18 @@ CLAIM_EXTRACTION_CONFIG = {
     "filter_rules": ["min_length_3", "no_negations", "direct_syntactic_subject_or_object"],
 }
 
+MAX_RETRIES = 3
+RETRYABLE_ERROR_CLASSES = {
+    "OutOfMemoryError",
+    "CUDAOutOfMemoryError",
+    "TimeoutError",
+    "ConnectionError",
+    "HTTPError",
+    "URLError",
+    "IOError",
+    "OSError",
+}
+
 
 def compute_json_hash(data: dict) -> str:
     """Compute SHA-256 of JSON-serialized data with canonical formatting."""
@@ -111,7 +129,7 @@ def compute_json_hash(data: dict) -> str:
 
 
 def atomic_json_write(path: Path, data: Any) -> None:
-    """Write JSON atomically: write to temp file, then rename."""
+    """Write JSON atomically: write to temp file in same directory, then rename."""
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp_fd, tmp_path = tempfile.mkstemp(
         dir=str(path.parent), suffix=".tmp", prefix=path.stem + "_"
@@ -119,7 +137,6 @@ def atomic_json_write(path: Path, data: Any) -> None:
     try:
         with os.fdopen(tmp_fd, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=2)
-        # On Windows, target must not exist for rename
         if path.exists():
             path.unlink()
         shutil.move(tmp_path, str(path))
@@ -130,7 +147,7 @@ def atomic_json_write(path: Path, data: Any) -> None:
 
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-# CUDA HARD GATE
+# CUDA HARD GATE & RUNTIME ENVIRONMENT FINGERPRINT
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 def enforce_cuda_gate() -> Dict[str, Any]:
     """
@@ -138,9 +155,6 @@ def enforce_cuda_gate() -> Dict[str, Any]:
 
     Returns:
         GPU environment metadata dict.
-
-    Raises:
-        RuntimeError: if no CUDA GPU is detected.
     """
     import torch
 
@@ -170,40 +184,218 @@ def enforce_cuda_gate() -> Dict[str, Any]:
     return env
 
 
+def capture_runtime_environment(cuda_env: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    """Capture exact versions of runtime dependencies for environment lock and provenance."""
+    import torch
+    import PIL
+    import numpy as np
+    import scipy
+
+    def get_mod_version(name: str) -> str:
+        try:
+            mod = __import__(name)
+            return getattr(mod, "__version__", "unknown")
+        except ImportError:
+            return "not_installed"
+
+    env = {
+        "python_version": platform.python_version(),
+        "platform": platform.platform(),
+        "torch_version": torch.__version__,
+        "torchvision_version": get_mod_version("torchvision"),
+        "transformers_version": get_mod_version("transformers"),
+        "accelerate_version": get_mod_version("accelerate"),
+        "bitsandbytes_version": get_mod_version("bitsandbytes"),
+        "pillow_version": PIL.__version__,
+        "numpy_version": np.__version__,
+        "scipy_version": scipy.__version__,
+        "cuda_available": torch.cuda.is_available(),
+        "cuda_version": torch.version.cuda if torch.cuda.is_available() else None,
+        "device": torch.cuda.get_device_name(0) if torch.cuda.is_available() else "cpu",
+        "gpu_memory_gb": round(torch.cuda.get_device_properties(0).total_mem / (1024 ** 3), 2) if torch.cuda.is_available() else 0.0,
+    }
+    if cuda_env:
+        env.update({k: v for k, v in cuda_env.items() if v is not None})
+    return env
+
+
+def compute_environment_fingerprint(env: Dict[str, Any]) -> str:
+    """Compute deterministic SHA-256 of locked runtime dependencies."""
+    locked_keys = [
+        "python_version", "torch_version", "torchvision_version",
+        "transformers_version", "accelerate_version", "bitsandbytes_version",
+        "pillow_version", "numpy_version", "scipy_version",
+    ]
+    locked_dict = {k: env.get(k) for k in locked_keys}
+    return compute_json_hash(locked_dict)
+
+
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-# CHECKPOINT MANAGEMENT
+# SOURCE IMAGE VERIFICATION GATE
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+def verify_source_images_prepared(
+    image_dir: Path,
+    audit_p: Path,
+    expected_count: int = 600,
+) -> Tuple[bool, str, Dict[str, Any]]:
+    """
+    Verify that all 600 source images are present and pass the acquisition gate.
+    Requires requested=600, valid=600, missing=0, corrupt=0.
+    """
+    if not audit_p.exists():
+        msg = (
+            f"Source image audit missing: {audit_p}. "
+            "COCO source images are gitignored and must be acquired before GPU inference. "
+            "Please run: python scripts/acquire_and_verify_source_images_v2.py"
+        )
+        return False, msg, {}
+
+    try:
+        with open(audit_p, "r", encoding="utf-8") as f:
+            audit = json.load(f)
+    except Exception as e:
+        return False, f"Failed to read source image audit {audit_p}: {e}", {}
+
+    valid_count = audit.get("valid_count", 0)
+    missing_count = audit.get("missing_count", 0)
+    corrupt_count = audit.get("corrupt_count", 0)
+    total_requested = audit.get("total_requested", 0)
+
+    if (
+        total_requested != expected_count
+        or valid_count != expected_count
+        or missing_count > 0
+        or corrupt_count > 0
+    ):
+        msg = (
+            f"Source image audit shows incomplete acquisition: "
+            f"Valid={valid_count}/{expected_count}, Missing={missing_count}, Corrupt={corrupt_count}. "
+            "Please run: python scripts/acquire_and_verify_source_images_v2.py"
+        )
+        return False, msg, audit
+
+    if not image_dir.exists():
+        msg = f"Image directory does not exist: {image_dir}"
+        return False, msg, audit
+
+    return True, "Source images fully verified (600/600 valid).", audit
+
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# CHECKPOINT PROVENANCE & MANAGEMENT
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+def compute_checkpoint_provenance(
+    sampling_manifest_hash: str,
+    audit_hash: str,
+    code_sha: str,
+    gen_cfg_hash: str,
+    claim_ext_hash: str,
+) -> Tuple[Dict[str, Any], str]:
+    """
+    Compute exact scientific provenance fingerprint for checkpoint binding.
+    Checkpoints cannot be resumed if any component of this fingerprint differs.
+    """
+    fingerprint = {
+        "dataset_version": "v2",
+        "sampling_manifest_hash": sampling_manifest_hash,
+        "source_image_audit_hash": audit_hash,
+        "vlm_model": FROZEN_MODELS["vlm_model"],
+        "vlm_revision": FROZEN_MODELS["vlm_revision"],
+        "processor_revision": LLAVA_GENERATION_CONFIG["processor_revision"],
+        "generation_config_hash": gen_cfg_hash,
+        "claim_extractor_hash": claim_ext_hash,
+        "detector_model": FROZEN_MODELS["detector_model"],
+        "detector_revision": FROZEN_MODELS["detector_revision"],
+        "clip_model": FROZEN_MODELS["clip_model"],
+        "clip_revision": FROZEN_MODELS["clip_revision"],
+        "code_sha": code_sha,
+    }
+    prov_hash = compute_json_hash(fingerprint)
+    return fingerprint, prov_hash
+
+
+def classify_failure(err: Exception) -> Tuple[str, bool]:
+    """Classify failure as ('RETRYABLE', True) or ('TERMINAL', False)."""
+    err_class = type(err).__name__
+    err_msg = str(err).lower()
+    if (
+        err_class in RETRYABLE_ERROR_CLASSES
+        or "cuda out of memory" in err_msg
+        or "timed out" in err_msg
+        or "connection" in err_msg
+    ):
+        return "RETRYABLE", True
+    return "TERMINAL", False
+
+
 def load_or_create_checkpoint(
-    checkpoint_path: Path, sampling_manifest_hash: str, total_images: int
+    checkpoint_path: Path,
+    expected_checkpoint_type: str,
+    provenance_fingerprint: Dict[str, Any],
+    provenance_hash: str,
+    total_images: int,
+    resume: bool,
 ) -> Dict[str, Any]:
-    """Load existing checkpoint or create a fresh one."""
+    """
+    Load existing checkpoint or create a fresh one with strict provenance binding.
+
+    On resume:
+        - Must match expected_checkpoint_type (pilot vs full isolation)
+        - Must match checkpoint_provenance_hash (no config drift)
+        - If mismatch: HARD FAIL
+    """
     if checkpoint_path.exists():
+        if not resume:
+            raise RuntimeError(
+                f"Checkpoint already exists at {checkpoint_path}. "
+                "To resume this run, supply --resume. "
+                "To start a fresh acquisition, specify a different --checkpoint-dir."
+            )
+
         with open(checkpoint_path, "r", encoding="utf-8") as f:
             ckpt = json.load(f)
 
-        # Validate checkpoint is for the correct sampling manifest
-        if ckpt.get("sampling_manifest_hash") != sampling_manifest_hash:
-            logger.warning(
-                "Checkpoint sampling hash mismatch. Creating fresh checkpoint. "
-                f"Expected: {sampling_manifest_hash}, "
-                f"Found: {ckpt.get('sampling_manifest_hash')}"
+        # 1. Type isolation check (pilot vs full)
+        found_type = ckpt.get("checkpoint_type")
+        if found_type != expected_checkpoint_type:
+            raise RuntimeError(
+                f"CHECKPOINT TYPE MISMATCH: Found '{found_type}', expected '{expected_checkpoint_type}'. "
+                "Pilot checkpoints must NEVER be consumed by --full --resume."
             )
-        else:
-            completed = len(ckpt.get("completed_image_ids", []))
-            logger.info(f"Resuming from checkpoint: {completed}/{total_images} images completed.")
-            return ckpt
+
+        # 2. Strict provenance fingerprint check
+        found_prov_hash = ckpt.get("checkpoint_provenance_hash")
+        if found_prov_hash != provenance_hash:
+            raise RuntimeError(
+                f"CHECKPOINT PROVENANCE HASH MISMATCH: "
+                f"Expected {provenance_hash}, found {found_prov_hash}. "
+                "The scientific configuration, model revisions, code SHA, or dataset manifests have changed. "
+                "Cannot merge or resume into a divergent checkpoint namespace."
+            )
+
+        completed = len(ckpt.get("completed_image_ids", []))
+        failed = len(ckpt.get("failed_image_ids", []))
+        logger.info(
+            f"Resuming from verified checkpoint: {completed} completed, "
+            f"{failed} failed out of {total_images} target images."
+        )
+        return ckpt
 
     # Fresh checkpoint
     return {
         "schema_version": "2.0.0",
-        "checkpoint_type": "gpu_acquisition_checkpoint",
-        "state": "GPU_IN_PROGRESS",
-        "sampling_manifest_hash": sampling_manifest_hash,
+        "dataset_version": "v2",
+        "checkpoint_type": expected_checkpoint_type,
+        "state": "GPU_IN_PROGRESS" if expected_checkpoint_type == "gpu_acquisition_checkpoint" else "PILOT_IN_PROGRESS",
+        "checkpoint_provenance_hash": provenance_hash,
+        "provenance_fingerprint": provenance_fingerprint,
+        "sampling_manifest_hash": provenance_fingerprint.get("sampling_manifest_hash", ""),
         "total_target_images": total_images,
         "completed_images": 0,
         "failed_images": 0,
         "genuine_zero_claim_images": 0,
         "completed_image_ids": [],
+        "genuine_zero_image_ids": [],
         "failed_image_ids": [],
         "evidence_records": [],
         "failure_records": [],
@@ -220,7 +412,7 @@ def save_checkpoint(checkpoint_path: Path, checkpoint: Dict[str, Any]) -> None:
 
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-# SINGLE-IMAGE PROCESSING
+# SINGLE-IMAGE PROCESSING (STRICT GENUINE-ZERO & TYPED EVIDENCE FAILURES)
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 def process_single_image(
     image_id: str,
@@ -234,12 +426,23 @@ def process_single_image(
     clip_provider: Any,
     gen_config_hash: str,
     claim_ext_hash: str,
-) -> Tuple[List[Dict[str, Any]], Optional[Dict[str, Any]]]:
+    attempt_count: int = 1,
+) -> Tuple[List[Dict[str, Any]], Optional[Dict[str, Any]], bool]:
     """
     Process a single image through the full evidence pipeline.
 
+    Strict genuine-zero semantics:
+        - Image load SUCCESS
+        - LLaVA inference SUCCESS with NON-EMPTY response
+        - Claim extraction SUCCESS
+        - EXACTLY 0 eligible object-existence claims
+        => is_genuine_zero = True, failure_record = None, evidence_records = []
+
+    If LLaVA returns empty/invalid text:
+        => Typed failure (EmptyCaptionError / VLM_EMPTY_RESPONSE), NOT genuine zero.
+
     Returns:
-        (evidence_records, failure_record_or_none)
+        (evidence_records, failure_record_or_none, is_genuine_zero)
     """
     from PIL import Image
 
@@ -248,7 +451,52 @@ def process_single_image(
 
     try:
         # 1. Load image
-        img = Image.open(str(image_path)).convert("RGB")
+        if not image_path.exists():
+            failure_record = {
+                "claim_id": f"img_level_{image_id}",
+                "image_id": image_id,
+                "coco_source_split": coco_source_split,
+                "research_split": research_split,
+                "provider": FROZEN_MODELS["vlm_model"],
+                "failure_state": "FAILED",
+                "reason_code": "SOURCE_IMAGE_NOT_FOUND",
+                "attempt_count": attempt_count,
+                "failure_class": "TERMINAL",
+                "retryable": False,
+                "last_error_class": "FileNotFoundError",
+                "last_error_message": f"Image file not found: {image_path}",
+                "final_status": "TERMINAL_FAILURE",
+                "provenance_status": "REAL_UNLABELED",
+                "model_revision": FROZEN_MODELS["vlm_revision"],
+                "generation_config_hash": gen_config_hash,
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+            }
+            return [], failure_record, False
+
+        try:
+            img = Image.open(str(image_path)).convert("RGB")
+        except Exception as img_err:
+            f_class, is_retry = classify_failure(img_err)
+            failure_record = {
+                "claim_id": f"img_level_{image_id}",
+                "image_id": image_id,
+                "coco_source_split": coco_source_split,
+                "research_split": research_split,
+                "provider": FROZEN_MODELS["vlm_model"],
+                "failure_state": "FAILED",
+                "reason_code": f"IMAGE_LOAD_FAILED: {type(img_err).__name__}",
+                "attempt_count": attempt_count,
+                "failure_class": f_class,
+                "retryable": is_retry,
+                "last_error_class": type(img_err).__name__,
+                "last_error_message": str(img_err)[:500],
+                "final_status": "RETRY_EXHAUSTED" if (not is_retry or attempt_count >= MAX_RETRIES) else "FAILED",
+                "provenance_status": "REAL_UNLABELED",
+                "model_revision": FROZEN_MODELS["vlm_revision"],
+                "generation_config_hash": gen_config_hash,
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+            }
+            return [], failure_record, False
 
         # 2. LLaVA forward inference
         caption_text = vlm_provider.generate(
@@ -259,41 +507,131 @@ def process_single_image(
             temperature=LLAVA_GENERATION_CONFIG["temperature"],
         )
 
-        if not caption_text or not caption_text.strip():
-            # Genuine zero — model produced empty output
-            return [], None
+        # Strict validation: empty response is a typed failure, NEVER genuine zero
+        if not caption_text or not str(caption_text).strip():
+            failure_record = {
+                "claim_id": f"img_level_{image_id}",
+                "image_id": image_id,
+                "coco_source_split": coco_source_split,
+                "research_split": research_split,
+                "provider": FROZEN_MODELS["vlm_model"],
+                "failure_state": "FAILED",
+                "reason_code": "VLM_EMPTY_RESPONSE",
+                "attempt_count": attempt_count,
+                "failure_class": "TERMINAL",
+                "retryable": False,
+                "last_error_class": "EmptyCaptionError",
+                "last_error_message": "LLaVA generated empty or whitespace-only caption",
+                "final_status": "TERMINAL_FAILURE",
+                "provenance_status": "REAL_UNLABELED",
+                "model_revision": FROZEN_MODELS["vlm_revision"],
+                "generation_config_hash": gen_config_hash,
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+            }
+            logger.warning(f"VLM generated empty response for {image_id}; recorded as TYPED FAILURE.")
+            return [], failure_record, False
 
         # 3. Conservative claim extraction
-        claims = claim_extractor.extract_claims(caption_text, image_id=image_id)
+        try:
+            claims = claim_extractor.extract_claims(caption_text, image_id=image_id)
+        except Exception as claim_err:
+            f_class, is_retry = classify_failure(claim_err)
+            failure_record = {
+                "claim_id": f"img_level_{image_id}",
+                "image_id": image_id,
+                "coco_source_split": coco_source_split,
+                "research_split": research_split,
+                "provider": FROZEN_MODELS["vlm_model"],
+                "failure_state": "FAILED",
+                "reason_code": f"CLAIM_EXTRACTION_EXCEPTION: {type(claim_err).__name__}",
+                "attempt_count": attempt_count,
+                "failure_class": f_class,
+                "retryable": is_retry,
+                "last_error_class": type(claim_err).__name__,
+                "last_error_message": str(claim_err)[:500],
+                "final_status": "RETRY_EXHAUSTED" if (not is_retry or attempt_count >= MAX_RETRIES) else "FAILED",
+                "provenance_status": "REAL_UNLABELED",
+                "model_revision": FROZEN_MODELS["vlm_revision"],
+                "generation_config_hash": gen_config_hash,
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+            }
+            return [], failure_record, False
 
+        # 4. Genuine Zero Claim Check
         if len(claims) == 0:
-            # Genuine zero — model produced caption but no object-existence claims
-            return [], None
+            logger.info(f"Image {image_id}: Valid caption produced, but 0 COCO claims (GENUINE_ZERO_CLAIM).")
+            return [], None, True
 
-        # 4. For each claim, extract OWL-ViT and CLIP evidence
+        # 5. For each claim, extract OWL-ViT and CLIP evidence with typed failure provenance
         for claim in claims:
             claim_id = f"{image_id}_claim_{claim.category}"
-            det_score = None
-            det_available = False
-            clip_score = None
-            clip_available = False
 
             # OWL-ViT detection
+            det_score = None
+            det_available = False
+            det_status = "UNAVAILABLE"
+            det_failure_info = None
+
             try:
                 det_result = detector_provider.detect(img, claim.category)
                 if det_result is not None:
                     det_score = float(det_result.max_score)
                     det_available = True
+                    det_status = "AVAILABLE"
+                else:
+                    det_status = "FAILED"
+                    det_failure_info = {
+                        "provider": FROZEN_MODELS["detector_model"],
+                        "revision": FROZEN_MODELS["detector_revision"],
+                        "attempt_count": 1,
+                        "reason_code": "DETECTOR_RETURNED_NONE",
+                        "error_class": "NoneResultError",
+                        "error_message": "OWL-ViT returned None for claim category",
+                    }
             except Exception as det_err:
+                det_status = "FAILED"
+                det_failure_info = {
+                    "provider": FROZEN_MODELS["detector_model"],
+                    "revision": FROZEN_MODELS["detector_revision"],
+                    "attempt_count": 1,
+                    "reason_code": f"DETECTOR_EXCEPTION: {type(det_err).__name__}",
+                    "error_class": type(det_err).__name__,
+                    "error_message": str(det_err)[:500],
+                }
                 logger.warning(f"OWL-ViT failed for {claim_id}: {det_err}")
 
             # CLIP similarity
+            clip_score = None
+            clip_available = False
+            clip_status = "UNAVAILABLE"
+            clip_failure_info = None
+
             try:
                 clip_result = clip_provider.compute_similarity(img, claim.category)
                 if clip_result is not None:
                     clip_score = float(clip_result.cosine_similarity)
                     clip_available = True
+                    clip_status = "AVAILABLE"
+                else:
+                    clip_status = "FAILED"
+                    clip_failure_info = {
+                        "provider": FROZEN_MODELS["clip_model"],
+                        "revision": FROZEN_MODELS["clip_revision"],
+                        "attempt_count": 1,
+                        "reason_code": "CLIP_RETURNED_NONE",
+                        "error_class": "NoneResultError",
+                        "error_message": "CLIP returned None for claim category",
+                    }
             except Exception as clip_err:
+                clip_status = "FAILED"
+                clip_failure_info = {
+                    "provider": FROZEN_MODELS["clip_model"],
+                    "revision": FROZEN_MODELS["clip_revision"],
+                    "attempt_count": 1,
+                    "reason_code": f"CLIP_EXCEPTION: {type(clip_err).__name__}",
+                    "error_class": type(clip_err).__name__,
+                    "error_message": str(clip_err)[:500],
+                }
                 logger.warning(f"CLIP failed for {claim_id}: {clip_err}")
 
             record = {
@@ -305,10 +643,14 @@ def process_single_image(
                 "object_category": claim.category,
                 "raw_claim_text": claim.surface_text,
                 "raw_caption": caption_text,
-                "detector_score": det_score,
+                "detector_score": det_score,  # float or None (null in JSON)
                 "detector_available": det_available,
-                "clip_score": clip_score,
+                "detector_status": det_status,
+                "detector_failure_info": det_failure_info,
+                "clip_score": clip_score,  # float or None (null in JSON)
                 "similarity_available": clip_available,
+                "clip_status": clip_status,
+                "clip_failure_info": clip_failure_info,
                 "provenance_status": "REAL_UNLABELED",
                 "model_revision": FROZEN_MODELS["vlm_revision"],
                 "detector_revision": FROZEN_MODELS["detector_revision"],
@@ -320,7 +662,7 @@ def process_single_image(
             evidence_records.append(record)
 
     except Exception as err:
-        # Pipeline failure for this image
+        f_class, is_retry = classify_failure(err)
         failure_record = {
             "claim_id": f"img_level_{image_id}",
             "image_id": image_id,
@@ -329,9 +671,12 @@ def process_single_image(
             "provider": FROZEN_MODELS["vlm_model"],
             "failure_state": "FAILED",
             "reason_code": f"PIPELINE_EXCEPTION: {type(err).__name__}",
-            "attempt_count": 1,
+            "attempt_count": attempt_count,
+            "failure_class": f_class,
+            "retryable": is_retry,
             "last_error_class": type(err).__name__,
             "last_error_message": str(err)[:500],
+            "final_status": "RETRY_EXHAUSTED" if (not is_retry or attempt_count >= MAX_RETRIES) else "FAILED",
             "provenance_status": "REAL_UNLABELED",
             "model_revision": FROZEN_MODELS["vlm_revision"],
             "generation_config_hash": gen_config_hash,
@@ -339,43 +684,95 @@ def process_single_image(
         }
         logger.error(f"Pipeline failure for {image_id}: {err}")
 
-    return evidence_records, failure_record
+    return evidence_records, failure_record, False
 
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-# MAIN EXECUTION
+# CLI PARSER
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-def main() -> None:
+def parse_args(argv: Optional[List[str]] = None) -> argparse.Namespace:
     """
-    One-command Colab execution entry point.
+    Parse and validate CLI arguments with mutually exclusive required mode.
+    """
+    parser = argparse.ArgumentParser(
+        description="Phase 10A-R2 Canonical Colab GPU Execution Script."
+    )
 
-    Orchestrates the full evidence acquisition pipeline with
-    atomic checkpointing and strict provenance enforcement.
-    """
+    mode_group = parser.add_mutually_exclusive_group(required=True)
+    mode_group.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Perform environment, artifact, and source image validation only. Do not load models or write final artifacts.",
+    )
+    mode_group.add_argument(
+        "--pilot",
+        type=int,
+        metavar="N",
+        help="Process exactly N frozen-manifest images. Write checkpoint/preview with PILOT_ONLY status. Do not finalize scientific artifacts.",
+    )
+    mode_group.add_argument(
+        "--full",
+        action="store_true",
+        help="Process all 600 images in the primary cohort.",
+    )
+
+    parser.add_argument(
+        "--resume",
+        action="store_true",
+        default=False,
+        help="Reuse valid checkpoint entries and process only remaining/retryable images.",
+    )
+    parser.add_argument(
+        "--checkpoint-dir",
+        type=Path,
+        default=None,
+        help="Write persistent checkpoint files under this path (e.g. Google Drive mount).",
+    )
+    parser.add_argument(
+        "--output-dir",
+        type=Path,
+        default=None,
+        help="Optional output root for final transferable artifacts.",
+    )
+
+    args = parser.parse_args(argv)
+
+    if args.pilot is not None and args.pilot <= 0:
+        parser.error("--pilot N must be a positive integer greater than 0.")
+
+    return args
+
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# MAIN EXECUTION ENTRY POINT
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+def main(argv: Optional[List[str]] = None) -> None:
+    args = parse_args(argv)
+
     logger.info("=" * 60)
     logger.info("Phase 10A-R2 Colab GPU Execution — START")
+    logger.info(f"Mode: {'DRY-RUN' if args.dry_run else ('PILOT (' + str(args.pilot) + ' images)' if args.pilot else 'FULL (600 images)')}")
+    logger.info(f"Resume: {args.resume}")
+    logger.info(f"Checkpoint Dir: {args.checkpoint_dir or 'DEFAULT (data/manifests)'}")
+    logger.info(f"Output Dir: {args.output_dir or 'DEFAULT'}")
     logger.info("=" * 60)
 
     # ──────────────────────────────────────────────────────────────
-    # Step 1: CUDA Hard Gate
+    # Step 1: CUDA Gate & Environment Verification
     # ──────────────────────────────────────────────────────────────
     gpu_env = enforce_cuda_gate()
+    runtime_env = capture_runtime_environment(gpu_env)
+    env_fingerprint = compute_environment_fingerprint(runtime_env)
+    logger.info(f"Runtime environment fingerprint: {env_fingerprint[:16]}...")
 
     # ──────────────────────────────────────────────────────────────
-    # Step 2: Load Frozen Artifacts
+    # Step 2: Load Frozen Artifacts & Hashes
     # ──────────────────────────────────────────────────────────────
     manifest_p = PROJECT_ROOT / "data" / "manifests" / "final_sampling_manifest_v2.json"
     universe_p = PROJECT_ROOT / "data" / "manifests" / "coco_candidate_universe_v2.json"
     corruption_p = PROJECT_ROOT / "data" / "manifests" / "final_corruption_manifest_v2.json"
     audit_p = PROJECT_ROOT / "reports" / "m10a_recovery2" / "source_image_audit_v2.json"
     image_dir = PROJECT_ROOT / "data" / "coco" / "images"
-
-    checkpoint_p = PROJECT_ROOT / "data" / "manifests" / "gpu_acquisition_checkpoint_v2.json"
-    out_evidence_p = PROJECT_ROOT / "data" / "manifests" / "final_evidence_manifest_v2.json"
-    out_freeze_p = PROJECT_ROOT / "data" / "manifests" / "pre_annotation_freeze_v2.json"
-    task_a_p = PROJECT_ROOT / "data" / "annotations" / "annotator_A_tasks_v2.json"
-    task_b_p = PROJECT_ROOT / "data" / "annotations" / "annotator_B_tasks_v2.json"
-    out_report_p = PROJECT_ROOT / "reports" / "m10a_recovery2" / "gpu_acquisition_report.md"
 
     for required in [manifest_p, universe_p]:
         if not required.exists():
@@ -396,24 +793,148 @@ def main() -> None:
     coco_source_splits = sampling_data.get("coco_source_splits", {})
     images_meta = {img["image_id"]: img for img in sampling_data.get("images", [])}
 
-    assert len(image_ids) == 600, f"Expected 600 images, got {len(image_ids)}"
+    if len(image_ids) != 600:
+        raise ValueError(f"Expected exactly 600 images in sampling manifest, found {len(image_ids)}")
 
     code_sha = sampling_data.get("code_sha", "unknown")
 
-    logger.info(f"Loaded sampling manifest: {len(image_ids)} images, hash={sampling_hash[:16]}...")
-    logger.info(f"Generation config hash: {gen_cfg_hash[:16]}...")
-    logger.info(f"Claim extractor hash: {claim_ext_hash[:16]}...")
+    # ──────────────────────────────────────────────────────────────
+    # Step 3: Source Image Preparation Gate
+    # ──────────────────────────────────────────────────────────────
+    images_ok, images_msg, audit_data = verify_source_images_prepared(
+        image_dir=image_dir,
+        audit_p=audit_p,
+        expected_count=600,
+    )
+    if not images_ok:
+        logger.error(images_msg)
+        raise RuntimeError(images_msg)
+
+    audit_hash = ""
+    if audit_p.exists():
+        with open(audit_p, "rb") as f:
+            audit_hash = hashlib.sha256(f.read()).hexdigest()
+
+    corruption_hash = ""
+    if corruption_p.exists():
+        with open(corruption_p, "r", encoding="utf-8") as f:
+            corruption_data = json.load(f)
+            corruption_hash = corruption_data.get("manifest_hash", "")
+
+    # Compute checkpoint provenance fingerprint
+    prov_fingerprint, prov_hash = compute_checkpoint_provenance(
+        sampling_manifest_hash=sampling_hash,
+        audit_hash=audit_hash,
+        code_sha=code_sha,
+        gen_cfg_hash=gen_cfg_hash,
+        claim_ext_hash=claim_ext_hash,
+    )
+    logger.info(f"Checkpoint provenance hash: {prov_hash[:16]}...")
 
     # ──────────────────────────────────────────────────────────────
-    # Step 3: Initialize Models (GPU ONLY)
+    # Step 4: Resolve Checkpoint Paths (Physical Isolation)
     # ──────────────────────────────────────────────────────────────
-    logger.info("Loading frozen LLaVA-1.5-7B (4-bit quantized)...")
+    base_checkpoint_root = (
+        Path(args.checkpoint_dir)
+        if args.checkpoint_dir
+        else PROJECT_ROOT / "data" / "manifests"
+    )
+
+    if args.pilot:
+        ckpt_sub = base_checkpoint_root / "pilot"
+        ckpt_path = ckpt_sub / "gpu_acquisition_checkpoint_v2.json"
+        expected_ckpt_type = "pilot_acquisition_checkpoint"
+        target_image_ids = image_ids[: args.pilot]
+    else:
+        ckpt_sub = base_checkpoint_root / "full"
+        ckpt_path = ckpt_sub / "gpu_acquisition_checkpoint_v2.json"
+        expected_ckpt_type = "gpu_acquisition_checkpoint"
+        target_image_ids = image_ids
+
+    # ──────────────────────────────────────────────────────────────
+    # Step 5: DRY-RUN Mode Execution
+    # ──────────────────────────────────────────────────────────────
+    if args.dry_run:
+        logger.info("=" * 60)
+        logger.info("DRY-RUN VALIDATION COMPLETE")
+        logger.info("  CUDA Gate: PASSED")
+        logger.info(f"  Device: {gpu_env['device']} ({gpu_env['gpu_memory_gb']} GB)")
+        logger.info(f"  Source Images: 600/600 verified (audit hash: {audit_hash[:16]}...)")
+        logger.info(f"  Sampling Manifest: 600 images (hash: {sampling_hash[:16]}...)")
+        logger.info(f"  Provenance Hash: {prov_hash[:16]}...")
+        logger.info(f"  Target Checkpoint Path: {ckpt_path}")
+        logger.info("DRY-RUN SUCCESS: No models loaded, no final artifacts written.")
+        logger.info("=" * 60)
+        return
+
+    # ──────────────────────────────────────────────────────────────
+    # Step 6: Environment Lock Verification (A8)
+    # ──────────────────────────────────────────────────────────────
+    lock_file = base_checkpoint_root / "colab_runtime_environment_lock.json"
+    if args.full and lock_file.exists():
+        with open(lock_file, "r", encoding="utf-8") as f:
+            locked_env = json.load(f)
+        locked_fp = compute_environment_fingerprint(locked_env)
+        if locked_fp != env_fingerprint:
+            raise RuntimeError(
+                f"RUNTIME ENVIRONMENT DRIFT DETECTED: "
+                f"Current fingerprint {env_fingerprint} differs from locked pilot {locked_fp}. "
+                "Reinstall exact recorded package versions before running full acquisition."
+            )
+        logger.info("Runtime environment lock verified against pilot fingerprint.")
+
+    # ──────────────────────────────────────────────────────────────
+    # Step 7: Load or Create Checkpoint
+    # ──────────────────────────────────────────────────────────────
+    checkpoint = load_or_create_checkpoint(
+        checkpoint_path=ckpt_path,
+        expected_checkpoint_type=expected_ckpt_type,
+        provenance_fingerprint=prov_fingerprint,
+        provenance_hash=prov_hash,
+        total_images=len(target_image_ids),
+        resume=args.resume,
+    )
+    checkpoint["execution_environment"] = runtime_env
+
+    completed_set = set(checkpoint.get("completed_image_ids", []))
+    failed_records_by_img = {
+        r["image_id"]: r for r in checkpoint.get("failure_records", []) if "image_id" in r
+    }
+
+    # Determine remaining images, considering retry policy
+    remaining: List[str] = []
+    for iid in target_image_ids:
+        if iid in completed_set:
+            continue
+        if iid in failed_records_by_img:
+            f_rec = failed_records_by_img[iid]
+            if f_rec.get("failure_class") == "RETRYABLE" and f_rec.get("attempt_count", 1) < MAX_RETRIES:
+                logger.info(f"Image {iid} marked RETRYABLE (attempt {f_rec.get('attempt_count')}). Scheduling retry.")
+                remaining.append(iid)
+            else:
+                # Terminal failure or max retries exhausted -> skip
+                continue
+        else:
+            remaining.append(iid)
+
+    logger.info(
+        f"Target Images: {len(target_image_ids)}, "
+        f"Completed: {len(completed_set)}, "
+        f"Failed/Terminal: {len(checkpoint.get('failed_image_ids', [])) - (len(target_image_ids) - len(completed_set) - len(remaining))}, "
+        f"Remaining To Process: {len(remaining)}"
+    )
+
+    # ──────────────────────────────────────────────────────────────
+    # Step 8: Initialize Models (T4 Memory-Safe Device Policy)
+    # ──────────────────────────────────────────────────────────────
+    logger.info("Initializing models under T4 Memory-Safe Configuration...")
     from src.vlm.llava_provider import LLaVA15Provider
     from src.claims.extraction import ConservativeClaimExtractor
     from src.claims.vocabulary import create_coco_category_registry
     from src.evidence.detector_provider import HuggingFaceDetectorProvider
     from src.evidence.clip_provider import TransformersCLIPProvider
 
+    # LLaVA on CUDA with 4-bit NF4
     vlm_provider = LLaVA15Provider(
         model_name=FROZEN_MODELS["vlm_model"],
         model_revision=FROZEN_MODELS["vlm_revision"],
@@ -423,70 +944,47 @@ def main() -> None:
         local_files_only=False,
         allow_download=True,
     )
-    logger.info("LLaVA model loaded.")
+    logger.info("LLaVA-1.5-7B loaded on CUDA (4-bit NF4, fp16).")
 
     claim_extractor = ConservativeClaimExtractor(create_coco_category_registry())
-    logger.info("Claim extractor initialized.")
+    logger.info("Conservative claim extractor initialized.")
 
+    # OWL-ViT and CLIP on CPU by default (M6 memory-safe policy for T4 16GB)
     detector_provider = HuggingFaceDetectorProvider(
         model_name=FROZEN_MODELS["detector_model"],
         model_revision=FROZEN_MODELS["detector_revision"],
-        device="cuda",
+        device="cpu",
     )
-    logger.info("OWL-ViT detector loaded.")
+    logger.info("OWL-ViT detector loaded on CPU (M6 memory-safe policy).")
 
     clip_provider = TransformersCLIPProvider(
         model_name=FROZEN_MODELS["clip_model"],
         model_revision=FROZEN_MODELS["clip_revision"],
-        device="cuda",
+        device="cpu",
     )
-    logger.info("CLIP model loaded.")
+    logger.info("CLIP model loaded on CPU (M6 memory-safe policy).")
 
     # ──────────────────────────────────────────────────────────────
-    # Step 4: Load or Create Checkpoint
+    # Step 9: Process Images with Atomic Checkpointing
     # ──────────────────────────────────────────────────────────────
-    checkpoint = load_or_create_checkpoint(checkpoint_p, sampling_hash, len(image_ids))
-    checkpoint["execution_environment"] = gpu_env
-    completed_set = set(checkpoint.get("completed_image_ids", []))
-    failed_set = set(checkpoint.get("failed_image_ids", []))
-
-    remaining = [iid for iid in image_ids if iid not in completed_set and iid not in failed_set]
-    logger.info(f"Images remaining: {len(remaining)} / {len(image_ids)}")
-
-    # ──────────────────────────────────────────────────────────────
-    # Step 5: Process Images with Atomic Checkpointing
-    # ──────────────────────────────────────────────────────────────
-    CHECKPOINT_INTERVAL = 10  # Save checkpoint every N images
-
+    CHECKPOINT_INTERVAL = 10
     start_time = time.time()
+
     for idx, img_id in enumerate(remaining):
         meta = images_meta.get(img_id, {})
         file_name = meta.get("file_name", f"{img_id}.jpg")
         r_split = research_splits.get(img_id, "TRAIN")
         c_split = coco_source_splits.get(img_id, "train2017")
 
-        # Resolve image path
         img_path = image_dir / file_name
         if not img_path.exists():
-            # Try alternate naming
             numeric_id = img_id.replace("coco_", "")
             img_path = image_dir / f"{numeric_id}.jpg"
 
-        if not img_path.exists():
-            logger.error(f"Source image not found: {img_path}")
-            checkpoint["failed_image_ids"].append(img_id)
-            checkpoint["failed_images"] = len(checkpoint["failed_image_ids"])
-            checkpoint["failure_records"].append({
-                "claim_id": f"img_level_{img_id}",
-                "image_id": img_id,
-                "failure_state": "FAILED",
-                "reason_code": "SOURCE_IMAGE_NOT_FOUND",
-                "timestamp": datetime.now(timezone.utc).isoformat(),
-            })
-            continue
+        prev_attempts = failed_records_by_img.get(img_id, {}).get("attempt_count", 0)
+        current_attempt = prev_attempts + 1
 
-        # Process
-        records, failure = process_single_image(
+        records, failure, is_genuine_zero = process_single_image(
             image_id=img_id,
             image_path=img_path,
             research_split=r_split,
@@ -498,20 +996,40 @@ def main() -> None:
             clip_provider=clip_provider,
             gen_config_hash=gen_cfg_hash,
             claim_ext_hash=claim_ext_hash,
+            attempt_count=current_attempt,
         )
 
         if failure:
-            checkpoint["failed_image_ids"].append(img_id)
+            if img_id not in checkpoint["failed_image_ids"]:
+                checkpoint["failed_image_ids"].append(img_id)
             checkpoint["failed_images"] = len(checkpoint["failed_image_ids"])
+            # Update failure records
+            checkpoint["failure_records"] = [
+                r for r in checkpoint["failure_records"] if r.get("image_id") != img_id
+            ]
             checkpoint["failure_records"].append(failure)
         else:
-            checkpoint["completed_image_ids"].append(img_id)
+            if img_id not in checkpoint["completed_image_ids"]:
+                checkpoint["completed_image_ids"].append(img_id)
             checkpoint["completed_images"] = len(checkpoint["completed_image_ids"])
-            checkpoint["evidence_records"].extend(records)
-            if len(records) == 0:
-                checkpoint["genuine_zero_claim_images"] = (
-                    checkpoint.get("genuine_zero_claim_images", 0) + 1
-                )
+
+            # Clean any old failure records if this was a retry
+            checkpoint["failure_records"] = [
+                r for r in checkpoint["failure_records"] if r.get("image_id") != img_id
+            ]
+            checkpoint["failed_image_ids"] = [
+                iid for iid in checkpoint["failed_image_ids"] if iid != img_id
+            ]
+            checkpoint["failed_images"] = len(checkpoint["failed_image_ids"])
+
+            if is_genuine_zero:
+                if img_id not in checkpoint.get("genuine_zero_image_ids", []):
+                    if "genuine_zero_image_ids" not in checkpoint:
+                        checkpoint["genuine_zero_image_ids"] = []
+                    checkpoint["genuine_zero_image_ids"].append(img_id)
+                checkpoint["genuine_zero_claim_images"] = len(checkpoint["genuine_zero_image_ids"])
+            else:
+                checkpoint["evidence_records"].extend(records)
 
         # Periodic checkpoint
         processed_this_session = idx + 1
@@ -524,56 +1042,108 @@ def main() -> None:
                 f"claims={len(checkpoint['evidence_records'])}, "
                 f"failures={checkpoint['failed_images']}"
             )
-            save_checkpoint(checkpoint_p, checkpoint)
-
-    # Final checkpoint save
-    checkpoint["state"] = "GPU_COMPLETE"
-    save_checkpoint(checkpoint_p, checkpoint)
-
-    elapsed_total = time.time() - start_time
-    logger.info(f"GPU inference complete: {elapsed_total:.1f}s total")
+            save_checkpoint(ckpt_path, checkpoint)
 
     # ──────────────────────────────────────────────────────────────
-    # Step 6: Build Final Evidence Manifest V2
+    # Step 10: State Machine & GPU Complete Gate
+    # ──────────────────────────────────────────────────────────────
+    total_attempted = len(checkpoint["completed_image_ids"]) + len(checkpoint["failed_image_ids"])
+
+    if args.pilot:
+        checkpoint["state"] = "PILOT_COMPLETE"
+        save_checkpoint(ckpt_path, checkpoint)
+        logger.info(f"Pilot acquisition complete ({args.pilot} images attempted).")
+
+        # Save runtime environment lock from successful pilot
+        atomic_json_write(lock_file, runtime_env)
+        atomic_json_write(PROJECT_ROOT / "reports" / "m10a_recovery2" / "colab_runtime_environment_lock.json", runtime_env)
+
+        # Write pilot preview and diagnostics
+        pilot_preview = {
+            "status": "PILOT_ONLY",
+            "schema_version": "2.0.0",
+            "pilot_n": args.pilot,
+            "provenance_hash": prov_hash,
+            "completed_images": len(checkpoint["completed_image_ids"]),
+            "failed_images": len(checkpoint["failed_image_ids"]),
+            "genuine_zero_images": checkpoint.get("genuine_zero_claim_images", 0),
+            "claims_count": len(checkpoint["evidence_records"]),
+            "records_sample": checkpoint["evidence_records"][:10],
+            "failures": checkpoint["failure_records"],
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+        }
+        pilot_diag_p = ckpt_sub / "pilot_diagnostics.json"
+        atomic_json_write(pilot_diag_p, pilot_preview)
+
+        if args.output_dir:
+            out_root = Path(args.output_dir)
+            atomic_json_write(out_root / "pilot" / "pilot_diagnostics.json", pilot_preview)
+
+        logger.info(f"Pilot diagnostics written: {pilot_diag_p}")
+        logger.info("=" * 60)
+        logger.info("Phase 10A-R2 Colab PILOT Execution — COMPLETE (PILOT_ONLY)")
+        logger.info("=" * 60)
+        return
+
+    # FULL MODE: GPU Complete Gate
+    if total_attempted == 600:
+        checkpoint["state"] = "GPU_COMPLETE"
+        logger.info("GPU Complete Gate PASSED (all 600 cohort images attempted).")
+    else:
+        checkpoint["state"] = "GPU_PARTIAL"
+        logger.warning(f"GPU Complete Gate NOT MET: attempted {total_attempted}/600 images.")
+
+    save_checkpoint(ckpt_path, checkpoint)
+
+    # ──────────────────────────────────────────────────────────────
+    # Step 11: Compute Scientific Graph Testability Statistics (A6)
     # ──────────────────────────────────────────────────────────────
     evidence_records = checkpoint["evidence_records"]
     failure_records = checkpoint["failure_records"]
-    n_genuine_zero = checkpoint.get("genuine_zero_claim_images", 0)
 
-    # Compute per-image claim counts for graph testability
+    failed_img_ids = set(checkpoint["failed_image_ids"])
+    completed_img_ids = set(checkpoint["completed_image_ids"])
+    genuine_zero_ids = set(checkpoint.get("genuine_zero_image_ids", []))
+    claim_bearing_ids = completed_img_ids - genuine_zero_ids
+
+    total_images_count = len(image_ids)
+    pipeline_failure_images = len(failed_img_ids)
+    genuine_zero_images = len(genuine_zero_ids)
+    claim_bearing_images = len(claim_bearing_ids)
+    successful_claim_gen_images = len(completed_img_ids)
+
     claims_per_image: Counter = Counter()
     for rec in evidence_records:
         claims_per_image[rec["image_id"]] += 1
 
-    n_zero = sum(1 for iid in image_ids if claims_per_image.get(iid, 0) == 0)
     n_one = sum(1 for c in claims_per_image.values() if c == 1)
     n_two = sum(1 for c in claims_per_image.values() if c == 2)
     n_three = sum(1 for c in claims_per_image.values() if c == 3)
     n_four_plus = sum(1 for c in claims_per_image.values() if c >= 4)
     n_multi = sum(1 for c in claims_per_image.values() if c >= 2)
+    n_three_plus = sum(1 for c in claims_per_image.values() if c >= 3)
     n_graph_claims = sum(c for c in claims_per_image.values() if c >= 2)
     n_edges = sum(c - 1 for c in claims_per_image.values() if c >= 2)
 
-    # Test-split stats
-    test_ids = {iid for iid in image_ids if research_splits.get(iid) == "TEST"}
-    test_zero = sum(1 for iid in test_ids if claims_per_image.get(iid, 0) == 0)
+    # TEST split specifics (120 frozen test images)
+    test_ids = [iid for iid in image_ids if research_splits.get(iid) == "TEST"]
+    test_total = len(test_ids)
+    test_failed = sum(1 for iid in test_ids if iid in failed_img_ids)
+    test_genuine_zero = sum(1 for iid in test_ids if iid in genuine_zero_ids)
+    test_successful_gen = sum(1 for iid in test_ids if iid in completed_img_ids)
+    test_one = sum(1 for iid in test_ids if claims_per_image.get(iid, 0) == 1)
     test_multi = sum(1 for iid in test_ids if claims_per_image.get(iid, 0) >= 2)
+    test_three_plus = sum(1 for iid in test_ids if claims_per_image.get(iid, 0) >= 3)
+    test_graph_claims = sum(claims_per_image.get(iid, 0) for iid in test_ids if claims_per_image.get(iid, 0) >= 2)
 
-    multi_fraction = n_multi / len(image_ids) if image_ids else 0.0
-    testability = "SUFFICIENT" if multi_fraction >= 0.3 else ("MARGINAL" if multi_fraction >= 0.15 else "INSUFFICIENT")
+    multi_fraction_full = n_multi / total_images_count if total_images_count > 0 else 0.0
+    multi_fraction_successful = n_multi / successful_claim_gen_images if successful_claim_gen_images > 0 else 0.0
+    testability = "SUFFICIENT" if multi_fraction_successful >= 0.3 else ("MARGINAL" if multi_fraction_successful >= 0.15 else "INSUFFICIENT")
 
-    # Load audit hash if available
-    audit_hash = ""
-    if audit_p.exists():
-        with open(audit_p, "rb") as f:
-            audit_hash = hashlib.sha256(f.read()).hexdigest()
-
-    corruption_hash = ""
-    if corruption_p.exists():
-        with open(corruption_p, "r", encoding="utf-8") as f:
-            corruption_data = json.load(f)
-            corruption_hash = corruption_data.get("manifest_hash", "")
-
+    # ──────────────────────────────────────────────────────────────
+    # Step 12: Build Final Evidence Manifest V2
+    # ──────────────────────────────────────────────────────────────
+    out_evidence_p = PROJECT_ROOT / "data" / "manifests" / "final_evidence_manifest_v2.json"
     evidence_manifest = {
         "schema_version": "2.0.0",
         "dataset_version": "v2",
@@ -583,36 +1153,46 @@ def main() -> None:
         "source_image_audit_hash": audit_hash,
         "generation_config_hash": gen_cfg_hash,
         "claim_extractor_hash": claim_ext_hash,
+        "checkpoint_provenance_hash": prov_hash,
         "created_at": datetime.now(timezone.utc).isoformat(),
         "frozen_models": FROZEN_MODELS,
-        "execution_environment": gpu_env,
+        "execution_environment": runtime_env,
         "statistics": {
-            "total_images": len(image_ids),
-            "vlm_attempted": len(image_ids),
-            "vlm_successful": checkpoint["completed_images"],
-            "vlm_failed": checkpoint["failed_images"],
+            "total_images": total_images_count,
+            "vlm_attempted": total_attempted,
+            "successful_claim_generation_images": successful_claim_gen_images,
+            "claim_bearing_images": claim_bearing_images,
+            "genuine_zero_claim_images": genuine_zero_images,
+            "pipeline_failure_images": pipeline_failure_images,
             "total_claims": len(evidence_records),
-            "genuine_zero_claims": n_genuine_zero,
-            "pipeline_failure_zero_claims": checkpoint["failed_images"],
         },
         "graph_testability": {
             "overall": {
-                "total_images": len(image_ids),
-                "zero_claim_images": n_zero,
-                "genuine_zero_claims": n_genuine_zero,
-                "pipeline_failure_zero_claims": checkpoint["failed_images"],
+                "total_images_full_cohort": total_images_count,
+                "successful_claim_gen_images": successful_claim_gen_images,
+                "claim_bearing_images": claim_bearing_images,
+                "genuine_zero_claim_images": genuine_zero_images,
+                "pipeline_failure_images": pipeline_failure_images,
                 "one_claim_images": n_one,
                 "two_claim_images": n_two,
                 "three_claim_images": n_three,
                 "four_plus_claim_images": n_four_plus,
-                "multi_claim_fraction": round(multi_fraction, 4),
+                "multi_claim_images": n_multi,
+                "three_plus_claim_images": n_three_plus,
+                "multi_claim_fraction_full_cohort": round(multi_fraction_full, 4),
+                "multi_claim_fraction_successful_cohort": round(multi_fraction_successful, 4),
                 "graph_participating_claims": n_graph_claims,
                 "potential_tree_edges": n_edges,
             },
             "test_split": {
-                "total_images": len(test_ids),
-                "zero_claim_images": test_zero,
-                "multi_claim_images": test_multi,
+                "frozen_test_images_total": test_total,
+                "successful_claim_generation_test_images": test_successful_gen,
+                "genuine_zero_test_images": test_genuine_zero,
+                "pipeline_failed_test_images": test_failed,
+                "one_claim_test_images": test_one,
+                "multi_claim_test_images": test_multi,
+                "three_plus_claim_test_images": test_three_plus,
+                "graph_participating_test_claims": test_graph_claims,
             },
             "status": testability,
         },
@@ -624,13 +1204,15 @@ def main() -> None:
     evidence_manifest["manifest_hash"] = evidence_hash
 
     atomic_json_write(out_evidence_p, evidence_manifest)
+    if args.output_dir:
+        atomic_json_write(Path(args.output_dir) / "final_evidence_manifest_v2.json", evidence_manifest)
     logger.info(f"Evidence Manifest V2 written: {len(evidence_records)} claims, hash={evidence_hash[:16]}...")
 
     # ──────────────────────────────────────────────────────────────
-    # Step 7: Populate Human Task Packages V2
+    # Step 13: Populate Human Task Packages V2 (Canonical 'label': null)
     # ──────────────────────────────────────────────────────────────
-    tasks_dir = PROJECT_ROOT / "data" / "annotations"
-    tasks_dir.mkdir(parents=True, exist_ok=True)
+    task_a_p = PROJECT_ROOT / "data" / "annotations" / "annotator_A_tasks_v2.json"
+    task_b_p = PROJECT_ROOT / "data" / "annotations" / "annotator_B_tasks_v2.json"
 
     tasks_a = []
     tasks_b = []
@@ -642,23 +1224,12 @@ def main() -> None:
             "file_name": rec["file_name"],
             "claim_surface": rec["raw_claim_text"],
             "object_category": rec["object_category"],
-            "expected_label": None,  # MASKED — annotator must provide
+            "label": None,  # CANONICAL — annotator must provide supported/hallucinated/unknown
         }
         tasks_a.append(task_a)
         task_b = dict(task_a)
         task_b["task_id"] = f"task_B_{rec['claim_id']}"
         tasks_b.append(task_b)
-
-    if len(tasks_a) == 0:
-        logger.error(
-            "CRITICAL: Zero annotation tasks produced. "
-            "Cannot proceed to pre-annotation freeze with 0 claims."
-        )
-        # Still write the empty packages for auditability but flag as NOT ready
-        annotation_ready = False
-    else:
-        annotation_ready = True
-        logger.info(f"Annotation tasks populated: {len(tasks_a)} claims (A={len(tasks_a)}, B={len(tasks_b)})")
 
     task_payload_a = {
         "schema_version": "2.0.0",
@@ -681,47 +1252,91 @@ def main() -> None:
 
     atomic_json_write(task_a_p, task_payload_a)
     atomic_json_write(task_b_p, task_payload_b)
+    if args.output_dir:
+        atomic_json_write(Path(args.output_dir) / "annotator_A_tasks_v2.json", task_payload_a)
+        atomic_json_write(Path(args.output_dir) / "annotator_B_tasks_v2.json", task_payload_b)
+    logger.info(f"Annotation tasks written: A={len(tasks_a)}, B={len(tasks_b)} (canonical 'label': null)")
 
     # ──────────────────────────────────────────────────────────────
-    # Step 8: Seal Pre-Annotation Freeze V2
+    # Step 14: Pre-Annotation Freeze V2 Verification Gate (A10, Req 7)
     # ──────────────────────────────────────────────────────────────
-    task_claims_hash = compute_json_hash({
-        "claim_ids": [t["claim_id"] for t in tasks_a],
-        "count": len(tasks_a),
-    })
+    freeze_issues: List[str] = []
+    freeze_status = "TASKS_NOT_READY"
 
-    freeze = {
-        "schema_version": "2.0.0",
-        "dataset_version": "v2",
-        "acquisition_version": "10A-R2",
-        "freeze_status": "PRE_ANNOTATION_FROZEN_V2",
-        "timestamp": datetime.now(timezone.utc).isoformat(),
-        "code_sha": code_sha,
-        "hashes": {
-            "candidate_universe_hash": universe_hash,
-            "sampling_manifest_hash": sampling_hash,
-            "source_image_audit_hash": audit_hash,
-            "corruption_manifest_hash": corruption_hash,
-            "evidence_manifest_hash": evidence_hash,
-            "llava_generation_config_hash": gen_cfg_hash,
-            "claim_extraction_config_hash": claim_ext_hash,
-            "task_claims_set_hash": task_claims_hash,
-        },
-        "splits": sampling_data.get("split_counts"),
-        "total_source_images_verified": len(image_ids),
-        "annotation_tasks_ready": annotation_ready,
-        "annotation_tasks_count": len(tasks_a),
-    }
+    if total_attempted != 600:
+        freeze_issues.append(f"Cohort incomplete: attempted {total_attempted}/600 images.")
+        freeze_status = "GPU_PARTIAL"
 
-    freeze_hash = compute_json_hash(freeze)
-    freeze["freeze_hash"] = freeze_hash
+    if len(evidence_records) == 0:
+        freeze_issues.append("Evidence manifest has 0 claims.")
+        freeze_status = "EVIDENCE_INCOMPLETE"
 
-    atomic_json_write(out_freeze_p, freeze)
-    logger.info(f"Pre-Annotation Freeze V2 sealed: hash={freeze_hash[:16]}...")
+    if len(tasks_a) == 0 or len(tasks_b) == 0:
+        freeze_issues.append("Annotation tasks are empty.")
+        freeze_status = "TASKS_NOT_READY"
+
+    cids_a = [t["claim_id"] for t in tasks_a]
+    cids_b = [t["claim_id"] for t in tasks_b]
+    if cids_a != cids_b:
+        freeze_issues.append("Annotator A and B claim sets do not match.")
+        freeze_status = "TASKS_NOT_READY"
+
+    # Validate task readiness
+    ready_a, issues_a = validate_annotation_task_readiness(tasks_a, dataset_version="v2")
+    if not ready_a:
+        freeze_issues.extend(issues_a)
+        freeze_status = "TASKS_NOT_READY"
+
+    out_freeze_p = PROJECT_ROOT / "data" / "manifests" / "pre_annotation_freeze_v2.json"
+    if len(freeze_issues) == 0 and checkpoint["state"] == "GPU_COMPLETE":
+        freeze_status = "PRE_ANNOTATION_FROZEN_V2"
+        task_claims_hash = compute_json_hash({
+            "claim_ids": cids_a,
+            "count": len(tasks_a),
+        })
+
+        freeze = {
+            "schema_version": "2.0.0",
+            "dataset_version": "v2",
+            "acquisition_version": "10A-R2",
+            "freeze_status": freeze_status,
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "code_sha": code_sha,
+            "checkpoint_provenance_hash": prov_hash,
+            "hashes": {
+                "candidate_universe_hash": universe_hash,
+                "sampling_manifest_hash": sampling_hash,
+                "source_image_audit_hash": audit_hash,
+                "corruption_manifest_hash": corruption_hash,
+                "evidence_manifest_hash": evidence_hash,
+                "llava_generation_config_hash": gen_cfg_hash,
+                "claim_extraction_config_hash": claim_ext_hash,
+                "task_claims_set_hash": task_claims_hash,
+            },
+            "splits": sampling_data.get("split_counts"),
+            "total_source_images_verified": len(image_ids),
+            "annotation_tasks_ready": True,
+            "annotation_tasks_count": len(tasks_a),
+        }
+        freeze_hash = compute_json_hash(freeze)
+        freeze["freeze_hash"] = freeze_hash
+
+        atomic_json_write(out_freeze_p, freeze)
+        if args.output_dir:
+            atomic_json_write(Path(args.output_dir) / "pre_annotation_freeze_v2.json", freeze)
+        logger.info(f"Pre-Annotation Freeze V2 SEALED: hash={freeze_hash[:16]}...")
+    else:
+        logger.warning(
+            f"Pre-Annotation Freeze V2 NOT SEALED (Status: {freeze_status}). "
+            f"Issues: {freeze_issues}"
+        )
 
     # ──────────────────────────────────────────────────────────────
-    # Step 9: Generate GPU Acquisition Report
+    # Step 15: Acquisition Report
     # ──────────────────────────────────────────────────────────────
+    elapsed_total = time.time() - start_time
+    out_report_p = PROJECT_ROOT / "reports" / "m10a_recovery2" / "gpu_acquisition_report.md"
+
     report = f"""# Phase 10A-R2 GPU Acquisition Report
 
 **Date:** {datetime.now(timezone.utc).isoformat()}
@@ -729,6 +1344,7 @@ def main() -> None:
 **GPU Memory:** {gpu_env['gpu_memory_gb']} GB
 **CUDA Version:** {gpu_env['cuda_version']}
 **Execution Time:** {elapsed_total:.1f} seconds
+**Freeze Status:** `{freeze_status}`
 
 ---
 
@@ -736,56 +1352,70 @@ def main() -> None:
 
 | Metric | Value |
 | :--- | ---: |
-| Total Images | {len(image_ids)} |
-| VLM Successful | {checkpoint['completed_images']} |
-| VLM Failed | {checkpoint['failed_images']} |
-| Total Claims | {len(evidence_records)} |
-| Genuine Zero-Claim Images | {n_genuine_zero} |
+| Total Images (Full Cohort) | {total_images_count} |
+| Successfully Claim-Generated Images | {successful_claim_gen_images} |
+| Claim-Bearing Images | {claim_bearing_images} |
+| Genuine Zero-Claim Images | {genuine_zero_images} |
+| Pipeline-Failed Images | {pipeline_failure_images} |
+| Total Claims Extracted | {len(evidence_records)} |
 | Multi-Claim Images | {n_multi} |
-| Multi-Claim Fraction | {multi_fraction:.4f} |
+| Multi-Claim Fraction (Full Cohort) | {multi_fraction_full:.4f} |
+| Multi-Claim Fraction (Successful Cohort) | {multi_fraction_successful:.4f} |
 | Graph Testability | {testability} |
 
-## Model Revisions
+## TEST Split (120 Images)
 
-| Model | Revision |
-| :--- | :--- |
-| LLaVA-1.5-7B | `{FROZEN_MODELS['vlm_revision']}` |
-| OWL-ViT | `{FROZEN_MODELS['detector_revision']}` |
-| CLIP | `{FROZEN_MODELS['clip_revision']}` |
+| Metric | Value |
+| :--- | ---: |
+| Frozen Test Images | {test_total} |
+| Successful Generation | {test_successful_gen} |
+| Genuine Zero-Claim | {test_genuine_zero} |
+| Pipeline Failed | {test_failed} |
+| One-Claim Images | {test_one} |
+| Multi-Claim Images | {test_multi} |
+| 3+ Claim Images | {test_three_plus} |
+| Graph-Participating Claims | {test_graph_claims} |
 
-## Artifact Hashes
+## Model Revisions (T4 Memory-Safe Policy)
+
+| Model | Revision | Device |
+| :--- | :--- | :--- |
+| LLaVA-1.5-7B | `{FROZEN_MODELS['vlm_revision']}` | CUDA (4-bit NF4) |
+| OWL-ViT | `{FROZEN_MODELS['detector_revision']}` | CPU |
+| CLIP | `{FROZEN_MODELS['clip_revision']}` | CPU |
+
+## Provenance & Artifact Hashes
 
 | Artifact | Hash |
 | :--- | :--- |
+| Checkpoint Provenance | `{prov_hash}` |
 | Evidence Manifest V2 | `{evidence_hash}` |
-| Pre-Annotation Freeze V2 | `{freeze_hash}` |
 | Sampling Manifest V2 | `{sampling_hash}` |
+| Source Image Audit | `{audit_hash}` |
 | Generation Config | `{gen_cfg_hash}` |
 | Claim Extractor | `{claim_ext_hash}` |
 
 ## Annotation Readiness
 
-- **Tasks Populated:** {len(tasks_a)} claims
-- **Annotation Ready:** {'YES' if annotation_ready else 'NO — zero claims, investigate pipeline'}
-- **Label Masking:** All expected_label fields set to null
+- **Tasks Populated:** {len(tasks_a)} claims (A={len(tasks_a)}, B={len(tasks_b)})
+- **Annotation Ready:** {'YES' if freeze_status == 'PRE_ANNOTATION_FROZEN_V2' else 'NO — freeze gates not sealed'}
+- **Label Field:** Canonical `label = null` (strictly masking model evidence)
 """
 
     out_report_p.parent.mkdir(parents=True, exist_ok=True)
     with open(out_report_p, "w", encoding="utf-8") as f:
         f.write(report)
+    if args.output_dir:
+        with open(Path(args.output_dir) / "gpu_acquisition_report.md", "w", encoding="utf-8") as f:
+            f.write(report)
 
-    logger.info(f"Report written: {out_report_p}")
-
-    # ──────────────────────────────────────────────────────────────
-    # Final Summary
-    # ──────────────────────────────────────────────────────────────
     logger.info("=" * 60)
     logger.info("Phase 10A-R2 Colab GPU Execution — COMPLETE")
     logger.info(f"  Claims extracted: {len(evidence_records)}")
-    logger.info(f"  Pipeline failures: {checkpoint['failed_images']}")
+    logger.info(f"  Genuine zero-claim images: {genuine_zero_images}")
+    logger.info(f"  Pipeline failures: {pipeline_failure_images}")
     logger.info(f"  Annotation tasks: {len(tasks_a)}")
-    logger.info(f"  Testability: {testability}")
-    logger.info(f"  Annotation ready: {annotation_ready}")
+    logger.info(f"  Freeze status: {freeze_status}")
     logger.info("=" * 60)
 
 

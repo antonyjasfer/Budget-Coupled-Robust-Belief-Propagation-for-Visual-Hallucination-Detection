@@ -328,14 +328,30 @@ def validate_version_compatibility(artifact: Dict[str, Any], required_version: s
     return len(issues) == 0, issues
 
 
+def migrate_legacy_tasks_to_v2(tasks: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """
+    Explicit legacy migration function: converts 'expected_label' -> 'label'.
+    Isolated for backwards compatibility if reading legacy V1 tasks.
+    """
+    migrated = []
+    for t in tasks:
+        item = dict(t)
+        if "expected_label" in item:
+            item["label"] = item.pop("expected_label")
+        migrated.append(item)
+    return migrated
+
+
 def validate_annotation_task_readiness(
     tasks: List[Dict[str, Any]],
     require_real_claims: bool = True,
+    dataset_version: str = "v2",
 ) -> Tuple[bool, List[str]]:
     """
     Validate annotation task readiness:
     1. N > 0 real claims present.
-    2. All label fields are null (masked).
+    2. For dataset_version == 'v2', canonical 'label' field must be present and null (masked).
+       Legacy 'expected_label' is explicitly REJECTED in v2.
     3. All claims have valid provenance (not synthetic/mock).
 
     Returns:
@@ -351,13 +367,29 @@ def validate_annotation_task_readiness(
         )
         return False, issues
 
-    # Check label masking
+    # Check label masking and schema compliance
     for idx, task in enumerate(tasks):
-        label = task.get("expected_label")
+        # Strict V2 rejection of legacy field
+        if dataset_version == "v2" and "expected_label" in task:
+            issues.append(
+                f"SCHEMA VIOLATION: Task {idx} ({task.get('task_id', 'unknown')}) "
+                f"contains legacy field 'expected_label'. V2 tasks must strictly use 'label'."
+            )
+            continue
+
+        if dataset_version == "v2" and "label" not in task:
+            issues.append(
+                f"SCHEMA VIOLATION: Task {idx} ({task.get('task_id', 'unknown')}) "
+                f"is missing required canonical field 'label'."
+            )
+            continue
+
+        label = task.get("label") if dataset_version == "v2" else task.get("expected_label")
         if label is not None:
+            field_name = "label" if dataset_version == "v2" else "expected_label"
             issues.append(
                 f"LABEL MASKING VIOLATION: Task {idx} ({task.get('task_id', 'unknown')}) "
-                f"has expected_label={label!r}, must be null before annotation."
+                f"has {field_name}={label!r}, must be null before annotation."
             )
 
     # Check no synthetic/mock claims leaked
@@ -373,3 +405,4 @@ def validate_annotation_task_readiness(
                 )
 
     return len(issues) == 0, issues
+

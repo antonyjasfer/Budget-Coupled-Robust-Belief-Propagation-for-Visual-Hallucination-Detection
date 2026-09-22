@@ -246,8 +246,8 @@ class TestAnnotationTaskReadiness:
 
     def test_valid_tasks_pass(self):
         tasks = [
-            {"task_id": "task_A_001", "claim_surface": "a cat", "expected_label": None},
-            {"task_id": "task_A_002", "claim_surface": "a dog", "expected_label": None},
+            {"task_id": "task_A_001", "claim_surface": "a cat", "label": None},
+            {"task_id": "task_A_002", "claim_surface": "a dog", "label": None},
         ]
         ok, issues = validate_annotation_task_readiness(tasks)
         assert ok is True
@@ -260,15 +260,37 @@ class TestAnnotationTaskReadiness:
 
     def test_unmasked_label_rejected(self):
         tasks = [
-            {"task_id": "task_A_001", "claim_surface": "a cat", "expected_label": True},
+            {"task_id": "task_A_001", "claim_surface": "a cat", "label": "supported"},
         ]
         ok, issues = validate_annotation_task_readiness(tasks)
         assert ok is False
         assert any("LABEL MASKING" in i for i in issues)
 
+    def test_v2_rejects_expected_label(self):
+        """V2 validation MUST strictly reject legacy expected_label field."""
+        tasks = [
+            {"task_id": "task_A_001", "claim_surface": "a cat", "expected_label": None},
+        ]
+        ok, issues = validate_annotation_task_readiness(tasks, dataset_version="v2")
+        assert ok is False
+        assert any("expected_label" in i for i in issues)
+
+    def test_migrate_legacy_tasks_to_v2(self):
+        """Explicit migration converts expected_label to label."""
+        from src.data.artifact_state import migrate_legacy_tasks_to_v2
+        legacy = [
+            {"task_id": "task_A_001", "claim_surface": "a cat", "expected_label": None},
+        ]
+        migrated = migrate_legacy_tasks_to_v2(legacy)
+        assert "expected_label" not in migrated[0]
+        assert "label" in migrated[0]
+        assert migrated[0]["label"] is None
+        ok, issues = validate_annotation_task_readiness(migrated, dataset_version="v2")
+        assert ok is True
+
     def test_synthetic_marker_rejected(self):
         tasks = [
-            {"task_id": "task_A_SYNTHETIC_001", "claim_surface": "a cat", "expected_label": None},
+            {"task_id": "task_A_SYNTHETIC_001", "claim_surface": "a cat", "label": None},
         ]
         ok, issues = validate_annotation_task_readiness(tasks)
         assert ok is False
@@ -276,7 +298,7 @@ class TestAnnotationTaskReadiness:
 
     def test_mock_marker_rejected(self):
         tasks = [
-            {"task_id": "task_A_001", "claim_surface": "MOCK cat", "expected_label": None},
+            {"task_id": "task_A_001", "claim_surface": "MOCK cat", "label": None},
         ]
         ok, issues = validate_annotation_task_readiness(tasks)
         assert ok is False
@@ -284,7 +306,7 @@ class TestAnnotationTaskReadiness:
 
     def test_placeholder_marker_rejected(self):
         tasks = [
-            {"task_id": "task_A_PLACEHOLDER_001", "claim_surface": "a cat", "expected_label": None},
+            {"task_id": "task_A_PLACEHOLDER_001", "claim_surface": "a cat", "label": None},
         ]
         ok, issues = validate_annotation_task_readiness(tasks)
         assert ok is False

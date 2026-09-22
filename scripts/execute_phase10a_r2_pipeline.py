@@ -276,7 +276,7 @@ def main():
             "file_name": c["file_name"],
             "claim_surface": c["raw_claim_text"],
             "object_category": c["object_category"],
-            "expected_label": None,
+            "label": None,
         }
         tasks_a.append(task_item)
         task_item_b = dict(task_item)

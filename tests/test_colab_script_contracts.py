@@ -171,22 +171,36 @@ class TestCheckpointManagement:
 
     def test_fresh_checkpoint_creation(self, tmp_path):
         ckpt_path = tmp_path / "checkpoint.json"
-        ckpt = load_or_create_checkpoint(ckpt_path, "test_hash", 600)
+        fingerprint = {"sampling_manifest_hash": "test_hash"}
+        prov_hash = "test_prov_hash"
+        ckpt = load_or_create_checkpoint(
+            checkpoint_path=ckpt_path,
+            expected_checkpoint_type="gpu_acquisition_checkpoint",
+            provenance_fingerprint=fingerprint,
+            provenance_hash=prov_hash,
+            total_images=600,
+            resume=False,
+        )
 
         assert ckpt["checkpoint_type"] == "gpu_acquisition_checkpoint"
         assert ckpt["state"] == "GPU_IN_PROGRESS"
         assert ckpt["sampling_manifest_hash"] == "test_hash"
+        assert ckpt["checkpoint_provenance_hash"] == prov_hash
         assert ckpt["total_target_images"] == 600
         assert ckpt["completed_images"] == 0
         assert len(ckpt["completed_image_ids"]) == 0
 
     def test_checkpoint_resume(self, tmp_path):
         ckpt_path = tmp_path / "checkpoint.json"
+        fingerprint = {"sampling_manifest_hash": "test_hash"}
+        prov_hash = "test_prov_hash"
 
         # Create initial checkpoint
         initial = {
             "checkpoint_type": "gpu_acquisition_checkpoint",
             "state": "GPU_IN_PROGRESS",
+            "checkpoint_provenance_hash": prov_hash,
+            "provenance_fingerprint": fingerprint,
             "sampling_manifest_hash": "test_hash",
             "total_target_images": 600,
             "completed_images": 50,
@@ -199,26 +213,40 @@ class TestCheckpointManagement:
             json.dump(initial, f)
 
         # Load should resume
-        ckpt = load_or_create_checkpoint(ckpt_path, "test_hash", 600)
+        ckpt = load_or_create_checkpoint(
+            checkpoint_path=ckpt_path,
+            expected_checkpoint_type="gpu_acquisition_checkpoint",
+            provenance_fingerprint=fingerprint,
+            provenance_hash=prov_hash,
+            total_images=600,
+            resume=True,
+        )
         assert ckpt["completed_images"] == 50
         assert len(ckpt["completed_image_ids"]) == 50
 
-    def test_checkpoint_hash_mismatch_creates_fresh(self, tmp_path):
+    def test_checkpoint_provenance_mismatch_hard_fails(self, tmp_path):
         ckpt_path = tmp_path / "checkpoint.json"
 
         old = {
             "checkpoint_type": "gpu_acquisition_checkpoint",
-            "sampling_manifest_hash": "old_hash",
+            "checkpoint_provenance_hash": "old_hash",
+            "provenance_fingerprint": {"sampling_manifest_hash": "old_hash"},
             "completed_images": 100,
             "completed_image_ids": [f"img_{i}" for i in range(100)],
         }
         with open(ckpt_path, "w") as f:
             json.dump(old, f)
 
-        # Different hash → fresh checkpoint
-        ckpt = load_or_create_checkpoint(ckpt_path, "new_hash", 600)
-        assert ckpt["completed_images"] == 0
-        assert ckpt["sampling_manifest_hash"] == "new_hash"
+        # Different hash on resume must hard fail (A2)
+        with pytest.raises(RuntimeError, match="CHECKPOINT PROVENANCE HASH MISMATCH"):
+            load_or_create_checkpoint(
+                checkpoint_path=ckpt_path,
+                expected_checkpoint_type="gpu_acquisition_checkpoint",
+                provenance_fingerprint={"sampling_manifest_hash": "new_hash"},
+                provenance_hash="new_hash",
+                total_images=600,
+                resume=True,
+            )
 
 
 class TestEvidenceManifestContracts:

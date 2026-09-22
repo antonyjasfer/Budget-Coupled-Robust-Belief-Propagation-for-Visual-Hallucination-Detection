@@ -13,7 +13,7 @@
 Phase 10A-R2-S represents the definitive software closure layer prior to remote GPU acquisition and human annotation. The following components were engineered:
 
 1. **Artifact State Machine (`src/data/artifact_state.py`):**
-   - Implemented `ArtifactState` enum representing 8 discrete lifecycle stages from `SAMPLING_FROZEN` to `PRE_ANNOTATION_SEALED`.
+   - Implemented `ArtifactState` enum representing 9 discrete lifecycle stages from `SAMPLING_FROZEN` to `PRE_ANNOTATION_SEALED`.
    - Designed strict state transition matrix with backward-transition prevention, terminal state enforcement, and resumption branches.
    - Introduced `GPUAcquisitionCheckpoint` distinct from final evidence manifests.
 
@@ -190,7 +190,7 @@ Once frozen, claims and assignments are cryptographically immutable.
 
 All software development is now complete and frozen. Remaining tasks are strictly empirical:
 1. **Execute Google Colab GPU Pipeline:** Run LLaVA-1.5-7B, OWL-ViT, and CLIP over the 600 verified COCO images.
-2. **Double Human Annotation (Phase 10B):** Annotator A and Annotator B independently label masked claims (`supported` / `refuted`).
+2. **Double Human Annotation (Phase 10B):** Annotator A and Annotator B independently label masked claims (`supported` / `hallucinated` / `unknown`).
 3. **Adjudication (Phase 10B):** Resolve disagreements via senior adjudicator.
 4. **Dataset Lock (Phase 10C):** Seal final annotation manifest into `dataset_lock.json`.
 5. **Empirical Experiments:** Run budget-coupled robust BP against baselines.

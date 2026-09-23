@@ -492,9 +492,14 @@ class TestSourceImageVerificationGate:
 # 8. Dry-Run Semantics (Requirement 1, 13)
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 class TestDryRunSemantics:
+    @patch("scripts.run_phase10a_r2_colab.get_execution_git_info", return_value=("abc123deadbeef", True))
+    @patch("scripts.run_phase10a_r2_colab.verify_source_images_prepared")
+    @patch("scripts.run_phase10a_r2_colab.capture_runtime_environment")
     @patch("scripts.run_phase10a_r2_colab.enforce_cuda_gate")
     @patch("src.vlm.llava_provider.LLaVA15Provider")
-    def test_dry_run_does_not_load_models_or_write_artifacts(self, mock_llava, mock_cuda, tmp_path):
+    def test_dry_run_does_not_load_models_or_write_artifacts(
+        self, mock_llava, mock_cuda, mock_runtime, mock_verify, mock_git, tmp_path
+    ):
         """Dry-run must validate preflight and return without loading LLaVA or writing final artifacts."""
         mock_cuda.return_value = {
             "device": "NVIDIA T4",
@@ -502,6 +507,34 @@ class TestDryRunSemantics:
             "cuda_available": True,
             "cuda_version": "12.1",
         }
+        mock_runtime.return_value = {
+            "python_version": "3.12.6",
+            "platform": "Linux",
+            "torch_version": "2.1.0",
+            "torchvision_version": "0.16.0",
+            "transformers_version": "4.36.0",
+            "accelerate_version": "0.25.0",
+            "bitsandbytes_version": "0.41.0",
+            "pillow_version": "10.0.0",
+            "numpy_version": "1.26.0",
+            "scipy_version": "1.11.0",
+            "cuda_available": True,
+            "cuda_version": "12.1",
+            "device": "NVIDIA T4",
+            "gpu_memory_gb": 15.0,
+        }
+        mock_verify.return_value = (
+            True,
+            "Source images fully verified (600/600 valid).",
+            {
+                "sampling_manifest_hash": "abc123",
+                "total_requested": 600,
+                "valid_count": 600,
+                "missing_count": 0,
+                "corrupt_count": 0,
+                "records": [],
+            },
+        )
 
         # Run dry-run
         main(["--dry-run"])
@@ -524,21 +557,40 @@ class TestCUDAMemoryProperty:
     def test_enforce_cuda_gate_uses_total_memory(self, mock_name, mock_avail):
         """Must access total_memory without attempting to access non-existent total_mem."""
         import torch
-        with patch.object(torch.version, "cuda", "12.1"):
+        original_cuda = torch.version.cuda
+        try:
+            torch.version.cuda = "12.1"
             with patch("torch.cuda.get_device_properties", return_value=self.MockDeviceProperties(16 * 1024**3)):
                 env = enforce_cuda_gate()
                 assert env["device"] == "NVIDIA T4"
                 assert env["gpu_memory_gb"] == 16.0
+        finally:
+            torch.version.cuda = original_cuda
 
     @patch("torch.cuda.is_available", return_value=True)
     @patch("torch.cuda.get_device_name", return_value="NVIDIA T4")
     def test_capture_runtime_environment_uses_total_memory(self, mock_name, mock_avail):
         """capture_runtime_environment must access total_memory."""
+        import sys
         import torch
-        with patch.object(torch.version, "cuda", "12.1"):
+        # Mock bitsandbytes in sys.modules to avoid import failure on non-CUDA Windows
+        mock_bnb = MagicMock()
+        mock_bnb.__version__ = "0.41.0"
+        original_cuda = torch.version.cuda
+        had_bnb = "bitsandbytes" in sys.modules
+        original_bnb = sys.modules.get("bitsandbytes")
+        try:
+            torch.version.cuda = "12.1"
+            sys.modules["bitsandbytes"] = mock_bnb
             with patch("torch.cuda.get_device_properties", return_value=self.MockDeviceProperties(16 * 1024**3)):
                 env = capture_runtime_environment()
                 assert env["gpu_memory_gb"] == 16.0
+        finally:
+            torch.version.cuda = original_cuda
+            if had_bnb:
+                sys.modules["bitsandbytes"] = original_bnb
+            else:
+                sys.modules.pop("bitsandbytes", None)
 
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -1062,5 +1114,332 @@ class TestStrictProviderContracts:
 
         resp = wrapper.generate_caption(img_file, prompt="Test prompt")
         assert resp.caption == "A wrapped cat."
+
+
+class TestEvidenceDownloadAndRevisionPinning:
+    """Regression tests for evidence model download and revision pinning."""
+
+    def test_colab_runner_detector_clip_download_enabled(self):
+        """Runner must instantiate detector and CLIP providers with local_files_only=False."""
+        runner_path = Path(__file__).resolve().parent.parent / "scripts" / "run_phase10a_r2_colab.py"
+        source = runner_path.read_text(encoding="utf-8")
+
+        assert "HuggingFaceDetectorProvider(" in source
+        assert "TransformersCLIPProvider(" in source
+        assert "local_files_only=False" in source
+
+        # Verify specifically within the detector and clip instantiations
+        det_idx = source.find("HuggingFaceDetectorProvider(")
+        assert det_idx != -1
+        det_block = source[det_idx:det_idx + 300]
+        assert "local_files_only=False" in det_block
+
+        clip_idx = source.find("TransformersCLIPProvider(")
+        assert clip_idx != -1
+        clip_block = source[clip_idx:clip_idx + 300]
+        assert "local_files_only=False" in clip_block
+
+    def test_pinned_llava_revision_reaches_from_pretrained(self):
+        """Configured model_revision must be passed to AutoConfig, AutoProcessor, and LlavaForConditionalGeneration."""
+        from src.vlm.llava_provider import LLaVA15Provider
+        pinned_rev = "b234b804b114d9e37bb655e11cbbb5f5e971b7a9"
+        provider = LLaVA15Provider(
+            model_name="llava-hf/llava-1.5-7b-hf",
+            model_revision=pinned_rev,
+            device="cpu",
+            local_files_only=True,
+        )
+
+        mock_config = MagicMock()
+        mock_config._commit_hash = pinned_rev
+        mock_processor = MagicMock()
+        mock_model = MagicMock()
+        mock_model.config._commit_hash = pinned_rev
+        mock_model.parameters.return_value = []
+
+        # Reset singleton cache
+        LLaVA15Provider._model_instance = None
+        LLaVA15Provider._loaded_model_id = None
+        LLaVA15Provider._resolved_revision = None
+
+        with patch("transformers.AutoConfig.from_pretrained", return_value=mock_config) as mock_cfg_load, \
+             patch("transformers.AutoProcessor.from_pretrained", return_value=mock_processor) as mock_proc_load, \
+             patch("transformers.LlavaForConditionalGeneration.from_pretrained", return_value=mock_model) as mock_model_load:
+
+            # 1. resolve_revision passes revision
+            rev = provider.resolve_revision()
+            assert rev == pinned_rev
+            assert mock_cfg_load.call_args[1].get("revision") == pinned_rev
+
+            # 2. _ensure_loaded passes revision to processor and model
+            provider._ensure_loaded()
+            assert mock_proc_load.call_args[1].get("revision") == pinned_rev
+            assert mock_model_load.call_args[1].get("revision") == pinned_rev
+
+    def test_pinned_owlvit_revision_reaches_from_pretrained(self):
+        """Configured detector revision must be passed to AutoConfig, AutoProcessor, and OwlViTForObjectDetection."""
+        from src.evidence.detector_provider import HuggingFaceDetectorProvider
+        pinned_rev = "cbc355fb364588351c5d51c7f74465e8e7ec6f72"
+        provider = HuggingFaceDetectorProvider(
+            model_name="google/owlvit-base-patch32",
+            model_revision=pinned_rev,
+            device="cpu",
+            local_files_only=False,
+        )
+
+        mock_config = MagicMock()
+        mock_config._commit_hash = pinned_rev
+        mock_processor = MagicMock()
+        mock_model = MagicMock()
+        mock_model.config._commit_hash = pinned_rev
+        mock_model.parameters.return_value = []
+
+        # Reset caches
+        HuggingFaceDetectorProvider._model_cache.clear()
+        HuggingFaceDetectorProvider._processor_cache.clear()
+        HuggingFaceDetectorProvider._revision_cache.clear()
+
+        with patch("transformers.AutoConfig.from_pretrained", return_value=mock_config) as mock_cfg_load, \
+             patch("transformers.AutoProcessor.from_pretrained", return_value=mock_processor) as mock_proc_load, \
+             patch("transformers.OwlViTForObjectDetection.from_pretrained", return_value=mock_model) as mock_model_load:
+
+            rev = provider.resolve_revision()
+            assert rev == pinned_rev
+            assert mock_cfg_load.call_args[1].get("revision") == pinned_rev
+
+            provider._ensure_loaded()
+            assert mock_proc_load.call_args[1].get("revision") == pinned_rev
+            assert mock_model_load.call_args[1].get("revision") == pinned_rev
+
+    def test_pinned_clip_revision_reaches_from_pretrained(self):
+        """Configured CLIP revision must be passed to AutoConfig, AutoProcessor, and CLIPModel."""
+        from src.evidence.clip_provider import TransformersCLIPProvider
+        pinned_rev = "3d74acf9a28c67741b2f4f2ea7635f0aaf6f0268"
+        provider = TransformersCLIPProvider(
+            model_name="openai/clip-vit-base-patch32",
+            model_revision=pinned_rev,
+            device="cpu",
+            local_files_only=False,
+        )
+
+        mock_config = MagicMock()
+        mock_config._commit_hash = pinned_rev
+        mock_processor = MagicMock()
+        mock_model = MagicMock()
+        mock_model.config._commit_hash = pinned_rev
+        mock_model.parameters.return_value = []
+
+        # Reset caches
+        TransformersCLIPProvider._model_cache.clear()
+        TransformersCLIPProvider._processor_cache.clear()
+        TransformersCLIPProvider._revision_cache.clear()
+
+        with patch("transformers.AutoConfig.from_pretrained", return_value=mock_config) as mock_cfg_load, \
+             patch("transformers.AutoProcessor.from_pretrained", return_value=mock_processor) as mock_proc_load, \
+             patch("transformers.CLIPModel.from_pretrained", return_value=mock_model) as mock_model_load:
+
+            rev = provider.resolve_revision()
+            assert rev == pinned_rev
+            assert mock_cfg_load.call_args[1].get("revision") == pinned_rev
+
+            provider._ensure_loaded()
+            assert mock_proc_load.call_args[1].get("revision") == pinned_rev
+            assert mock_model_load.call_args[1].get("revision") == pinned_rev
+
+    def test_revision_mismatch_rejected_llava(self):
+        """If resolved revision does not match pinned revision, raise RuntimeError INVALID_PROVENANCE."""
+        from src.vlm.llava_provider import LLaVA15Provider
+        provider = LLaVA15Provider(
+            model_name="llava-hf/llava-1.5-7b-hf",
+            model_revision="b234b804b114d9e37bb655e11cbbb5f5e971b7a9",
+            device="cpu",
+        )
+        mock_model = MagicMock()
+        mock_model.config._commit_hash = "wrong_sha_1234567890abcdef"
+        mock_model.parameters.return_value = []
+
+        LLaVA15Provider._model_instance = None
+        LLaVA15Provider._loaded_model_id = None
+        LLaVA15Provider._resolved_revision = None
+
+        with patch("transformers.AutoProcessor.from_pretrained", return_value=MagicMock()), \
+             patch("transformers.LlavaForConditionalGeneration.from_pretrained", return_value=mock_model):
+            with pytest.raises(RuntimeError, match="INVALID_PROVENANCE"):
+                provider._ensure_loaded()
+
+    def test_revision_mismatch_rejected_owlvit(self):
+        """If resolved revision does not match pinned revision, raise RuntimeError INVALID_PROVENANCE."""
+        from src.evidence.detector_provider import HuggingFaceDetectorProvider
+        provider = HuggingFaceDetectorProvider(
+            model_name="google/owlvit-base-patch32",
+            model_revision="cbc355fb364588351c5d51c7f74465e8e7ec6f72",
+        )
+        mock_model = MagicMock()
+        mock_model.config._commit_hash = "wrong_sha_detector"
+        mock_model.parameters.return_value = []
+
+        HuggingFaceDetectorProvider._model_cache.clear()
+        HuggingFaceDetectorProvider._processor_cache.clear()
+        HuggingFaceDetectorProvider._revision_cache.clear()
+
+        with patch("transformers.AutoProcessor.from_pretrained", return_value=MagicMock()), \
+             patch("transformers.OwlViTForObjectDetection.from_pretrained", return_value=mock_model):
+            with pytest.raises(RuntimeError, match="INVALID_PROVENANCE"):
+                provider._ensure_loaded()
+
+    def test_revision_mismatch_rejected_clip(self):
+        """If resolved revision does not match pinned revision, raise RuntimeError INVALID_PROVENANCE."""
+        from src.evidence.clip_provider import TransformersCLIPProvider
+        provider = TransformersCLIPProvider(
+            model_name="openai/clip-vit-base-patch32",
+            model_revision="3d74acf9a28c67741b2f4f2ea7635f0aaf6f0268",
+        )
+        mock_model = MagicMock()
+        mock_model.config._commit_hash = "wrong_sha_clip"
+        mock_model.parameters.return_value = []
+
+        TransformersCLIPProvider._model_cache.clear()
+        TransformersCLIPProvider._processor_cache.clear()
+        TransformersCLIPProvider._revision_cache.clear()
+
+        with patch("transformers.AutoProcessor.from_pretrained", return_value=MagicMock()), \
+             patch("transformers.CLIPModel.from_pretrained", return_value=mock_model):
+            with pytest.raises(RuntimeError, match="INVALID_PROVENANCE"):
+                provider._ensure_loaded()
+
+    def test_pilot_evidence_health_gate_zero_detector_fails(self, tmp_path):
+        """When claims > 0 but detector_available == 0, pilot health gate must fail."""
+        from scripts.run_phase10a_r2_colab import main
+        ckpt_dir = tmp_path / "checkpoints"
+        ckpt_dir.mkdir(parents=True)
+
+        fake_records = [{
+            "claim_id": "c1",
+            "image_id": "img1",
+            "detector_available": False,
+            "detector_score": None,
+            "detector_status": "FAILED",
+            "clip_available": True,
+            "clip_score": 0.85,
+            "clip_status": "AVAILABLE",
+        }]
+
+        with patch("scripts.run_phase10a_r2_colab.enforce_cuda_gate", return_value={"device": "Tesla T4", "gpu_memory_gb": 15.0, "cuda_available": True, "cuda_version": "12.2"}), \
+             patch("scripts.run_phase10a_r2_colab.verify_source_images_prepared", return_value=(True, "OK", {"records": []})), \
+             patch("scripts.run_phase10a_r2_colab.get_execution_git_info", return_value=("1111222233334444555566667777888899990000", True)), \
+             patch("scripts.run_phase10a_r2_colab.process_single_image", return_value=(fake_records, None, False)):
+            with pytest.raises(RuntimeError, match="PILOT_EVIDENCE_INCOMPLETE"):
+                main(["--pilot", "1", "--checkpoint-dir", str(ckpt_dir)])
+
+    def test_pilot_evidence_health_gate_zero_clip_fails(self, tmp_path):
+        """When claims > 0 but clip_available == 0, pilot health gate must fail."""
+        from scripts.run_phase10a_r2_colab import main
+        ckpt_dir = tmp_path / "checkpoints"
+        ckpt_dir.mkdir(parents=True)
+
+        fake_records = [{
+            "claim_id": "c1",
+            "image_id": "img1",
+            "detector_available": True,
+            "detector_score": 0.92,
+            "detector_status": "AVAILABLE",
+            "clip_available": False,
+            "clip_score": None,
+            "clip_status": "FAILED",
+        }]
+
+        with patch("scripts.run_phase10a_r2_colab.enforce_cuda_gate", return_value={"device": "Tesla T4", "gpu_memory_gb": 15.0, "cuda_available": True, "cuda_version": "12.2"}), \
+             patch("scripts.run_phase10a_r2_colab.verify_source_images_prepared", return_value=(True, "OK", {"records": []})), \
+             patch("scripts.run_phase10a_r2_colab.get_execution_git_info", return_value=("1111222233334444555566667777888899990000", True)), \
+             patch("scripts.run_phase10a_r2_colab.process_single_image", return_value=(fake_records, None, False)):
+            with pytest.raises(RuntimeError, match="PILOT_EVIDENCE_INCOMPLETE"):
+                main(["--pilot", "1", "--checkpoint-dir", str(ckpt_dir)])
+
+    def test_pilot_evidence_health_gate_mixed_evidence_succeeds(self, tmp_path):
+        """When claims > 0 and both detector and clip have at least 1 usable score, pilot succeeds even with mixed failures."""
+        from scripts.run_phase10a_r2_colab import main
+        ckpt_dir = tmp_path / "checkpoints"
+        ckpt_dir.mkdir(parents=True)
+
+        fake_records = [
+            {
+                "claim_id": "c1",
+                "image_id": "img1",
+                "detector_available": True,
+                "detector_score": 0.92,
+                "detector_status": "AVAILABLE",
+                "clip_available": False,
+                "similarity_available": False,
+                "clip_score": None,
+                "clip_status": "FAILED",
+            },
+            {
+                "claim_id": "c2",
+                "image_id": "img1",
+                "detector_available": False,
+                "detector_score": None,
+                "detector_status": "FAILED",
+                "clip_available": True,
+                "similarity_available": True,
+                "clip_score": 0.77,
+                "clip_status": "AVAILABLE",
+            },
+        ]
+
+        with patch("scripts.run_phase10a_r2_colab.enforce_cuda_gate", return_value={"device": "Tesla T4", "gpu_memory_gb": 15.0, "cuda_available": True, "cuda_version": "12.2"}), \
+             patch("scripts.run_phase10a_r2_colab.verify_source_images_prepared", return_value=(True, "OK", {"records": []})), \
+             patch("scripts.run_phase10a_r2_colab.get_execution_git_info", return_value=("1111222233334444555566667777888899990000", True)), \
+             patch("scripts.run_phase10a_r2_colab.process_single_image", return_value=(fake_records, None, False)):
+            main(["--pilot", "1", "--checkpoint-dir", str(ckpt_dir)])
+
+            diag_file = ckpt_dir / "pilot" / "pilot_diagnostics.json"
+            assert diag_file.exists()
+            with open(diag_file, "r") as f:
+                diag = json.load(f)
+            assert diag["status"] == "PILOT_ONLY"
+            assert diag["claims_count"] == 2
+            assert diag["detector_available_count"] == 1
+            assert diag["clip_available_count"] == 1
+
+    def test_null_evidence_remains_null_never_zero(self, tmp_path):
+        """Failed or unavailable detector and CLIP evidence must strictly produce score None, never 0.0."""
+        from scripts.run_phase10a_r2_colab import process_single_image
+        from PIL import Image
+
+        test_img = tmp_path / "test.jpg"
+        Image.new("RGB", (100, 100), color="blue").save(test_img)
+
+        fake_vlm = StrictFakeLLaVA(caption="A zebra and a lion.")
+        fake_ext = StrictFakeExtractor([
+            StrictFakeExtractedClaim(claim_id="c_z", object_category="zebra", raw_claim_text="a zebra"),
+        ])
+        fake_det = StrictFakeDetector(score=None, available=False, error="OWL-ViT timeout")
+        fake_clip = StrictFakeCLIP(score=None, available=False, error="CLIP OOM")
+
+        records, failure, is_zero = process_single_image(
+            image_id="coco_test_999",
+            image_path=test_img,
+            file_name="test.jpg",
+            coco_source_split="train2017",
+            research_split="TRAIN",
+            vlm_provider=fake_vlm,
+            claim_extractor=fake_ext,
+            detector_provider=fake_det,
+            clip_provider=fake_clip,
+            gen_config_hash="gen_hash",
+            claim_ext_hash="claim_hash",
+        )
+
+        assert len(records) == 1
+        rec = records[0]
+        assert rec["detector_score"] is None
+        assert rec["detector_score"] != 0.0
+        assert rec["detector_available"] is False
+        assert rec["detector_status"] == "FAILED"
+        assert rec["clip_score"] is None
+        assert rec["clip_score"] != 0.0
+        assert rec["clip_available"] is False
+        assert rec["similarity_available"] is False
+        assert rec["clip_status"] == "FAILED"
 
 

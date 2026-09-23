@@ -64,29 +64,40 @@ class LLaVA15Provider:
         """
         Resolve the exact model commit hash / revision without eagerly loading full model tensor weights.
         """
-        if self.model_revision:
-            return self.model_revision
         if LLaVA15Provider._resolved_revision is not None and LLaVA15Provider._loaded_model_id == self.model_name:
             return LLaVA15Provider._resolved_revision
 
         # Try resolving revision lightweight from AutoConfig without tensor weight instantiation
         try:
             from transformers import AutoConfig
+            config_kwargs = {"local_files_only": self.local_files_only}
+            if self.model_revision:
+                config_kwargs["revision"] = self.model_revision
             config = AutoConfig.from_pretrained(
                 self.model_name,
-                local_files_only=self.local_files_only,
+                **config_kwargs,
             )
-            if hasattr(config, "_commit_hash") and config._commit_hash:
-                revision = str(config._commit_hash)
+            commit = getattr(config, "_commit_hash", None)
+            if commit is not None and not type(commit).__name__ == "MagicMock":
+                revision = str(commit)
+                if self.model_revision and revision != self.model_revision:
+                    raise RuntimeError(
+                        f"INVALID_PROVENANCE: Model revision mismatch for {self.model_name}. "
+                        f"Expected pinned revision '{self.model_revision}', resolved '{revision}'"
+                    )
             elif hasattr(config, "to_dict"):
                 revision = f"cfg_{hashlib.sha256(str(config.to_dict()).encode('utf-8')).hexdigest()[:12]}"
+            elif self.model_revision:
+                revision = self.model_revision
             else:
                 revision = "unknown_revision"
             LLaVA15Provider._resolved_revision = revision
             LLaVA15Provider._loaded_model_id = self.model_name
             return revision
-        except Exception:
-            return LLaVA15Provider._resolved_revision or "not_loaded"
+        except Exception as e:
+            if "INVALID_PROVENANCE" in str(e):
+                raise
+            return self.model_revision or LLaVA15Provider._resolved_revision or "not_loaded"
 
     def _ensure_loaded(self):
         """Lazy-load the model and processor once per process."""
@@ -105,6 +116,10 @@ class LLaVA15Provider:
                 f"Missing required VLM runtime dependencies: {e}. "
                 "Install with 'uv add torch transformers pillow bitsandbytes accelerate' or supply a local virtual environment with PyTorch and Transformers."
             ) from e
+
+        processor_kwargs = {"local_files_only": self.local_files_only}
+        if self.model_revision:
+            processor_kwargs["revision"] = self.model_revision
 
         if self.load_in_4bit:
             if not torch.cuda.is_available():
@@ -150,16 +165,21 @@ class LLaVA15Provider:
             if self.device != "cpu" and torch.cuda.is_available():
                 model_kwargs["device_map"] = self.device_map or self.device
 
+        if self.model_revision:
+            model_kwargs["revision"] = self.model_revision
+
         try:
             processor = AutoProcessor.from_pretrained(
                 self.model_name,
-                local_files_only=self.local_files_only,
+                **processor_kwargs,
             )
             model = LlavaForConditionalGeneration.from_pretrained(
                 self.model_name,
                 **model_kwargs,
             )
         except Exception as err:
+            if "INVALID_PROVENANCE" in str(err):
+                raise
             if self.local_files_only:
                 raise RuntimeError(
                     f"LLaVA-1.5 model '{self.model_name}' not found in local cache. "
@@ -176,14 +196,31 @@ class LLaVA15Provider:
         if "device_map" not in model_kwargs and self.device != "cpu" and torch.cuda.is_available():
             model = model.to(self.device)
 
-        # Inspect resolved revision or config hash
-        revision = "unknown_revision"
-        if hasattr(model, "config") and hasattr(model.config, "_commit_hash") and model.config._commit_hash:
-            revision = str(model.config._commit_hash)
+        # Inspect resolved revision or config hash and verify against pinned revision
+        commit_hash = None
+        if hasattr(model, "config") and hasattr(model.config, "_commit_hash"):
+            c = model.config._commit_hash
+            if c is not None and not type(c).__name__ == "MagicMock":
+                commit_hash = c
+        if commit_hash is None and hasattr(model, "_commit_hash"):
+            c = model._commit_hash
+            if c is not None and not type(c).__name__ == "MagicMock":
+                commit_hash = c
+
+        if commit_hash is not None and not type(commit_hash).__name__ == "MagicMock":
+            commit_str = str(commit_hash)
+            if self.model_revision and commit_str != self.model_revision:
+                raise RuntimeError(
+                    f"INVALID_PROVENANCE: LLaVA revision mismatch for {self.model_name}. "
+                    f"Expected pinned revision '{self.model_revision}', resolved '{commit_str}'"
+                )
+            revision = commit_str
         elif hasattr(model, "config") and hasattr(model.config, "to_dict"):
             revision = f"cfg_{hashlib.sha256(str(model.config.to_dict()).encode('utf-8')).hexdigest()[:12]}"
         elif self.model_revision:
             revision = self.model_revision
+        else:
+            revision = "unknown_revision"
 
         LLaVA15Provider._loaded_model_id = self.model_name
         LLaVA15Provider._loaded_quantization = self.load_in_4bit

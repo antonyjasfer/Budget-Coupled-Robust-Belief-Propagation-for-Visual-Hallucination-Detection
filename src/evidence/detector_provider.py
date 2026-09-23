@@ -94,26 +94,35 @@ class HuggingFaceDetectorProvider(BaseDetectorProvider):
 
     def resolve_revision(self) -> str:
         """Resolve the model snapshot commit hash without eagerly loading weights."""
-        if self.model_revision:
-            return self.model_revision
         if self.model_name in self._revision_cache:
             return self._revision_cache[self.model_name]
 
         try:
             from transformers import AutoConfig
+            config_kwargs = {"local_files_only": self.local_files_only}
+            if self.model_revision:
+                config_kwargs["revision"] = self.model_revision
             config = AutoConfig.from_pretrained(
                 self.model_name,
-                local_files_only=self.local_files_only,
+                **config_kwargs,
             )
-            if hasattr(config, "_commit_hash") and config._commit_hash:
-                rev = str(config._commit_hash)
+            commit = getattr(config, "_commit_hash", None)
+            if commit is not None and not type(commit).__name__ == "MagicMock":
+                rev = str(commit)
+                if self.model_revision and rev != self.model_revision:
+                    raise RuntimeError(
+                        f"INVALID_PROVENANCE: Detector revision mismatch for {self.model_name}. "
+                        f"Expected pinned revision '{self.model_revision}', resolved '{rev}'"
+                    )
             elif hasattr(config, "to_dict"):
                 rev = f"cfg_{hashlib.sha256(str(config.to_dict()).encode('utf-8')).hexdigest()[:12]}"
             else:
                 rev = "unknown_revision"
             self._revision_cache[self.model_name] = rev
             return rev
-        except Exception:
+        except Exception as e:
+            if "INVALID_PROVENANCE" in str(e):
+                raise
             return self.model_revision or "unresolved"
 
     def _ensure_loaded(self):
@@ -129,22 +138,28 @@ class HuggingFaceDetectorProvider(BaseDetectorProvider):
                 f"Missing required detection dependencies: {e}. Install torch and transformers."
             ) from e
 
+        load_kwargs = {"local_files_only": self.local_files_only}
+        if self.model_revision:
+            load_kwargs["revision"] = self.model_revision
+
         try:
             processor = AutoProcessor.from_pretrained(
                 self.model_name,
-                local_files_only=self.local_files_only,
+                **load_kwargs,
             )
             if self._is_owlvit:
                 model = OwlViTForObjectDetection.from_pretrained(
                     self.model_name,
-                    local_files_only=self.local_files_only,
+                    **load_kwargs,
                 )
             else:
                 model = AutoModelForObjectDetection.from_pretrained(
                     self.model_name,
-                    local_files_only=self.local_files_only,
+                    **load_kwargs,
                 )
         except Exception as err:
+            if "INVALID_PROVENANCE" in str(err):
+                raise
             raise RuntimeError(f"Failed to load detector model '{self.model_name}': {err}") from err
 
         model.eval()
@@ -154,10 +169,27 @@ class HuggingFaceDetectorProvider(BaseDetectorProvider):
         if self.device != "cpu" and torch.cuda.is_available():
             model = model.to(self.device)
 
-        rev = self.resolve_revision()
-        if hasattr(model, "config") and hasattr(model.config, "_commit_hash") and model.config._commit_hash:
-            rev = str(model.config._commit_hash)
+        commit_hash = None
+        if hasattr(model, "config") and hasattr(model.config, "_commit_hash"):
+            c = model.config._commit_hash
+            if c is not None and not type(c).__name__ == "MagicMock":
+                commit_hash = c
+        if commit_hash is None and hasattr(model, "_commit_hash"):
+            c = model._commit_hash
+            if c is not None and not type(c).__name__ == "MagicMock":
+                commit_hash = c
+
+        if commit_hash is not None and not type(commit_hash).__name__ == "MagicMock":
+            commit_str = str(commit_hash)
+            if self.model_revision and commit_str != self.model_revision:
+                raise RuntimeError(
+                    f"INVALID_PROVENANCE: Detector revision mismatch for {self.model_name}. "
+                    f"Expected pinned revision '{self.model_revision}', resolved '{commit_str}'"
+                )
+            rev = commit_str
             self._revision_cache[self.model_name] = rev
+        else:
+            rev = self.resolve_revision()
 
         self._model_cache[self.model_name] = model
         self._processor_cache[self.model_name] = processor

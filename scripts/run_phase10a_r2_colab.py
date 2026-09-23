@@ -784,6 +784,7 @@ def process_single_image(
                 "detector_failure_info": det_failure_info,
                 "clip_score": clip_score,  # float or None (null in JSON)
                 "similarity_available": clip_available,
+                "clip_available": clip_available,
                 "clip_status": clip_status,
                 "clip_failure_info": clip_failure_info,
                 "provenance_status": "REAL_UNLABELED",
@@ -1119,15 +1120,17 @@ def main(argv: Optional[List[str]] = None) -> None:
         model_name=FROZEN_MODELS["detector_model"],
         model_revision=FROZEN_MODELS["detector_revision"],
         device="cpu",
+        local_files_only=False,
     )
-    logger.info("OWL-ViT detector provider initialized (CPU); model weights will lazy-load on first inference.")
+    logger.info("OWL-ViT detector provider initialized (CPU, local_files_only=False); model weights will lazy-load on first inference.")
 
     clip_provider = TransformersCLIPProvider(
         model_name=FROZEN_MODELS["clip_model"],
         model_revision=FROZEN_MODELS["clip_revision"],
         device="cpu",
+        local_files_only=False,
     )
-    logger.info("CLIP provider initialized (CPU); model weights will lazy-load on first inference.")
+    logger.info("CLIP provider initialized (CPU, local_files_only=False); model weights will lazy-load on first inference.")
 
     # ──────────────────────────────────────────────────────────────
     # Step 9: Process Images with Atomic Checkpointing
@@ -1219,25 +1222,51 @@ def main(argv: Optional[List[str]] = None) -> None:
     total_attempted = len(checkpoint["completed_image_ids"]) + len(checkpoint["failed_image_ids"])
 
     if args.pilot:
-        checkpoint["state"] = "PILOT_COMPLETE"
-        save_checkpoint(ckpt_path, checkpoint)
-        logger.info(f"Pilot acquisition complete ({args.pilot} images attempted).")
+        evidence_records = checkpoint["evidence_records"]
+        claims_count = len(evidence_records)
+        detector_available_count = sum(
+            1 for r in evidence_records
+            if r.get("detector_available") is True and r.get("detector_score") is not None
+        )
+        detector_failed_count = claims_count - detector_available_count
+        clip_available_count = sum(
+            1 for r in evidence_records
+            if (r.get("clip_available") is True or r.get("similarity_available") is True) and r.get("clip_score") is not None
+        )
+        clip_failed_count = claims_count - clip_available_count
 
-        # Save runtime environment lock from successful pilot
-        atomic_json_write(lock_file, runtime_env)
-        atomic_json_write(PROJECT_ROOT / "reports" / "m10a_recovery2" / "colab_runtime_environment_lock.json", runtime_env)
+        logger.info(
+            f"Pilot evidence health check: claims={claims_count}, "
+            f"detector_available={detector_available_count}/{claims_count}, "
+            f"clip_available={clip_available_count}/{claims_count}"
+        )
+
+        is_evidence_incomplete = False
+        if claims_count > 0 and (detector_available_count == 0 or clip_available_count == 0):
+            is_evidence_incomplete = True
+            pilot_status = "PILOT_EVIDENCE_INCOMPLETE"
+            checkpoint["state"] = "PILOT_EVIDENCE_INCOMPLETE"
+        else:
+            pilot_status = "PILOT_ONLY"
+            checkpoint["state"] = "PILOT_COMPLETE"
+
+        save_checkpoint(ckpt_path, checkpoint)
 
         # Write pilot preview and diagnostics
         pilot_preview = {
-            "status": "PILOT_ONLY",
+            "status": pilot_status,
             "schema_version": "2.0.0",
             "pilot_n": args.pilot,
             "provenance_hash": prov_hash,
             "completed_images": len(checkpoint["completed_image_ids"]),
             "failed_images": len(checkpoint["failed_image_ids"]),
             "genuine_zero_images": checkpoint.get("genuine_zero_claim_images", 0),
-            "claims_count": len(checkpoint["evidence_records"]),
-            "records_sample": checkpoint["evidence_records"][:10],
+            "claims_count": claims_count,
+            "detector_available_count": detector_available_count,
+            "detector_failed_count": detector_failed_count,
+            "clip_available_count": clip_available_count,
+            "clip_failed_count": clip_failed_count,
+            "records_sample": evidence_records[:10],
             "failures": checkpoint["failure_records"],
             "timestamp": datetime.now(timezone.utc).isoformat(),
         }
@@ -1249,6 +1278,21 @@ def main(argv: Optional[List[str]] = None) -> None:
             atomic_json_write(out_root / "pilot" / "pilot_diagnostics.json", pilot_preview)
 
         logger.info(f"Pilot diagnostics written: {pilot_diag_p}")
+
+        if is_evidence_incomplete:
+            err_msg = (
+                f"PILOT EVIDENCE HEALTH GATE FAILED: Systematic provider failure detected. "
+                f"claims_count={claims_count}, detector_available={detector_available_count}, "
+                f"clip_available={clip_available_count}. Status: PILOT_EVIDENCE_INCOMPLETE"
+            )
+            logger.error(err_msg)
+            raise RuntimeError(err_msg)
+
+        # Save runtime environment lock from successful pilot
+        atomic_json_write(lock_file, runtime_env)
+        atomic_json_write(PROJECT_ROOT / "reports" / "m10a_recovery2" / "colab_runtime_environment_lock.json", runtime_env)
+
+        logger.info(f"Pilot acquisition complete ({args.pilot} images attempted).")
         logger.info("=" * 60)
         logger.info("Phase 10A-R2 Colab PILOT Execution — COMPLETE (PILOT_ONLY)")
         logger.info("=" * 60)

@@ -166,7 +166,7 @@ def enforce_cuda_gate() -> Dict[str, Any]:
         )
 
     gpu_name = torch.cuda.get_device_name(0)
-    gpu_mem = torch.cuda.get_device_properties(0).total_mem / (1024 ** 3)
+    gpu_mem = torch.cuda.get_device_properties(0).total_memory / (1024 ** 3)
     cuda_ver = torch.version.cuda
     torch_ver = torch.__version__
 
@@ -212,7 +212,7 @@ def capture_runtime_environment(cuda_env: Optional[Dict[str, Any]] = None) -> Di
         "cuda_available": torch.cuda.is_available(),
         "cuda_version": torch.version.cuda if torch.cuda.is_available() else None,
         "device": torch.cuda.get_device_name(0) if torch.cuda.is_available() else "cpu",
-        "gpu_memory_gb": round(torch.cuda.get_device_properties(0).total_mem / (1024 ** 3), 2) if torch.cuda.is_available() else 0.0,
+        "gpu_memory_gb": round(torch.cuda.get_device_properties(0).total_memory / (1024 ** 3), 2) if torch.cuda.is_available() else 0.0,
     }
     if cuda_env:
         env.update({k: v for k, v in cuda_env.items() if v is not None})
@@ -281,20 +281,105 @@ def verify_source_images_prepared(
     return True, "Source images fully verified (600/600 valid).", audit
 
 
+def compute_stable_source_audit_hash(audit_data: Dict[str, Any]) -> str:
+    """
+    Compute a deterministic scientific fingerprint of source image audit data.
+    Excludes volatile fields like timestamp, local paths, or download timing.
+    Includes sampling_manifest_hash, counts, and per-image canonical metadata/sha256.
+    """
+    records = audit_data.get("records", [])
+    stable_records = []
+    for r in records:
+        rec_entry = {
+            "image_id": r.get("image_id"),
+            "coco_integer_id": r.get("coco_integer_id"),
+            "file_name": r.get("file_name"),
+            "coco_source_split": r.get("coco_source_split"),
+            "research_split": r.get("research_split"),
+            "expected_width": r.get("expected_width"),
+            "expected_height": r.get("expected_height"),
+            "actual_width": r.get("actual_width"),
+            "actual_height": r.get("actual_height"),
+            "sha256": r.get("sha256"),
+            "status": r.get("status"),
+            "is_valid": r.get("is_valid"),
+        }
+        stable_records.append(rec_entry)
+
+    # Sort deterministically by image_id
+    stable_records.sort(key=lambda x: str(x.get("image_id", "")))
+
+    payload = {
+        "sampling_manifest_hash": audit_data.get("sampling_manifest_hash", ""),
+        "total_requested": audit_data.get("total_requested", 0),
+        "valid_count": audit_data.get("valid_count", 0),
+        "missing_count": audit_data.get("missing_count", 0),
+        "corrupt_count": audit_data.get("corrupt_count", 0),
+        "records": stable_records,
+    }
+    return compute_json_hash(payload)
+
+
+def get_execution_git_info(cwd: Optional[Path] = None) -> Tuple[str, bool]:
+    """
+    Get actual execution Git commit SHA and working tree cleanliness.
+
+    Returns:
+        (execution_code_sha, working_tree_clean)
+    """
+    import subprocess
+
+    target_dir = str(cwd or PROJECT_ROOT)
+    try:
+        sha_proc = subprocess.run(
+            ["git", "rev-parse", "HEAD"],
+            cwd=target_dir,
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        head_sha = sha_proc.stdout.strip()
+
+        diff_proc = subprocess.run(
+            ["git", "diff", "--quiet"],
+            cwd=target_dir,
+            capture_output=True,
+        )
+        unstaged_clean = (diff_proc.returncode == 0)
+
+        cached_proc = subprocess.run(
+            ["git", "diff", "--cached", "--quiet"],
+            cwd=target_dir,
+            capture_output=True,
+        )
+        staged_clean = (cached_proc.returncode == 0)
+
+        working_tree_clean = unstaged_clean and staged_clean
+        return head_sha, working_tree_clean
+    except Exception as e:
+        logger.warning(f"Failed to query git status: {e}")
+        return "unknown", False
+
+
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 # CHECKPOINT PROVENANCE & MANAGEMENT
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 def compute_checkpoint_provenance(
     sampling_manifest_hash: str,
     audit_hash: str,
-    code_sha: str,
-    gen_cfg_hash: str,
-    claim_ext_hash: str,
+    execution_code_sha: str = "",
+    gen_cfg_hash: str = "",
+    claim_ext_hash: str = "",
+    working_tree_clean: bool = True,
+    sampling_manifest_creation_sha: str = "",
+    code_sha: str = "",
 ) -> Tuple[Dict[str, Any], str]:
     """
     Compute exact scientific provenance fingerprint for checkpoint binding.
     Checkpoints cannot be resumed if any component of this fingerprint differs.
     """
+    if not execution_code_sha and code_sha:
+        execution_code_sha = code_sha
     fingerprint = {
         "dataset_version": "v2",
         "sampling_manifest_hash": sampling_manifest_hash,
@@ -308,7 +393,9 @@ def compute_checkpoint_provenance(
         "detector_revision": FROZEN_MODELS["detector_revision"],
         "clip_model": FROZEN_MODELS["clip_model"],
         "clip_revision": FROZEN_MODELS["clip_revision"],
-        "code_sha": code_sha,
+        "execution_code_sha": execution_code_sha,
+        "working_tree_clean": working_tree_clean,
+        "sampling_manifest_creation_sha": sampling_manifest_creation_sha,
     }
     prov_hash = compute_json_hash(fingerprint)
     return fingerprint, prov_hash
@@ -796,7 +883,20 @@ def main(argv: Optional[List[str]] = None) -> None:
     if len(image_ids) != 600:
         raise ValueError(f"Expected exactly 600 images in sampling manifest, found {len(image_ids)}")
 
-    code_sha = sampling_data.get("code_sha", "unknown")
+    sampling_manifest_creation_sha = sampling_data.get("code_sha", "unknown")
+
+    # Actual Execution Git HEAD and Working Tree Verification
+    execution_sha, working_tree_clean = get_execution_git_info()
+    logger.info(f"Execution Git SHA: {execution_sha} (Clean: {working_tree_clean})")
+
+    # Clean working tree gate for scientific execution (PILOT / FULL)
+    if not args.dry_run and not working_tree_clean:
+        raise RuntimeError(
+            f"DIRTY GIT WORKING TREE DETECTED: Execution Git SHA is {execution_sha}, "
+            "but uncommitted or staged changes are present in the working tree. "
+            "Scientific GPU execution (--pilot / --full) strictly requires a clean Git working tree. "
+            "Commit or stash all changes and verify 'git status' before proceeding."
+        )
 
     # ──────────────────────────────────────────────────────────────
     # Step 3: Source Image Preparation Gate
@@ -810,10 +910,9 @@ def main(argv: Optional[List[str]] = None) -> None:
         logger.error(images_msg)
         raise RuntimeError(images_msg)
 
-    audit_hash = ""
-    if audit_p.exists():
-        with open(audit_p, "rb") as f:
-            audit_hash = hashlib.sha256(f.read()).hexdigest()
+    # Compute deterministic scientific fingerprint of source image audit data
+    audit_hash = compute_stable_source_audit_hash(audit_data)
+    logger.info(f"Stable source image audit hash: {audit_hash[:16]}...")
 
     corruption_hash = ""
     if corruption_p.exists():
@@ -825,9 +924,11 @@ def main(argv: Optional[List[str]] = None) -> None:
     prov_fingerprint, prov_hash = compute_checkpoint_provenance(
         sampling_manifest_hash=sampling_hash,
         audit_hash=audit_hash,
-        code_sha=code_sha,
+        execution_code_sha=execution_sha,
         gen_cfg_hash=gen_cfg_hash,
         claim_ext_hash=claim_ext_hash,
+        working_tree_clean=working_tree_clean,
+        sampling_manifest_creation_sha=sampling_manifest_creation_sha,
     )
     logger.info(f"Checkpoint provenance hash: {prov_hash[:16]}...")
 
@@ -859,7 +960,9 @@ def main(argv: Optional[List[str]] = None) -> None:
         logger.info("DRY-RUN VALIDATION COMPLETE")
         logger.info("  CUDA Gate: PASSED")
         logger.info(f"  Device: {gpu_env['device']} ({gpu_env['gpu_memory_gb']} GB)")
-        logger.info(f"  Source Images: 600/600 verified (audit hash: {audit_hash[:16]}...)")
+        logger.info(f"  Execution Git SHA: {execution_sha}")
+        logger.info(f"  Working Tree Clean: {working_tree_clean}")
+        logger.info(f"  Source Images: 600/600 verified (stable audit hash: {audit_hash[:16]}...)")
         logger.info(f"  Sampling Manifest: 600 images (hash: {sampling_hash[:16]}...)")
         logger.info(f"  Provenance Hash: {prov_hash[:16]}...")
         logger.info(f"  Target Checkpoint Path: {ckpt_path}")
@@ -1154,6 +1257,9 @@ def main(argv: Optional[List[str]] = None) -> None:
         "generation_config_hash": gen_cfg_hash,
         "claim_extractor_hash": claim_ext_hash,
         "checkpoint_provenance_hash": prov_hash,
+        "execution_code_sha": execution_sha,
+        "working_tree_clean": working_tree_clean,
+        "sampling_manifest_creation_sha": sampling_manifest_creation_sha,
         "created_at": datetime.now(timezone.utc).isoformat(),
         "frozen_models": FROZEN_MODELS,
         "execution_environment": runtime_env,
@@ -1301,7 +1407,10 @@ def main(argv: Optional[List[str]] = None) -> None:
             "acquisition_version": "10A-R2",
             "freeze_status": freeze_status,
             "timestamp": datetime.now(timezone.utc).isoformat(),
-            "code_sha": code_sha,
+            "execution_code_sha": execution_sha,
+            "working_tree_clean": working_tree_clean,
+            "sampling_manifest_creation_sha": sampling_manifest_creation_sha,
+            "code_sha": execution_sha,
             "checkpoint_provenance_hash": prov_hash,
             "hashes": {
                 "candidate_universe_hash": universe_hash,
@@ -1340,6 +1449,9 @@ def main(argv: Optional[List[str]] = None) -> None:
     report = f"""# Phase 10A-R2 GPU Acquisition Report
 
 **Date:** {datetime.now(timezone.utc).isoformat()}
+**Execution Git SHA:** `{execution_sha}`
+**Working Tree Clean:** `{working_tree_clean}`
+**Sampling Manifest Creation SHA:** `{sampling_manifest_creation_sha}`
 **GPU Device:** {gpu_env['device']}
 **GPU Memory:** {gpu_env['gpu_memory_gb']} GB
 **CUDA Version:** {gpu_env['cuda_version']}
@@ -1386,8 +1498,11 @@ def main(argv: Optional[List[str]] = None) -> None:
 
 ## Provenance & Artifact Hashes
 
-| Artifact | Hash |
+| Artifact | Hash / SHA |
 | :--- | :--- |
+| Execution Git SHA | `{execution_sha}` |
+| Working Tree Clean | `{working_tree_clean}` |
+| Sampling Creation SHA | `{sampling_manifest_creation_sha}` |
 | Checkpoint Provenance | `{prov_hash}` |
 | Evidence Manifest V2 | `{evidence_hash}` |
 | Sampling Manifest V2 | `{sampling_hash}` |

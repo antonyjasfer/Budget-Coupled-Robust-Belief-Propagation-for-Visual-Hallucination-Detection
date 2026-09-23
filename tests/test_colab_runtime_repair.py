@@ -22,11 +22,15 @@ import os
 from pathlib import Path
 import tempfile
 from unittest.mock import MagicMock, patch
+import copy
 import pytest
 
 from scripts.run_phase10a_r2_colab import (
     parse_args,
     compute_json_hash,
+    compute_stable_source_audit_hash,
+    get_execution_git_info,
+    enforce_cuda_gate,
     atomic_json_write,
     compute_checkpoint_provenance,
     classify_failure,
@@ -424,3 +428,330 @@ class TestDryRunSemantics:
 
         # Ensure LLaVA was never instantiated
         mock_llava.assert_not_called()
+
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# 9. PyTorch CUDA Memory Property (Defect 1)
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+class TestCUDAMemoryProperty:
+    class MockDeviceProperties:
+        def __init__(self, memory_bytes: int):
+            self.total_memory = memory_bytes
+            # Note: total_mem deliberately does NOT exist
+
+    @patch("torch.cuda.is_available", return_value=True)
+    @patch("torch.cuda.get_device_name", return_value="NVIDIA T4")
+    def test_enforce_cuda_gate_uses_total_memory(self, mock_name, mock_avail):
+        """Must access total_memory without attempting to access non-existent total_mem."""
+        import torch
+        with patch.object(torch.version, "cuda", "12.1"):
+            with patch("torch.cuda.get_device_properties", return_value=self.MockDeviceProperties(16 * 1024**3)):
+                env = enforce_cuda_gate()
+                assert env["device"] == "NVIDIA T4"
+                assert env["gpu_memory_gb"] == 16.0
+
+    @patch("torch.cuda.is_available", return_value=True)
+    @patch("torch.cuda.get_device_name", return_value="NVIDIA T4")
+    def test_capture_runtime_environment_uses_total_memory(self, mock_name, mock_avail):
+        """capture_runtime_environment must access total_memory."""
+        import torch
+        with patch.object(torch.version, "cuda", "12.1"):
+            with patch("torch.cuda.get_device_properties", return_value=self.MockDeviceProperties(16 * 1024**3)):
+                env = capture_runtime_environment()
+                assert env["gpu_memory_gb"] == 16.0
+
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# 10. Stable Source-Image Audit Fingerprint (Defect 2)
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+class TestStableSourceAuditHash:
+    def _create_sample_audit(self, timestamp: str, local_path_prefix: str) -> dict:
+        records = [
+            {
+                "image_id": f"coco_{i:012d}",
+                "coco_integer_id": i,
+                "file_name": f"{i:012d}.jpg",
+                "coco_source_split": "train2017" if i % 2 == 0 else "val2017",
+                "research_split": "TRAIN" if i % 2 == 0 else "TEST",
+                "expected_width": 640,
+                "expected_height": 480,
+                "actual_width": 640,
+                "actual_height": 480,
+                "sha256": f"sha256_mock_hash_{i:04d}",
+                "status": "VALID",
+                "is_valid": True,
+                # Volatile metadata:
+                "local_path": f"{local_path_prefix}/{i:012d}.jpg",
+                "download_time_seconds": 0.123,
+                "timestamp": timestamp,
+            }
+            for i in range(1, 11)
+        ]
+        return {
+            "sampling_manifest_hash": "manifest_test_hash_12345",
+            "total_requested": 10,
+            "valid_count": 10,
+            "missing_count": 0,
+            "corrupt_count": 0,
+            "timestamp": timestamp,
+            "execution_duration_sec": 42.5,
+            "records": records,
+        }
+
+    def test_stable_audit_hash_ignores_timestamp_and_volatile_fields(self):
+        """Regenerated identical audit with different timestamps/paths must yield identical hash."""
+        audit_1 = self._create_sample_audit("2026-09-20T10:00:00Z", "/content/drive/images")
+        audit_2 = self._create_sample_audit("2026-09-23T15:30:00Z", "/tmp/colab_run_2/images")
+
+        hash_1 = compute_stable_source_audit_hash(audit_1)
+        hash_2 = compute_stable_source_audit_hash(audit_2)
+
+        assert len(hash_1) == 64
+        assert hash_1 == hash_2
+
+    def test_stable_audit_hash_changes_when_image_sha_changes(self):
+        """Modifying any image SHA must change the audit hash."""
+        audit = self._create_sample_audit("2026-09-20T10:00:00Z", "/content/images")
+        hash_orig = compute_stable_source_audit_hash(audit)
+
+        audit_tampered = copy.deepcopy(audit)
+        audit_tampered["records"][3]["sha256"] = "sha256_tampered_bytes_here"
+        hash_tampered = compute_stable_source_audit_hash(audit_tampered)
+
+        assert hash_orig != hash_tampered
+
+    def test_stable_audit_hash_changes_when_dimensions_or_status_changes(self):
+        """Modifying dimensions or status must change the audit hash."""
+        audit = self._create_sample_audit("2026-09-20T10:00:00Z", "/content/images")
+        hash_orig = compute_stable_source_audit_hash(audit)
+
+        # Dimension change
+        audit_dim = copy.deepcopy(audit)
+        audit_dim["records"][0]["actual_width"] = 1920
+        assert compute_stable_source_audit_hash(audit_dim) != hash_orig
+
+        # Status change
+        audit_status = copy.deepcopy(audit)
+        audit_status["records"][0]["status"] = "CORRUPT"
+        audit_status["records"][0]["is_valid"] = False
+        assert compute_stable_source_audit_hash(audit_status) != hash_orig
+
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# 11. Git Execution SHA & Clean Working Tree Gate (Defect 3)
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+class TestGitExecutionProvenance:
+    def test_actual_git_execution_sha_captured(self):
+        """get_execution_git_info must return a 40-char hex SHA and boolean clean status."""
+        sha, is_clean = get_execution_git_info()
+        assert len(sha) == 40
+        assert all(c in "0123456789abcdefABCDEF" for c in sha)
+        assert isinstance(is_clean, bool)
+
+    @patch("scripts.run_phase10a_r2_colab.enforce_cuda_gate")
+    @patch("scripts.run_phase10a_r2_colab.get_execution_git_info")
+    def test_pilot_rejects_dirty_working_tree(self, mock_git, mock_cuda):
+        """Pilot scientific execution must hard-fail before inference if working tree is dirty."""
+        mock_cuda.return_value = {"device": "T4", "gpu_memory_gb": 15.0, "cuda_available": True, "cuda_version": "12.1"}
+        mock_git.return_value = ("1111222233334444555566667777888899990000", False)
+
+        with pytest.raises(RuntimeError, match="DIRTY GIT WORKING TREE DETECTED"):
+            main(["--pilot", "5"])
+
+    @patch("scripts.run_phase10a_r2_colab.enforce_cuda_gate")
+    @patch("scripts.run_phase10a_r2_colab.get_execution_git_info")
+    def test_full_rejects_dirty_working_tree(self, mock_git, mock_cuda):
+        """Full scientific execution must hard-fail before inference if working tree is dirty."""
+        mock_cuda.return_value = {"device": "T4", "gpu_memory_gb": 15.0, "cuda_available": True, "cuda_version": "12.1"}
+        mock_git.return_value = ("1111222233334444555566667777888899990000", False)
+
+        with pytest.raises(RuntimeError, match="DIRTY GIT WORKING TREE DETECTED"):
+            main(["--full"])
+
+    @patch("scripts.run_phase10a_r2_colab.enforce_cuda_gate")
+    @patch("scripts.run_phase10a_r2_colab.get_execution_git_info")
+    def test_dry_run_accepts_dirty_tree(self, mock_git, mock_cuda):
+        """Dry-run may report dirty working tree without failing."""
+        mock_cuda.return_value = {"device": "T4", "gpu_memory_gb": 15.0, "cuda_available": True, "cuda_version": "12.1"}
+        mock_git.return_value = ("1111222233334444555566667777888899990000", False)
+
+        # Must not raise RuntimeError
+        main(["--dry-run"])
+
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# 12. Resume Stability & Provenance Binding (Requirement 4)
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+class TestResumeStabilityWithAuditAndGit:
+    def _create_audit(self, timestamp: str, image_sha: str = "valid_sha_123") -> dict:
+        return {
+            "sampling_manifest_hash": "manifest_hash_fixed",
+            "total_requested": 1,
+            "valid_count": 1,
+            "missing_count": 0,
+            "corrupt_count": 0,
+            "timestamp": timestamp,
+            "records": [
+                {
+                    "image_id": "img1",
+                    "file_name": "img1.jpg",
+                    "coco_source_split": "train2017",
+                    "research_split": "TRAIN",
+                    "expected_width": 640,
+                    "expected_height": 480,
+                    "actual_width": 640,
+                    "actual_height": 480,
+                    "sha256": image_sha,
+                    "status": "VALID",
+                    "is_valid": True,
+                }
+            ],
+        }
+
+    def test_resume_accepts_regenerated_identical_audit(self, tmp_path):
+        """Checkpoint created under audit v1 must resume successfully under regenerated audit v2."""
+        audit_v1 = self._create_audit("2026-09-20T10:00:00Z")
+        audit_v2 = self._create_audit("2026-09-23T12:00:00Z")  # regenerated with new timestamp
+
+        audit_hash_v1 = compute_stable_source_audit_hash(audit_v1)
+        audit_hash_v2 = compute_stable_source_audit_hash(audit_v2)
+        assert audit_hash_v1 == audit_hash_v2
+
+        git_sha = "aabbccddeeff00112233445566778899aabbccdd"
+        fp_v1, prov_hash_v1 = compute_checkpoint_provenance(
+            sampling_manifest_hash="samp_hash",
+            audit_hash=audit_hash_v1,
+            execution_code_sha=git_sha,
+            gen_cfg_hash="g_cfg",
+            claim_ext_hash="c_ext",
+            working_tree_clean=True,
+        )
+
+        ckpt_p = tmp_path / "gpu_acquisition_checkpoint_v2.json"
+        initial = {
+            "schema_version": "2.0.0",
+            "checkpoint_type": "gpu_acquisition_checkpoint",
+            "checkpoint_provenance_hash": prov_hash_v1,
+            "provenance_fingerprint": fp_v1,
+            "completed_image_ids": ["img1"],
+            "failed_image_ids": [],
+        }
+        with open(ckpt_p, "w", encoding="utf-8") as f:
+            json.dump(initial, f)
+
+        # Resume under regenerated audit v2
+        fp_v2, prov_hash_v2 = compute_checkpoint_provenance(
+            sampling_manifest_hash="samp_hash",
+            audit_hash=audit_hash_v2,
+            execution_code_sha=git_sha,
+            gen_cfg_hash="g_cfg",
+            claim_ext_hash="c_ext",
+            working_tree_clean=True,
+        )
+
+        resumed = load_or_create_checkpoint(
+            checkpoint_path=ckpt_p,
+            expected_checkpoint_type="gpu_acquisition_checkpoint",
+            provenance_fingerprint=fp_v2,
+            provenance_hash=prov_hash_v2,
+            total_images=1,
+            resume=True,
+        )
+        assert resumed["completed_image_ids"] == ["img1"]
+
+    def test_resume_rejects_changed_source_image_content(self, tmp_path):
+        """Checkpoint created under audit v1 must FAIL resume if image bytes changed."""
+        audit_v1 = self._create_audit("2026-09-20T10:00:00Z", image_sha="original_sha")
+        audit_tampered = self._create_audit("2026-09-23T12:00:00Z", image_sha="tampered_sha")
+
+        audit_hash_v1 = compute_stable_source_audit_hash(audit_v1)
+        audit_hash_tampered = compute_stable_source_audit_hash(audit_tampered)
+        assert audit_hash_v1 != audit_hash_tampered
+
+        git_sha = "aabbccddeeff00112233445566778899aabbccdd"
+        fp_v1, prov_hash_v1 = compute_checkpoint_provenance(
+            sampling_manifest_hash="samp_hash",
+            audit_hash=audit_hash_v1,
+            execution_code_sha=git_sha,
+            gen_cfg_hash="g_cfg",
+            claim_ext_hash="c_ext",
+            working_tree_clean=True,
+        )
+
+        ckpt_p = tmp_path / "gpu_acquisition_checkpoint_v2.json"
+        initial = {
+            "schema_version": "2.0.0",
+            "checkpoint_type": "gpu_acquisition_checkpoint",
+            "checkpoint_provenance_hash": prov_hash_v1,
+            "provenance_fingerprint": fp_v1,
+            "completed_image_ids": ["img1"],
+            "failed_image_ids": [],
+        }
+        with open(ckpt_p, "w", encoding="utf-8") as f:
+            json.dump(initial, f)
+
+        # Attempt resume under tampered image audit
+        fp_tampered, prov_hash_tampered = compute_checkpoint_provenance(
+            sampling_manifest_hash="samp_hash",
+            audit_hash=audit_hash_tampered,
+            execution_code_sha=git_sha,
+            gen_cfg_hash="g_cfg",
+            claim_ext_hash="c_ext",
+            working_tree_clean=True,
+        )
+
+        with pytest.raises(RuntimeError, match="CHECKPOINT PROVENANCE HASH MISMATCH"):
+            load_or_create_checkpoint(
+                checkpoint_path=ckpt_p,
+                expected_checkpoint_type="gpu_acquisition_checkpoint",
+                provenance_fingerprint=fp_tampered,
+                provenance_hash=prov_hash_tampered,
+                total_images=1,
+                resume=True,
+            )
+
+    def test_resume_rejects_changed_execution_sha(self, tmp_path):
+        """Checkpoint must FAIL resume if execution code SHA has changed."""
+        audit = self._create_audit("2026-09-20T10:00:00Z")
+        audit_hash = compute_stable_source_audit_hash(audit)
+
+        fp_1, prov_hash_1 = compute_checkpoint_provenance(
+            sampling_manifest_hash="samp_hash",
+            audit_hash=audit_hash,
+            execution_code_sha="sha_commit_1",
+            gen_cfg_hash="g_cfg",
+            claim_ext_hash="c_ext",
+            working_tree_clean=True,
+        )
+
+        ckpt_p = tmp_path / "gpu_acquisition_checkpoint_v2.json"
+        initial = {
+            "schema_version": "2.0.0",
+            "checkpoint_type": "gpu_acquisition_checkpoint",
+            "checkpoint_provenance_hash": prov_hash_1,
+            "provenance_fingerprint": fp_1,
+            "completed_image_ids": ["img1"],
+            "failed_image_ids": [],
+        }
+        with open(ckpt_p, "w", encoding="utf-8") as f:
+            json.dump(initial, f)
+
+        fp_2, prov_hash_2 = compute_checkpoint_provenance(
+            sampling_manifest_hash="samp_hash",
+            audit_hash=audit_hash,
+            execution_code_sha="sha_commit_2_modified",
+            gen_cfg_hash="g_cfg",
+            claim_ext_hash="c_ext",
+            working_tree_clean=True,
+        )
+
+        with pytest.raises(RuntimeError, match="CHECKPOINT PROVENANCE HASH MISMATCH"):
+            load_or_create_checkpoint(
+                checkpoint_path=ckpt_p,
+                expected_checkpoint_type="gpu_acquisition_checkpoint",
+                provenance_fingerprint=fp_2,
+                provenance_hash=prov_hash_2,
+                total_images=1,
+                resume=True,
+            )
+

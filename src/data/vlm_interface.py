@@ -96,9 +96,12 @@ class LLaVAProviderWrapper(BaseVLMProvider):
         config: Optional[VLMGenerationConfig] = None,
     ) -> VLMResponse:
         cfg = config or self._config
-        if prompt:
-            cfg.prompt = prompt
-        return self._provider.generate(str(image_path), cfg)
+        active_prompt = prompt or cfg.prompt
+        return self._provider.generate_caption(
+            image_path=image_path,
+            prompt=active_prompt,
+            gen_config=cfg,
+        )
 
 
 class SecondVLMProviderInterface(BaseVLMProvider):

@@ -59,6 +59,8 @@ if str(PROJECT_ROOT) not in sys.path:
 from src.data.artifact_state import (
     validate_annotation_task_readiness,
 )
+from src.vlm.provider import VLMGenerationConfig, VLMResponse
+from src.data.schemas import GeneratedResponseRecord
 
 logging.basicConfig(
     level=logging.INFO,
@@ -79,24 +81,22 @@ FROZEN_MODELS = {
 }
 
 LLAVA_GENERATION_CONFIG = {
-    "prompt_template": (
-        "USER: <image>\n"
-        "Describe this image in detail focusing on the main objects present. ASSISTANT:"
-    ),
-    "model_id": FROZEN_MODELS["vlm_model"],
-    "model_revision": FROZEN_MODELS["vlm_revision"],
-    "processor_revision": FROZEN_MODELS["vlm_revision"],
+    "model_name": FROZEN_MODELS["vlm_model"],
+    "prompt": "Describe this image in detail focusing on the main objects present.",
     "max_new_tokens": 128,
     "temperature": 0.2,
     "do_sample": False,
-    "top_p": None,
-    "top_k": None,
-    "repetition_penalty": 1.0,
-    "stopping_criteria": "eos_token",
+    "seed": 42,
     "random_seed": 42,
-    "quantization": "4bit_nf4",
+    "device": "cuda",
     "dtype": "float16",
-    "image_preprocessing": "clip_image_processor_standard",
+    "local_files_only": False,
+    "load_in_4bit": True,
+    "quantization_type": "nf4",
+    "quantization": "4bit_nf4",
+    "bnb_4bit_use_double_quant": True,
+    "compute_dtype": "float16",
+    "device_map": "auto",
 }
 
 CLAIM_EXTRACTION_CONFIG = {
@@ -386,7 +386,7 @@ def compute_checkpoint_provenance(
         "source_image_audit_hash": audit_hash,
         "vlm_model": FROZEN_MODELS["vlm_model"],
         "vlm_revision": FROZEN_MODELS["vlm_revision"],
-        "processor_revision": LLAVA_GENERATION_CONFIG["processor_revision"],
+        "processor_revision": FROZEN_MODELS["vlm_revision"],
         "generation_config_hash": gen_cfg_hash,
         "claim_extractor_hash": claim_ext_hash,
         "detector_model": FROZEN_MODELS["detector_model"],
@@ -514,9 +514,10 @@ def process_single_image(
     gen_config_hash: str,
     claim_ext_hash: str,
     attempt_count: int = 1,
+    vlm_gen_config: Optional[Any] = None,
 ) -> Tuple[List[Dict[str, Any]], Optional[Dict[str, Any]], bool]:
     """
-    Process a single image through the full evidence pipeline.
+    Process a single image through the full evidence pipeline using canonical provider contracts.
 
     Strict genuine-zero semantics:
         - Image load SUCCESS
@@ -537,7 +538,7 @@ def process_single_image(
     failure_record = None
 
     try:
-        # 1. Load image
+        # 1. Load & verify image on disk
         if not image_path.exists():
             failure_record = {
                 "claim_id": f"img_level_{image_id}",
@@ -561,7 +562,8 @@ def process_single_image(
             return [], failure_record, False
 
         try:
-            img = Image.open(str(image_path)).convert("RGB")
+            with Image.open(str(image_path)) as img_check:
+                img_check.verify()
         except Exception as img_err:
             f_class, is_retry = classify_failure(img_err)
             failure_record = {
@@ -585,14 +587,42 @@ def process_single_image(
             }
             return [], failure_record, False
 
-        # 2. LLaVA forward inference
-        caption_text = vlm_provider.generate(
-            image=img,
-            prompt=LLAVA_GENERATION_CONFIG["prompt_template"],
-            max_new_tokens=LLAVA_GENERATION_CONFIG["max_new_tokens"],
-            do_sample=LLAVA_GENERATION_CONFIG["do_sample"],
-            temperature=LLAVA_GENERATION_CONFIG["temperature"],
+        # 2. Canonical LLaVA forward inference (takes image_path, returns VLMResponse)
+        prompt_text = LLAVA_GENERATION_CONFIG.get("prompt", "Describe this image in detail focusing on the main objects present.")
+        vlm_response = vlm_provider.generate_caption(
+            image_path=image_path,
+            prompt=prompt_text,
+            gen_config=vlm_gen_config,
+            image_id=image_id,
         )
+
+        caption_text = vlm_response.caption if vlm_response is not None else ""
+
+        # Validate provenance: must be real_inference and not synthetic
+        is_synth = getattr(vlm_response, "is_synthetic", False)
+        gen_source = getattr(vlm_response, "generation_source", "real_inference")
+        if is_synth or gen_source != "real_inference":
+            failure_record = {
+                "claim_id": f"img_level_{image_id}",
+                "image_id": image_id,
+                "coco_source_split": coco_source_split,
+                "research_split": research_split,
+                "provider": FROZEN_MODELS["vlm_model"],
+                "failure_state": "FAILED",
+                "reason_code": "INVALID_PROVENANCE",
+                "attempt_count": attempt_count,
+                "failure_class": "TERMINAL",
+                "retryable": False,
+                "last_error_class": "InvalidProvenanceError",
+                "last_error_message": f"Expected real_inference with is_synthetic=False, got source={gen_source}, is_synthetic={is_synth}",
+                "final_status": "TERMINAL_FAILURE",
+                "provenance_status": "REAL_UNLABELED",
+                "model_revision": FROZEN_MODELS["vlm_revision"],
+                "generation_config_hash": gen_config_hash,
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+            }
+            logger.warning(f"VLM returned invalid provenance for {image_id}; recorded as TYPED FAILURE.")
+            return [], failure_record, False
 
         # Strict validation: empty response is a typed failure, NEVER genuine zero
         if not caption_text or not str(caption_text).strip():
@@ -618,9 +648,16 @@ def process_single_image(
             logger.warning(f"VLM generated empty response for {image_id}; recorded as TYPED FAILURE.")
             return [], failure_record, False
 
-        # 3. Conservative claim extraction
+        # 3. Canonical conservative claim extraction via GeneratedResponseRecord
         try:
-            claims = claim_extractor.extract_claims(caption_text, image_id=image_id)
+            resp_record = GeneratedResponseRecord(
+                response_id=vlm_response.response_id,
+                image_id=image_id,
+                model_name=getattr(vlm_response, "model_name", FROZEN_MODELS["vlm_model"]),
+                response_text=caption_text,
+            )
+            report = claim_extractor.extract_from_response(resp_record)
+            claims = report.accepted_claims
         except Exception as claim_err:
             f_class, is_retry = classify_failure(claim_err)
             failure_record = {
@@ -649,31 +686,37 @@ def process_single_image(
             logger.info(f"Image {image_id}: Valid caption produced, but 0 COCO claims (GENUINE_ZERO_CLAIM).")
             return [], None, True
 
-        # 5. For each claim, extract OWL-ViT and CLIP evidence with typed failure provenance
+        # 5. Extract OWL-ViT and CLIP evidence with canonical provider methods
         for claim in claims:
-            claim_id = f"{image_id}_claim_{claim.category}"
+            claim_id = claim.claim_id
+            cat = claim.object_category
+            raw_claim_text = claim.raw_claim_text
 
-            # OWL-ViT detection
+            # OWL-ViT detection: detect_category(image_path=image_path, category=cat)
             det_score = None
             det_available = False
             det_status = "UNAVAILABLE"
             det_failure_info = None
 
             try:
-                det_result = detector_provider.detect(img, claim.category)
-                if det_result is not None:
-                    det_score = float(det_result.max_score)
+                det_result = detector_provider.detect_category(
+                    image_path=image_path,
+                    category=cat,
+                )
+                if det_result is not None and det_result.available and det_result.score is not None:
+                    det_score = float(det_result.score)
                     det_available = True
                     det_status = "AVAILABLE"
                 else:
                     det_status = "FAILED"
+                    err_msg = det_result.error if (det_result and det_result.error) else "OWL-ViT detector returned unavailable or None score"
                     det_failure_info = {
                         "provider": FROZEN_MODELS["detector_model"],
                         "revision": FROZEN_MODELS["detector_revision"],
                         "attempt_count": 1,
-                        "reason_code": "DETECTOR_RETURNED_NONE",
-                        "error_class": "NoneResultError",
-                        "error_message": "OWL-ViT returned None for claim category",
+                        "reason_code": "DETECTOR_FAILED",
+                        "error_class": "DetectorError",
+                        "error_message": str(err_msg)[:500],
                     }
             except Exception as det_err:
                 det_status = "FAILED"
@@ -687,27 +730,31 @@ def process_single_image(
                 }
                 logger.warning(f"OWL-ViT failed for {claim_id}: {det_err}")
 
-            # CLIP similarity
+            # CLIP similarity: compute_similarity(image_path=image_path, text=cat)
             clip_score = None
             clip_available = False
             clip_status = "UNAVAILABLE"
             clip_failure_info = None
 
             try:
-                clip_result = clip_provider.compute_similarity(img, claim.category)
-                if clip_result is not None:
-                    clip_score = float(clip_result.cosine_similarity)
+                clip_result = clip_provider.compute_similarity(
+                    image_path=image_path,
+                    text=cat,
+                )
+                if clip_result is not None and clip_result.available and clip_result.score is not None:
+                    clip_score = float(clip_result.score)
                     clip_available = True
                     clip_status = "AVAILABLE"
                 else:
                     clip_status = "FAILED"
+                    err_msg = clip_result.error if (clip_result and clip_result.error) else "CLIP returned unavailable or None score"
                     clip_failure_info = {
                         "provider": FROZEN_MODELS["clip_model"],
                         "revision": FROZEN_MODELS["clip_revision"],
                         "attempt_count": 1,
-                        "reason_code": "CLIP_RETURNED_NONE",
-                        "error_class": "NoneResultError",
-                        "error_message": "CLIP returned None for claim category",
+                        "reason_code": "CLIP_FAILED",
+                        "error_class": "CLIPError",
+                        "error_message": str(err_msg)[:500],
                     }
             except Exception as clip_err:
                 clip_status = "FAILED"
@@ -727,9 +774,10 @@ def process_single_image(
                 "file_name": file_name,
                 "coco_source_split": coco_source_split,
                 "research_split": research_split,
-                "object_category": claim.category,
-                "raw_claim_text": claim.surface_text,
+                "object_category": cat,
+                "raw_claim_text": raw_claim_text,
                 "raw_caption": caption_text,
+                "response_id": vlm_response.response_id,
                 "detector_score": det_score,  # float or None (null in JSON)
                 "detector_available": det_available,
                 "detector_status": det_status,
@@ -746,6 +794,13 @@ def process_single_image(
                 "claim_extractor_hash": claim_ext_hash,
                 "timestamp": datetime.now(timezone.utc).isoformat(),
             }
+            if hasattr(vlm_response, "image_hash") and vlm_response.image_hash:
+                record["image_hash"] = vlm_response.image_hash
+            if hasattr(vlm_response, "prompt_hash") and vlm_response.prompt_hash:
+                record["prompt_hash"] = vlm_response.prompt_hash
+            if hasattr(vlm_response, "execution_time_seconds"):
+                record["vlm_execution_time_seconds"] = vlm_response.execution_time_seconds
+
             evidence_records.append(record)
 
     except Exception as err:
@@ -770,8 +825,9 @@ def process_single_image(
             "timestamp": datetime.now(timezone.utc).isoformat(),
         }
         logger.error(f"Pipeline failure for {image_id}: {err}")
+        return [], failure_record, False
 
-    return evidence_records, failure_record, False
+    return evidence_records, None, False
 
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -1037,17 +1093,23 @@ def main(argv: Optional[List[str]] = None) -> None:
     from src.evidence.detector_provider import HuggingFaceDetectorProvider
     from src.evidence.clip_provider import TransformersCLIPProvider
 
-    # LLaVA on CUDA with 4-bit NF4
+    vlm_gen_config = VLMGenerationConfig.from_dict(LLAVA_GENERATION_CONFIG)
+
+    # LLaVA on CUDA with 4-bit NF4 (lazy-loaded on first inference)
     vlm_provider = LLaVA15Provider(
         model_name=FROZEN_MODELS["vlm_model"],
         model_revision=FROZEN_MODELS["vlm_revision"],
         device="cuda",
         dtype="float16",
         load_in_4bit=True,
+        quantization_type="nf4",
+        bnb_4bit_compute_dtype="float16",
+        bnb_4bit_use_double_quant=True,
+        device_map="auto",
         local_files_only=False,
         allow_download=True,
     )
-    logger.info("LLaVA-1.5-7B loaded on CUDA (4-bit NF4, fp16).")
+    logger.info("LLaVA provider initialized; model weights will lazy-load on first inference.")
 
     claim_extractor = ConservativeClaimExtractor(create_coco_category_registry())
     logger.info("Conservative claim extractor initialized.")
@@ -1058,14 +1120,14 @@ def main(argv: Optional[List[str]] = None) -> None:
         model_revision=FROZEN_MODELS["detector_revision"],
         device="cpu",
     )
-    logger.info("OWL-ViT detector loaded on CPU (M6 memory-safe policy).")
+    logger.info("OWL-ViT detector provider initialized (CPU); model weights will lazy-load on first inference.")
 
     clip_provider = TransformersCLIPProvider(
         model_name=FROZEN_MODELS["clip_model"],
         model_revision=FROZEN_MODELS["clip_revision"],
         device="cpu",
     )
-    logger.info("CLIP model loaded on CPU (M6 memory-safe policy).")
+    logger.info("CLIP provider initialized (CPU); model weights will lazy-load on first inference.")
 
     # ──────────────────────────────────────────────────────────────
     # Step 9: Process Images with Atomic Checkpointing
@@ -1100,7 +1162,11 @@ def main(argv: Optional[List[str]] = None) -> None:
             gen_config_hash=gen_cfg_hash,
             claim_ext_hash=claim_ext_hash,
             attempt_count=current_attempt,
+            vlm_gen_config=vlm_gen_config,
         )
+
+        if not failure and len(checkpoint.get("completed_image_ids", [])) == 0:
+            logger.info("First LLaVA inference successful; model weights active.")
 
         if failure:
             if img_id not in checkpoint["failed_image_ids"]:

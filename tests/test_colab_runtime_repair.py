@@ -21,6 +21,7 @@ import json
 import os
 from pathlib import Path
 import tempfile
+from typing import Optional, List, Dict, Any
 from unittest.mock import MagicMock, patch
 import copy
 import pytest
@@ -204,6 +205,101 @@ class TestResumeFailureSemantics:
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 # 4. Strict Genuine-Zero Semantics (Requirement 6)
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+class StrictFakeLLaVA:
+    def __init__(self, caption: str = "A cat on a rug.", is_synthetic: bool = False, generation_source: str = "real_inference"):
+        self.caption = caption
+        self.is_synthetic = is_synthetic
+        self.generation_source = generation_source
+
+    def generate_caption(self, image_path, prompt=None, gen_config=None, image_id=None, image_hash=None):
+        return StrictFakeVLMResponse(
+            caption=self.caption,
+            image_id=image_id or "img_test",
+            response_id=f"resp_{image_id or 'test'}",
+            model_name="llava-hf/llava-1.5-7b-hf",
+            model_revision="b234b804b114d9e37bb655e11cbbb5f5e971b7a9",
+            is_synthetic=self.is_synthetic,
+            generation_source=self.generation_source,
+        )
+
+
+class StrictFakeVLMResponse:
+    def __init__(self, caption: str, image_id: str, response_id: str, model_name: str, model_revision: str, is_synthetic: bool = False, generation_source: str = "real_inference"):
+        self.caption = caption
+        self.image_id = image_id
+        self.response_id = response_id
+        self.model_name = model_name
+        self.model_revision = model_revision
+        self.is_synthetic = is_synthetic
+        self.generation_source = generation_source
+        self.image_hash = "mock_img_hash_123"
+        self.prompt_hash = "mock_prompt_hash_456"
+        self.execution_time_seconds = 0.42
+
+
+class StrictFakeExtractedClaim:
+    def __init__(self, claim_id: str, object_category: str, raw_claim_text: str):
+        self.claim_id = claim_id
+        self.object_category = object_category
+        self.raw_claim_text = raw_claim_text
+        # Note: category and surface_text deliberately omitted
+
+
+class StrictFakeExtractionReport:
+    def __init__(self, accepted_claims: list):
+        self.accepted_claims = accepted_claims
+
+
+class StrictFakeExtractor:
+    def __init__(self, claims: list = None):
+        self.claims = claims if claims is not None else [
+            StrictFakeExtractedClaim(
+                claim_id="claim_resp_test_cat",
+                object_category="cat",
+                raw_claim_text="a cat",
+            )
+        ]
+
+    def extract_from_response(self, response_record):
+        return StrictFakeExtractionReport(accepted_claims=self.claims)
+
+
+class StrictFakeDetectorResult:
+    def __init__(self, score: Optional[float], available: bool = True, error: Optional[str] = None):
+        self.score = score
+        self.available = available
+        self.error = error
+        # Note: max_score deliberately omitted
+
+
+class StrictFakeDetector:
+    def __init__(self, score: Optional[float] = 0.92, available: bool = True, error: Optional[str] = None):
+        self.score = score
+        self.available = available
+        self.error = error
+
+    def detect_category(self, image_path, category):
+        return StrictFakeDetectorResult(score=self.score, available=self.available, error=self.error)
+
+
+class StrictFakeCLIPResult:
+    def __init__(self, score: Optional[float], available: bool = True, error: Optional[str] = None):
+        self.score = score
+        self.available = available
+        self.error = error
+        # Note: cosine_similarity deliberately omitted
+
+
+class StrictFakeCLIP:
+    def __init__(self, score: Optional[float] = 0.88, available: bool = True, error: Optional[str] = None):
+        self.score = score
+        self.available = available
+        self.error = error
+
+    def compute_similarity(self, image_path, text):
+        return StrictFakeCLIPResult(score=self.score, available=self.available, error=self.error)
+
+
 class TestStrictGenuineZeroSemantics:
     def test_empty_llava_caption_is_typed_failure(self, tmp_path):
         """Empty LLaVA response must produce a typed failure, NEVER genuine zero."""
@@ -211,11 +307,10 @@ class TestStrictGenuineZeroSemantics:
         from PIL import Image
         Image.new("RGB", (100, 100), color="blue").save(img_file)
 
-        mock_vlm = MagicMock()
-        mock_vlm.generate.return_value = "   "  # Empty / whitespace caption
-        mock_extractor = MagicMock()
-        mock_detector = MagicMock()
-        mock_clip = MagicMock()
+        fake_vlm = StrictFakeLLaVA(caption="   ")  # Whitespace-only caption
+        fake_extractor = StrictFakeExtractor()
+        fake_detector = StrictFakeDetector()
+        fake_clip = StrictFakeCLIP()
 
         records, failure, is_genuine_zero = process_single_image(
             image_id="img_001",
@@ -223,10 +318,10 @@ class TestStrictGenuineZeroSemantics:
             research_split="TRAIN",
             coco_source_split="train2017",
             file_name="test.jpg",
-            vlm_provider=mock_vlm,
-            claim_extractor=mock_extractor,
-            detector_provider=mock_detector,
-            clip_provider=mock_clip,
+            vlm_provider=fake_vlm,
+            claim_extractor=fake_extractor,
+            detector_provider=fake_detector,
+            clip_provider=fake_clip,
             gen_config_hash="g_hash",
             claim_ext_hash="ce_hash",
         )
@@ -244,12 +339,10 @@ class TestStrictGenuineZeroSemantics:
         from PIL import Image
         Image.new("RGB", (100, 100), color="blue").save(img_file)
 
-        mock_vlm = MagicMock()
-        mock_vlm.generate.return_value = "A beautiful abstract blur with no objects."
-        mock_extractor = MagicMock()
-        mock_extractor.extract_claims.return_value = []  # 0 claims extracted
-        mock_detector = MagicMock()
-        mock_clip = MagicMock()
+        fake_vlm = StrictFakeLLaVA(caption="A beautiful abstract blur with no objects.")
+        fake_extractor = StrictFakeExtractor(claims=[])  # 0 claims extracted
+        fake_detector = StrictFakeDetector()
+        fake_clip = StrictFakeCLIP()
 
         records, failure, is_genuine_zero = process_single_image(
             image_id="img_002",
@@ -257,10 +350,10 @@ class TestStrictGenuineZeroSemantics:
             research_split="TEST",
             coco_source_split="val2017",
             file_name="test.jpg",
-            vlm_provider=mock_vlm,
-            claim_extractor=mock_extractor,
-            detector_provider=mock_detector,
-            clip_provider=mock_clip,
+            vlm_provider=fake_vlm,
+            claim_extractor=fake_extractor,
+            detector_provider=fake_detector,
+            clip_provider=fake_clip,
             gen_config_hash="g_hash",
             claim_ext_hash="ce_hash",
         )
@@ -280,23 +373,10 @@ class TestTypedEvidenceFailures:
         from PIL import Image
         Image.new("RGB", (100, 100), color="blue").save(img_file)
 
-        mock_vlm = MagicMock()
-        mock_vlm.generate.return_value = "A cat sitting on a rug."
-
-        mock_claim = MagicMock()
-        mock_claim.category = "cat"
-        mock_claim.surface_text = "a cat"
-
-        mock_extractor = MagicMock()
-        mock_extractor.extract_claims.return_value = [mock_claim]
-
-        mock_detector = MagicMock()
-        mock_detector.detect.side_effect = RuntimeError("Detector CUDA execution failure")
-
-        mock_clip = MagicMock()
-        clip_res = MagicMock()
-        clip_res.cosine_similarity = 0.85
-        mock_clip.compute_similarity.return_value = clip_res
+        fake_vlm = StrictFakeLLaVA(caption="A cat sitting on a rug.")
+        fake_extractor = StrictFakeExtractor()
+        fake_detector = StrictFakeDetector(score=None, available=False, error="Simulated detector CUDA failure")
+        fake_clip = StrictFakeCLIP(score=0.85, available=True)
 
         records, failure, is_zero = process_single_image(
             image_id="img_003",
@@ -304,10 +384,10 @@ class TestTypedEvidenceFailures:
             research_split="TEST",
             coco_source_split="val2017",
             file_name="test.jpg",
-            vlm_provider=mock_vlm,
-            claim_extractor=mock_extractor,
-            detector_provider=mock_detector,
-            clip_provider=mock_clip,
+            vlm_provider=fake_vlm,
+            claim_extractor=fake_extractor,
+            detector_provider=fake_detector,
+            clip_provider=fake_clip,
             gen_config_hash="g_hash",
             claim_ext_hash="ce_hash",
         )
@@ -318,7 +398,7 @@ class TestTypedEvidenceFailures:
         assert rec["detector_available"] is False
         assert rec["detector_status"] == "FAILED"
         assert rec["detector_failure_info"] is not None
-        assert "RuntimeError" in rec["detector_failure_info"]["error_class"]
+        assert "Simulated detector CUDA failure" in rec["detector_failure_info"]["error_message"]
         # CLIP succeeded
         assert rec["clip_score"] == 0.85
         assert rec["similarity_available"] is True
@@ -754,4 +834,233 @@ class TestResumeStabilityWithAuditAndGit:
                 total_images=1,
                 resume=True,
             )
+
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# 13. Strict Provider Contract Compliance (Section 10)
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+class TestStrictProviderContracts:
+    """
+    Interface-faithful regression tests enforcing that caller uses ONLY
+    production method names and result attributes from M6 pipeline providers.
+    """
+
+    def test_strict_fakes_produce_valid_claim_evidence_record(self, tmp_path):
+        img_file = tmp_path / "test_strict.jpg"
+        from PIL import Image
+        Image.new("RGB", (100, 100), color="green").save(img_file)
+
+        vlm = StrictFakeLLaVA(caption="A cat on a rug.")
+        extractor = StrictFakeExtractor()
+        detector = StrictFakeDetector(score=0.92, available=True)
+        clip = StrictFakeCLIP(score=0.88, available=True)
+
+        records, failure, is_zero = process_single_image(
+            image_id="img_strict_001",
+            image_path=img_file,
+            research_split="TRAIN",
+            coco_source_split="train2017",
+            file_name="test_strict.jpg",
+            vlm_provider=vlm,
+            claim_extractor=extractor,
+            detector_provider=detector,
+            clip_provider=clip,
+            gen_config_hash="g_cfg_strict",
+            claim_ext_hash="c_ext_strict",
+        )
+
+        assert is_zero is False
+        assert failure is None
+        assert len(records) == 1
+
+        rec = records[0]
+        assert rec["raw_caption"] == "A cat on a rug."
+        assert rec["claim_id"] == "claim_resp_test_cat"
+        assert rec["object_category"] == "cat"
+        assert rec["raw_claim_text"] == "a cat"
+        assert rec["detector_score"] == 0.92
+        assert rec["detector_available"] is True
+        assert rec["detector_status"] == "AVAILABLE"
+        assert rec["clip_score"] == 0.88
+        assert rec["similarity_available"] is True
+        assert rec["clip_status"] == "AVAILABLE"
+        assert rec["provenance_status"] == "REAL_UNLABELED"
+
+    def test_detector_unavailable_yields_none_score(self, tmp_path):
+        img_file = tmp_path / "test_strict_det.jpg"
+        from PIL import Image
+        Image.new("RGB", (100, 100), color="green").save(img_file)
+
+        vlm = StrictFakeLLaVA(caption="A cat on a rug.")
+        extractor = StrictFakeExtractor()
+        detector = StrictFakeDetector(score=None, available=False, error="OWL-ViT execution timeout")
+        clip = StrictFakeCLIP(score=0.88, available=True)
+
+        records, failure, is_zero = process_single_image(
+            image_id="img_strict_002",
+            image_path=img_file,
+            research_split="TRAIN",
+            coco_source_split="train2017",
+            file_name="test_strict_det.jpg",
+            vlm_provider=vlm,
+            claim_extractor=extractor,
+            detector_provider=detector,
+            clip_provider=clip,
+            gen_config_hash="g_cfg_strict",
+            claim_ext_hash="c_ext_strict",
+        )
+
+        assert len(records) == 1
+        rec = records[0]
+        assert rec["detector_score"] is None
+        assert rec["detector_available"] is False
+        assert rec["detector_status"] == "FAILED"
+        assert "OWL-ViT execution timeout" in rec["detector_failure_info"]["error_message"]
+
+    def test_clip_unavailable_yields_none_score(self, tmp_path):
+        img_file = tmp_path / "test_strict_clip.jpg"
+        from PIL import Image
+        Image.new("RGB", (100, 100), color="green").save(img_file)
+
+        vlm = StrictFakeLLaVA(caption="A cat on a rug.")
+        extractor = StrictFakeExtractor()
+        detector = StrictFakeDetector(score=0.92, available=True)
+        clip = StrictFakeCLIP(score=None, available=False, error="CLIP Out of Memory")
+
+        records, failure, is_zero = process_single_image(
+            image_id="img_strict_003",
+            image_path=img_file,
+            research_split="TRAIN",
+            coco_source_split="train2017",
+            file_name="test_strict_clip.jpg",
+            vlm_provider=vlm,
+            claim_extractor=extractor,
+            detector_provider=detector,
+            clip_provider=clip,
+            gen_config_hash="g_cfg_strict",
+            claim_ext_hash="c_ext_strict",
+        )
+
+        assert len(records) == 1
+        rec = records[0]
+        assert rec["clip_score"] is None
+        assert rec["similarity_available"] is False
+        assert rec["clip_status"] == "FAILED"
+        assert "CLIP Out of Memory" in rec["clip_failure_info"]["error_message"]
+
+    def test_empty_caption_yields_vlm_empty_response(self, tmp_path):
+        img_file = tmp_path / "test_strict_empty.jpg"
+        from PIL import Image
+        Image.new("RGB", (100, 100), color="green").save(img_file)
+
+        vlm = StrictFakeLLaVA(caption="   ")
+        extractor = StrictFakeExtractor()
+        detector = StrictFakeDetector()
+        clip = StrictFakeCLIP()
+
+        records, failure, is_zero = process_single_image(
+            image_id="img_strict_004",
+            image_path=img_file,
+            research_split="TRAIN",
+            coco_source_split="train2017",
+            file_name="test_strict_empty.jpg",
+            vlm_provider=vlm,
+            claim_extractor=extractor,
+            detector_provider=detector,
+            clip_provider=clip,
+            gen_config_hash="g_cfg_strict",
+            claim_ext_hash="c_ext_strict",
+        )
+
+        assert is_zero is False
+        assert len(records) == 0
+        assert failure["reason_code"] == "VLM_EMPTY_RESPONSE"
+
+    def test_zero_accepted_claims_yields_genuine_zero(self, tmp_path):
+        img_file = tmp_path / "test_strict_zero.jpg"
+        from PIL import Image
+        Image.new("RGB", (100, 100), color="green").save(img_file)
+
+        vlm = StrictFakeLLaVA(caption="An abstract blurry landscape.")
+        extractor = StrictFakeExtractor(claims=[])
+        detector = StrictFakeDetector()
+        clip = StrictFakeCLIP()
+
+        records, failure, is_zero = process_single_image(
+            image_id="img_strict_005",
+            image_path=img_file,
+            research_split="TRAIN",
+            coco_source_split="train2017",
+            file_name="test_strict_zero.jpg",
+            vlm_provider=vlm,
+            claim_extractor=extractor,
+            detector_provider=detector,
+            clip_provider=clip,
+            gen_config_hash="g_cfg_strict",
+            claim_ext_hash="c_ext_strict",
+        )
+
+        assert is_zero is True
+        assert len(records) == 0
+        assert failure is None
+
+    def test_invalid_provenance_yields_typed_failure(self, tmp_path):
+        img_file = tmp_path / "test_strict_synth.jpg"
+        from PIL import Image
+        Image.new("RGB", (100, 100), color="green").save(img_file)
+
+        vlm = StrictFakeLLaVA(caption="A cat on a rug.", is_synthetic=True, generation_source="synthetic_fixture")
+        extractor = StrictFakeExtractor()
+        detector = StrictFakeDetector()
+        clip = StrictFakeCLIP()
+
+        records, failure, is_zero = process_single_image(
+            image_id="img_strict_006",
+            image_path=img_file,
+            research_split="TRAIN",
+            coco_source_split="train2017",
+            file_name="test_strict_synth.jpg",
+            vlm_provider=vlm,
+            claim_extractor=extractor,
+            detector_provider=detector,
+            clip_provider=clip,
+            gen_config_hash="g_cfg_strict",
+            claim_ext_hash="c_ext_strict",
+        )
+
+        assert is_zero is False
+        assert len(records) == 0
+        assert failure["reason_code"] == "INVALID_PROVENANCE"
+
+    def test_static_contract_regression_no_old_api_references(self):
+        """Assert runner source code contains no deprecated or nonexistent provider calls."""
+        runner_path = Path(__file__).resolve().parent.parent / "scripts" / "run_phase10a_r2_colab.py"
+        source = runner_path.read_text(encoding="utf-8")
+
+        forbidden_patterns = [
+            "vlm_provider.generate(",
+            "claim_extractor.extract_claims(",
+            "detector_provider.detect(",
+            ".max_score",
+            ".cosine_similarity",
+            "claim.category",
+            "claim.surface_text",
+        ]
+
+        violations = [pat for pat in forbidden_patterns if pat in source]
+        assert len(violations) == 0, f"Found forbidden deprecated API patterns in runner: {violations}"
+
+    def test_llava_provider_wrapper_delegation(self, tmp_path):
+        """LLaVAProviderWrapper must delegate to generate_caption on the underlying provider."""
+        from src.data.vlm_interface import LLaVAProviderWrapper
+        img_file = tmp_path / "wrapper_test.jpg"
+        from PIL import Image
+        Image.new("RGB", (100, 100), color="yellow").save(img_file)
+
+        fake_underlying = StrictFakeLLaVA(caption="A wrapped cat.")
+        wrapper = LLaVAProviderWrapper(underlying_provider=fake_underlying)
+
+        resp = wrapper.generate_caption(img_file, prompt="Test prompt")
+        assert resp.caption == "A wrapped cat."
+
 

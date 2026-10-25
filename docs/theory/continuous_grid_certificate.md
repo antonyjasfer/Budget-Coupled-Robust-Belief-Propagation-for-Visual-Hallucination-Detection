@@ -16,9 +16,11 @@ Define the **rigorous discretization certificate gap**:
 $$G_{\text{cert}} = \min\left( B, \, \sum_{i \in \mathcal{V}} \gamma_i \min(\epsilon_i, \Delta) \right)$$
 
 Then:
-1. For any continuous perturbation $\delta \in \mathcal{U}(B, \epsilon)$:
-   $$\left| \eta_r(\delta) - \eta_r(\hat{\delta}^*) \right| \le G_{\text{cert}}$$
-   where $\hat{\delta}^*$ is the discrete grid extremizer computed by the robust dynamic program.
+1. Let $\hat{\delta}^*$ be the discrete grid maximizer computed by the robust dynamic program. Then the gap between the continuous supremum and the grid optimum is bounded:
+   $$0 \le \sup_{\delta \in \mathcal{U}(B, \epsilon)} \eta_r(\delta) - \eta_r(\hat{\delta}^*) \le G_{\text{cert}}$$
+   (and symmetrically for the infimum and the grid minimizer).
+
+   > **Correction (Phase 0, 2026-10-25).** An earlier version stated $|\eta_r(\delta) - \eta_r(\hat{\delta}^*)| \le G_{\text{cert}}$ *for any* $\delta \in \mathcal{U}(B, \epsilon)$. That is false: e.g. $\delta = 0$ can differ from the grid maximizer by far more than $G_{\text{cert}}$. The proof below only ever bounds the gap between the continuous **supremum** and the grid optimum, which is what parts 2 and 3 use.
 2. The continuous robust extrema satisfy the sandwich bounds:
    $$\eta_{r, \text{upper, grid}} \le \sup_{\delta \in \mathcal{U}(B, \epsilon)} \eta_r(\delta) \le \eta_{r, \text{upper, grid}} + G_{\text{cert}}$$
    $$\eta_{r, \text{lower, grid}} - G_{\text{cert}} \le \inf_{\delta \in \mathcal{U}(B, \epsilon)} \eta_r(\delta) \le \eta_{r, \text{lower, grid}}$$

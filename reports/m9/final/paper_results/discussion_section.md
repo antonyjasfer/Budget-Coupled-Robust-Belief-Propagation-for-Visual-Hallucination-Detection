@@ -1,25 +1,37 @@
 # Discussion: Interpretation, Evidence, and Boundaries
 
-To maintain rigorous scientific standards, this discussion explicitly partitions findings into directly measured facts, evidence-supported interpretations, and known limitations.
+> **STATUS: DEVELOPMENT ONLY — NO EMPIRICAL FINDINGS.**
+> 0 ground-truth-labelled claims were evaluated. Nothing in this file is a
+> research result. Do not quote any number below as a finding.
+
+This file separates mathematical facts, measured quantities, and interpretations. Interpretations are written by the authors only after labelled results exist; this generator never writes them.
 
 ---
 
-### [FACT: Directly Measured Observations]
-1. **Interval Bounds**: Across all evaluated configurations, the mathematical constraint $0 \le L_i \le U_i \le 1$ held without exception, and the calculated width satisfies $w_i = U_i - L_i \ge 0$.
-2. **Interval Expansion under Budget**: Setting budget $B = 0$ reduces the robust interval to the point marginal $L_i = U_i = P(H_i = +1 \mid E)$. As budget $B$ increases, interval widths expand non-decreasingly.
-3. **Evidence Sensitivity**: A measurable fraction of claim decisions span the nominal decision threshold ($L_i < \tau < U_i$), identifying claims whose classification depends directly on evidence uncertainty.
-4. **Discretization Complexity**: Inference runtime per claim scales linearly with the numerical grid resolution $K$.
+### [FACT: Mathematical Properties (hold by construction)]
+1. $0 \le L_i \le U_i \le 1$ and $w_i = U_i - L_i \ge 0$.
+2. With $B = 0$ the interval collapses to the point marginal; widths are non-decreasing in $B$ because the uncertainty sets are nested.
+3. Root dominance: if $B \le \varepsilon_i$, then $[L_i, U_i] = [\sigma(2(\eta_i - B)), \sigma(2(\eta_i + B))]$ exactly (see docs/theory/root_dominance.md).
+4. The grid DP costs $\mathcal{O}(n K^2)$ per target node.
+
+### [FACT: Measured in this run]
+- Evaluated (ground-truth-labelled) claims: 0
+- Mean / median interval width: 0.216 / 0.177
+- Threshold-crossing rate ($L_i < \tau < U_i$): 28.3%
+- Fraction of records in the root-dominance regime: 0.840
 
 ---
 
-### [INTERPRETATION: Evidence-Based Scientific Analysis]
-1. **Uncertainty Calibration**: Wide posterior intervals correlate with evidence conflict between the object detector and the vision-language projection (CLIP), indicating that interval width serves as a valid indicator of multimodal ambiguity.
-2. **Selective Risk Reduction**: Filtering out evidence-sensitive claims before automated downstream actions reduces error rates on the retained set, supporting the utility of robust intervals for safety-critical deployment.
-3. **Graph Coupling vs. Independent Bounds**: Incorporating pairwise spatial/co-occurrence potentials enforces consistency across related objects, preventing isolated false positives that contradict connected detections.
+### [INTERPRETATION: Pending]
+No interpretation is generated automatically. Questions to answer with labelled data, each against its baseline:
+1. Does abstaining when $L_i < \tau < U_i$ beat margin abstention on the point posterior at equal coverage?
+2. Does width track real evidence shift (corruption, detector change) beyond what the point posterior already explains?
+3. Does claim coupling ($J \neq 0$) improve detection on images with 3 or more claims?
 
 ---
 
 ### [LIMITATION: Structural Boundaries and Unknowns]
-1. **Tree Topology Assumption**: Exact polynomial-time belief propagation relies on tree-structured factor graphs. Applying the method to dense cyclic graphs requires either tree-decomposition or loopy approximations.
-2. **Discretization Approximation**: The grid-based numerical solver operates at resolution $K$. While empirically stable, continuous analytical bounds may differ by $\mathcal{O}(1/K)$.
-3. **VLM and Evidence Bias**: Upstream detector miss rates or CLIP representation biases bound the quality of initial potentials; robust BP models uncertainty over given potentials but cannot recover completely missing visual primitives.
+1. **Tree Topology Assumption**: Exact inference requires a tree; cyclic dependencies must be pruned or approximated.
+2. **Discretisation**: Grid bounds are within the certificate gap $G = \min(B, \sum_i \gamma_i \min(\varepsilon_i, \Delta))$ of the continuous bounds; report $G$ with every interval.
+3. **Uncalibrated Uncertainty Set**: Unless $\varepsilon$ and $B$ are calibrated to measured evidence shifts, the interval has no coverage meaning.
+4. **Upstream Evidence**: Detector and CLIP biases bound the quality of the unary potentials; robust inference cannot recover evidence that is missing.

@@ -17,6 +17,10 @@ dependencies = [
 dev = [
     "pytest>=7.0.0",
 ]
+phase1 = [
+    "inflect>=7.0.0",
+    "pillow>=9.0.0",
+]
 vlm = [
     "torch>=2.0.0",
     "transformers>=4.36.0",

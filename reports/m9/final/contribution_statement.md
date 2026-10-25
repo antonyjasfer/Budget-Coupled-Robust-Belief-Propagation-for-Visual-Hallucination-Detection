@@ -1,10 +1,11 @@
-# Research Contribution Statement
+# Contribution Statement (DRAFT — candidate contributions, not yet supported by results)
 
-This research makes the following specific contributions to multimodal hallucination detection and probabilistic inference:
+Status of each candidate contribution. Only items marked ESTABLISHED may be claimed in a paper today.
 
-1. **Interdependent Claim Formulation**: We formulate visual hallucination detection as probabilistic inference over a factor graph of interdependent object existence claims, capturing semantic and spatial co-occurrence constraints.
-2. **Global $\ell_1$ Uncertainty Budget**: We introduce a global $\ell_1$ uncertainty budget ($B$) over multimodal evidence potentials, coupling local sensor perturbations across related visual entities.
-3. **Budget-Aware Robust Marginal Inference**: We develop a polynomial-time dynamic programming algorithm over tree topologies that computes exact worst-case posterior intervals $[L_i, U_i]$ for each claim.
-4. **Empirical Analysis of Evidence Sensitivity**: We demonstrate that claims spanning the decision threshold ($L_i < \tau < U_i$) capture multimodal ambiguity and visual degradation, providing a rigorous mechanism for selective prediction and deferral.
+1. **Exact budget DP on trees** — ESTABLISHED (mathematical). An $O(nK^2)$ dynamic program computes exact bounds over the discretised budget set on attractive trees, with a continuous certificate gap. Related prior work (credal networks, graph certification with local and global budgets) must be cited.
+2. **Root-dominance lemma** — ESTABLISHED (mathematical, numerically verified). If $B \le \varepsilon_r$, the interval is $\sigma(2(\eta_r \pm B))$; in general the graph adds at most $\gamma_{\max}(B - \varepsilon_r)_+$ to the target field.
+3. **Calibrated global budget uncertainty set with a coverage guarantee** — PLANNED (Phase 3/5). Requires the conformal construction and measured evidence shifts.
+4. **Claim-graph CRF with learned couplings for hallucination detection** — PLANNED (Phase 4). Requires labelled data and comparison with J = 0.
+5. **Empirical utility of robust intervals for selective prediction** — NOT YET SUPPORTED. Requires labelled results against margin-abstention and conformal-filter baselines.
 
-*Note: All statements reflect empirical and mathematical findings within the defined experimental scope without unsupported primacy or superiority claims.*
+Claims we must not make: "first", "guaranteed" or "certified" without stating the uncertainty set and assumptions, "multimodal" unless several evidence types are actually used in the reported run.

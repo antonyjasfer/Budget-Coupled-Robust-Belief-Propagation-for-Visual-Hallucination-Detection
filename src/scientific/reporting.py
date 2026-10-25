@@ -72,6 +72,57 @@ def _fmt(val: Optional[float], decimals: int = 3) -> str:
     return f"{val:.{decimals}f}"
 
 
+# ---------------------------------------------------------------------------
+# Evidence status helpers (Phase 0 integrity rule: no claim without data)
+# ---------------------------------------------------------------------------
+
+def _crossing_rate(istats: Dict[str, Any]) -> float:
+    """Threshold-crossing rate (L < tau < U); older stats store it as evidence_sensitive_fraction."""
+    for key in ("threshold_crossing_rate", "evidence_sensitive_fraction"):
+        val = istats.get(key)
+        if val is not None:
+            return float(val)
+    return float("nan")
+
+
+def _evaluated_claim_count(data: "M9ConsolidatedData") -> int:
+    """Largest number of ground-truth-labelled claims evaluated by any method."""
+    counts = [
+        int(m.get("evaluated_claims", 0) or 0)
+        for m in data.metrics.values()
+        if isinstance(m, dict)
+    ]
+    return max(counts) if counts else 0
+
+
+def _root_dominance_fraction(data: "M9ConsolidatedData") -> Optional[float]:
+    """Fraction of claim records with B <= eps_i.
+
+    In that regime the robust interval equals sigma(2(eta +/- B)) exactly
+    (root-dominance lemma, docs/theory/root_dominance.md), so the graph,
+    the global budget and the DP do not change the interval.
+    """
+    rows = [c for c in data.claim_results if getattr(c, "budget", None) is not None]
+    if not rows:
+        return None
+    hits = sum(1 for c in rows if float(c.budget) <= float(c.epsilon_i) + 1e-12)
+    return hits / len(rows)
+
+
+def _evidence_banner(data: "M9ConsolidatedData") -> str:
+    n_eval = _evaluated_claim_count(data)
+    if n_eval == 0:
+        return (
+            "> **STATUS: DEVELOPMENT ONLY — NO EMPIRICAL FINDINGS.**\n"
+            "> 0 ground-truth-labelled claims were evaluated. Nothing in this file is a\n"
+            "> research result. Do not quote any number below as a finding.\n"
+        )
+    return (
+        f"> **STATUS: {n_eval} ground-truth-labelled claims evaluated.** Every statement\n"
+        "> below is computed from the result files; interpretation is left to the authors.\n"
+    )
+
+
 def _write_results_section(data: M9ConsolidatedData, target_path: Path) -> None:
     m_std = data.metrics.get("standard_bp", {})
     m_rob = data.metrics.get("robust_bp", {})
@@ -80,6 +131,7 @@ def _write_results_section(data: M9ConsolidatedData, target_path: Path) -> None:
 
     content = f"""# Results: Empirical Evaluation of Budget-Coupled Robust Belief Propagation
 
+{_evidence_banner(data)}
 ## 1. Primary Classification Performance
 
 We evaluate Visual Hallucination Detection across three primary formulations:
@@ -97,46 +149,59 @@ We evaluate Visual Hallucination Detection across three primary formulations:
 
 ## 2. Robust Posterior Interval Characterization
 
-Rather than collapsing posterior uncertainty into a single scalar point estimate, Robust BP computes guaranteed upper and lower marginal bounds $[L_i, U_i]$ for each claim $i$. The interval width $w_i = U_i - L_i$ measures epistemic and evidence sensitivity.
+Robust BP computes model-based lower and upper marginal bounds $[L_i, U_i]$ for each claim $i$ over the specified uncertainty set (grid solution plus discretisation certificate). These bounds hold only for that set; they are not calibrated probabilities or confidence intervals unless the set itself is calibrated.
 
 - **Mean Interval Width**: {_fmt(istats.get('mean_width'))} ($\\pm$ {_fmt(istats.get('std_width'))})
 - **Median Interval Width**: {_fmt(istats.get('median_width'))}
 - **Observed Range**: [{_fmt(istats.get('min_width'))}, {_fmt(istats.get('max_width'))}]
-- **Evidence-Sensitive Decisions ($\\tau \\in [L_i, U_i]$)**: {istats.get('threshold_crossing_count', 0)} claims ({istats.get('threshold_crossing_rate', 0.0) * 100:.1f}%)
+- **Evidence-Sensitive Decisions ($\\tau \\in [L_i, U_i]$)**: {sum(1 for c in data.claim_results if getattr(c, 'evidence_sensitive', False))} records ({_crossing_rate(istats) * 100:.1f}%)
 
 ## 3. Evidence-Sensitive Abstention and Selective Prediction
 
-When claims exhibit $L_i \\le \\tau \\le U_i$, the classification decision is sensitive to allowable perturbations within budget $B$. Treating this condition as an abstention criterion allows the system to defer judgment on ambiguous claims, trading coverage for increased reliability on non-abstaining predictions.
+When $L_i < \\tau < U_i$, the decision can flip under some perturbation in the uncertainty set. Whether abstaining on these claims improves reliability is an empirical question that must be answered with labelled data and compared against margin abstention on the point posterior.
+
+- **Records in the root-dominance regime ($B \\le \\varepsilon_i$)**: {_fmt(_root_dominance_fraction(data) if _root_dominance_fraction(data) is not None else None, 3)} of all records. For these records the interval equals $\\sigma(2(\\eta_i \\pm B))$ exactly, so it carries no information beyond the point posterior.
 """
     target_path.write_text(content, encoding="utf-8")
 
 
 def _write_discussion_section(data: M9ConsolidatedData, target_path: Path) -> None:
-    content = """# Discussion: Interpretation, Evidence, and Boundaries
+    istats = data.interval_stats
+    rd = _root_dominance_fraction(data)
+    content = f"""# Discussion: Interpretation, Evidence, and Boundaries
 
-To maintain rigorous scientific standards, this discussion explicitly partitions findings into directly measured facts, evidence-supported interpretations, and known limitations.
-
----
-
-### [FACT: Directly Measured Observations]
-1. **Interval Bounds**: Across all evaluated configurations, the mathematical constraint $0 \\le L_i \\le U_i \\le 1$ held without exception, and the calculated width satisfies $w_i = U_i - L_i \\ge 0$.
-2. **Interval Expansion under Budget**: Setting budget $B = 0$ reduces the robust interval to the point marginal $L_i = U_i = P(H_i = +1 \\mid E)$. As budget $B$ increases, interval widths expand non-decreasingly.
-3. **Evidence Sensitivity**: A measurable fraction of claim decisions span the nominal decision threshold ($L_i < \\tau < U_i$), identifying claims whose classification depends directly on evidence uncertainty.
-4. **Discretization Complexity**: Inference runtime per claim scales linearly with the numerical grid resolution $K$.
+{_evidence_banner(data)}
+This file separates mathematical facts, measured quantities, and interpretations. Interpretations are written by the authors only after labelled results exist; this generator never writes them.
 
 ---
 
-### [INTERPRETATION: Evidence-Based Scientific Analysis]
-1. **Uncertainty Calibration**: Wide posterior intervals correlate with evidence conflict between the object detector and the vision-language projection (CLIP), indicating that interval width serves as a valid indicator of multimodal ambiguity.
-2. **Selective Risk Reduction**: Filtering out evidence-sensitive claims before automated downstream actions reduces error rates on the retained set, supporting the utility of robust intervals for safety-critical deployment.
-3. **Graph Coupling vs. Independent Bounds**: Incorporating pairwise spatial/co-occurrence potentials enforces consistency across related objects, preventing isolated false positives that contradict connected detections.
+### [FACT: Mathematical Properties (hold by construction)]
+1. $0 \\le L_i \\le U_i \\le 1$ and $w_i = U_i - L_i \\ge 0$.
+2. With $B = 0$ the interval collapses to the point marginal; widths are non-decreasing in $B$ because the uncertainty sets are nested.
+3. Root dominance: if $B \\le \\varepsilon_i$, then $[L_i, U_i] = [\\sigma(2(\\eta_i - B)), \\sigma(2(\\eta_i + B))]$ exactly (see docs/theory/root_dominance.md).
+4. The grid DP costs $\\mathcal{{O}}(n K^2)$ per target node.
+
+### [FACT: Measured in this run]
+- Evaluated (ground-truth-labelled) claims: {_evaluated_claim_count(data)}
+- Mean / median interval width: {_fmt(istats.get('mean_width'))} / {_fmt(istats.get('median_width'))}
+- Threshold-crossing rate ($L_i < \\tau < U_i$): {_crossing_rate(istats) * 100:.1f}%
+- Fraction of records in the root-dominance regime: {_fmt(rd)}
+
+---
+
+### [INTERPRETATION: Pending]
+No interpretation is generated automatically. Questions to answer with labelled data, each against its baseline:
+1. Does abstaining when $L_i < \\tau < U_i$ beat margin abstention on the point posterior at equal coverage?
+2. Does width track real evidence shift (corruption, detector change) beyond what the point posterior already explains?
+3. Does claim coupling ($J \\neq 0$) improve detection on images with 3 or more claims?
 
 ---
 
 ### [LIMITATION: Structural Boundaries and Unknowns]
-1. **Tree Topology Assumption**: Exact polynomial-time belief propagation relies on tree-structured factor graphs. Applying the method to dense cyclic graphs requires either tree-decomposition or loopy approximations.
-2. **Discretization Approximation**: The grid-based numerical solver operates at resolution $K$. While empirically stable, continuous analytical bounds may differ by $\\mathcal{O}(1/K)$.
-3. **VLM and Evidence Bias**: Upstream detector miss rates or CLIP representation biases bound the quality of initial potentials; robust BP models uncertainty over given potentials but cannot recover completely missing visual primitives.
+1. **Tree Topology Assumption**: Exact inference requires a tree; cyclic dependencies must be pruned or approximated.
+2. **Discretisation**: Grid bounds are within the certificate gap $G = \\min(B, \\sum_i \\gamma_i \\min(\\varepsilon_i, \\Delta))$ of the continuous bounds; report $G$ with every interval.
+3. **Uncalibrated Uncertainty Set**: Unless $\\varepsilon$ and $B$ are calibrated to measured evidence shifts, the interval has no coverage meaning.
+4. **Upstream Evidence**: Detector and CLIP biases bound the quality of the unary potentials; robust inference cannot recover evidence that is missing.
 """
     target_path.write_text(content, encoding="utf-8")
 
@@ -161,7 +226,7 @@ $$\tilde{\theta}_i = \theta_i + \delta_i, \quad \text{subject to } |\delta_i| \l
 Here, $B \ge 0$ enforces a **global uncertainty budget** across the entire claim graph, coupling local potential variations.
 
 ## 3. Robust Posterior Intervals
-Rather than evaluating a single point posterior, we compute guaranteed lower and upper bounds on the marginal hallucination probability:
+Rather than evaluating a single point posterior, we compute the lower and upper marginal hallucination probability over the uncertainty set (model-based bounds; their real-world meaning depends on how $\epsilon$ and $B$ are calibrated):
 $$L_i = \min_{\|\delta\|_1 \le B, |\delta_k| \le \epsilon_k} P_{\theta + \delta}(H_i = +1 \mid E)$$
 $$U_i = \max_{\|\delta\|_1 \le B, |\delta_k| \le \epsilon_k} P_{\theta + \delta}(H_i = +1 \mid E)$$
 
@@ -216,8 +281,10 @@ def _write_limitations(target_path: Path) -> None:
     content = r"""# Limitations and Scope of Validity
 
 1. **Tree Topology Assumption**: Exact tree-structured message passing requires acyclic claim factor graphs. Cyclic dependency structures must be approximated or clustered.
-2. **Grid Discretization**: Continuous worst-case budgets are solved numerically via grid discretization $K$. Grid resolution introduces a truncation error bounded by $\mathcal{O}(1/K)$.
-3. **Multimodal Model Dependence**: Detection potentials depend upon frozen upstream models (e.g. Grounding DINO, CLIP). Systematic blind spots in the upstream vision models cannot be eliminated through inference alone.
+2. **Grid Discretization**: Continuous worst-case budgets are solved on a grid with $K$ steps. The continuous bound lies within the certificate gap $G = \min(B, \sum_i \gamma_i \min(\epsilon_i, \Delta))$ of the grid value.
+3. **Multimodal Model Dependence**: Unary potentials depend on frozen upstream models (currently OWL-ViT and CLIP; note OWL-ViT is built on a CLIP backbone, so the two signals are correlated). Systematic blind spots in these models cannot be removed by inference.
+6. **Root-Dominance Regime**: When $B \le \epsilon_i$, the robust interval is a closed-form function of the point posterior, and the graph and budget have no effect on it.
+7. **Uncalibrated Uncertainty Set**: Until $\epsilon$ and $B$ are calibrated to measured evidence shifts, intervals are model-based sensitivity bounds without coverage meaning.
 4. **Sample Size & Split Independence**: Final benchmark generalization relies on zero split leakage between calibration and test partitions.
 5. **UNKNOWN Annotations**: Ambiguous claims labeled UNKNOWN are properly excluded from binary accuracy metrics to preserve scientific integrity.
 """
@@ -270,85 +337,58 @@ def _write_research_summary(data: M9ConsolidatedData, target_path: Path) -> None
     m_std = data.metrics.get("standard_bp", {})
     m_rob = data.metrics.get("robust_bp", {})
     istats = data.interval_stats
+    n_eval = _evaluated_claim_count(data)
+    ds = data.manifest.get("dataset_summary", {}) if isinstance(data.manifest, dict) else {}
+    rd = _root_dominance_fraction(data)
+    pending = "Not available: no ground-truth-labelled claims in this run." if n_eval == 0 else None
 
-    content = f"""# Final Research Summary: Budget-Coupled Robust Belief Propagation for Visual Hallucination Detection
+    content = f"""# Research Summary: Budget-Coupled Robust Belief Propagation for Visual Hallucination Detection
 
+{_evidence_banner(data)}
 ### 1. Research Problem
-Large Vision-Language Models frequently generate hallucinated object claims that conflict with image evidence. Detecting these errors requires robust multimodal reasoning that accounts for evidence ambiguity and spatial dependencies.
+Large vision-language models generate object claims that the image does not support. We study how stable a claim-level hallucination decision is when the visual evidence behind it shifts.
 
-### 2. Research Gap
-Existing methods rely on point posteriors that collapse epistemic uncertainty, failing to identify claims whose classification is sensitive to evidence noise and model calibration error.
+### 2. Method (as implemented)
+- Claims form a tree-structured Ising model; unary fields $\\theta_i$ come from detector (and optionally CLIP) evidence.
+- Uncertainty set: $|\\delta_i| \\le \\varepsilon_i$ and $\\sum_i |\\delta_i| \\le B$.
+- Output: model-based bounds $[L_i, U_i]$ over that set, computed by an exact grid DP with a discretisation certificate.
 
-### 3. Proposed Method
-We formulate hallucination verification as inference over a tree-structured pairwise factor graph and introduce **Budget-Coupled Robust Belief Propagation**, where unary evidence perturbations are constrained by a global $\\ell_1$ budget ($B$).
+### 3. Data in this run
+- Records: {ds.get('total_records', 'N/A')} · unique images: {ds.get('unique_images', 'N/A')} · unique claims: {ds.get('unique_claims', 'N/A')}
+- Ground-truth-labelled claims evaluated: {n_eval}
 
-### 4. Mathematical Formulation
-- Unary potentials: $\\theta_i$ derived from detector + CLIP evidence.
-- Global budget: $\\sum_i |\\delta_i| \\le B$ with local bounds $|\\delta_i| \\le \\epsilon_i$.
-- Output: Guaranteed marginal posterior intervals $[L_i, U_i]$ computed via dynamic programming grid discretization.
+### 4. Main Results
+{pending or f"- Standard BP accuracy {_fmt(m_std.get('accuracy'))}, F1 {_fmt(m_std.get('f1'))}, ROC-AUC {_fmt(m_std.get('roc_auc'))}" + chr(10) + f"- Robust BP accuracy {_fmt(m_rob.get('accuracy'))}, F1 {_fmt(m_rob.get('f1'))}, ROC-AUC {_fmt(m_rob.get('roc_auc'))}"}
 
-### 5. Experimental Design
-- Baselines: Evidence-only, Standard BP, Robust BP ($B=0$), Robust BP (Global $B$).
-- Ablations: Uncoupled graph ($J=0$), Box bounds ($B=\\infty$).
-- Stress Tests: Visual corruptions (blur, noise, downsampling, occlusion).
+### 5. Interval Statistics (descriptive only)
+- Mean / median width: {_fmt(istats.get('mean_width'))} / {_fmt(istats.get('median_width'))}
+- Threshold-crossing rate: {_crossing_rate(istats) * 100:.1f}%
+- Records in the root-dominance regime ($B \\le \\varepsilon_i$, interval = $\\sigma(2(\\eta \\pm B))$): {_fmt(rd)}
 
-### 6. Dataset
-- Development: 10 genuine COCO train2017 images, 15 verified claims.
-- Final: 600-image locked M7 benchmark (pending Colab annotation lock).
+### 6. Ablations, Corruption Study, Statistical Tests
+{pending or "See final_ablation_results.json, final_corruption_results.json and final_statistics.json. Conclusions are written by the authors, not by this generator."}
 
-### 7. Baselines
-- Evidence-Only Baseline
-- Standard Belief Propagation (Point Posteriors)
+### 7. Known Limitations
+Tree topology; grid resolution (certificate gap reported per interval); uncalibrated $\\varepsilon$ and $B$; correlated evidence sources (OWL-ViT uses a CLIP backbone); root-dominance regime when $B \\le \\varepsilon_i$.
 
-### 8. Main Results
-- Standard BP Accuracy: {_fmt(m_std.get('accuracy'))}, F1: {_fmt(m_std.get('f1'))}
-- Robust BP Accuracy: {_fmt(m_rob.get('accuracy'))}, F1: {_fmt(m_rob.get('f1'))}
-
-### 9. Robust-Interval Results
-- Mean Interval Width: {_fmt(istats.get('mean_width'))}
-- Threshold-Crossing Rate: {istats.get('threshold_crossing_rate', 0.0) * 100:.1f}%
-
-### 10. Ablation Results
-Ablating pairwise coupling ($J=0$) or global budget ($B=0$) demonstrates that budget coupling produces tighter, context-aware bounds compared to uncoupled box bounds.
-
-### 11. Corruption Results
-Increasing visual degradation directly leads to interval width expansion, verifying that the robust intervals capture sensor and perceptual ambiguity.
-
-### 12. Statistical Analysis
-Cluster bootstrap resampling at the image level confirms consistent behavior across splits.
-
-### 13. Computational Cost
-Inference complexity is $\\mathcal{{O}}(n K^2)$, completing in milliseconds per claim graph on commodity hardware.
-
-### 14. Error Analysis
-Deterministic error categorization identifies false hallucinations, missed detections, and evidence-conflict regimes.
-
-### 15. Limitations
-Tree topology restriction, numerical grid resolution $K$, dependence on upstream detector accuracy.
-
-### 16. Research Contribution
-An uncertainty-aware inference formulation providing certifiable posterior intervals for visual hallucination detection without heuristics.
-
-### 17. Reproducibility
-Deterministic seeds, complete provenance manifest, immutable report structure.
-
-### 18. Final Conclusion
-Globally budget-coupled robust inference successfully exposes evidence-sensitive hallucination decisions that point-posterior methods obscure, establishing a principled foundation for risk-aware vision-language verification.
+### 8. Conclusion
+No scientific conclusion is generated automatically. Conclusions require labelled results, the pre-registered tests in docs/PREREG.md, and author review.
 """
     target_path.write_text(content, encoding="utf-8")
 
 
 def _write_contribution_statement(target_path: Path) -> None:
-    content = """# Research Contribution Statement
+    content = """# Contribution Statement (DRAFT — candidate contributions, not yet supported by results)
 
-This research makes the following specific contributions to multimodal hallucination detection and probabilistic inference:
+Status of each candidate contribution. Only items marked ESTABLISHED may be claimed in a paper today.
 
-1. **Interdependent Claim Formulation**: We formulate visual hallucination detection as probabilistic inference over a factor graph of interdependent object existence claims, capturing semantic and spatial co-occurrence constraints.
-2. **Global $\\ell_1$ Uncertainty Budget**: We introduce a global $\\ell_1$ uncertainty budget ($B$) over multimodal evidence potentials, coupling local sensor perturbations across related visual entities.
-3. **Budget-Aware Robust Marginal Inference**: We develop a polynomial-time dynamic programming algorithm over tree topologies that computes exact worst-case posterior intervals $[L_i, U_i]$ for each claim.
-4. **Empirical Analysis of Evidence Sensitivity**: We demonstrate that claims spanning the decision threshold ($L_i < \\tau < U_i$) capture multimodal ambiguity and visual degradation, providing a rigorous mechanism for selective prediction and deferral.
+1. **Exact budget DP on trees** — ESTABLISHED (mathematical). An $O(nK^2)$ dynamic program computes exact bounds over the discretised budget set on attractive trees, with a continuous certificate gap. Related prior work (credal networks, graph certification with local and global budgets) must be cited.
+2. **Root-dominance lemma** — ESTABLISHED (mathematical, numerically verified). If $B \\le \\varepsilon_r$, the interval is $\\sigma(2(\\eta_r \\pm B))$; in general the graph adds at most $\\gamma_{\\max}(B - \\varepsilon_r)_+$ to the target field.
+3. **Calibrated global budget uncertainty set with a coverage guarantee** — PLANNED (Phase 3/5). Requires the conformal construction and measured evidence shifts.
+4. **Claim-graph CRF with learned couplings for hallucination detection** — PLANNED (Phase 4). Requires labelled data and comparison with J = 0.
+5. **Empirical utility of robust intervals for selective prediction** — NOT YET SUPPORTED. Requires labelled results against margin-abstention and conformal-filter baselines.
 
-*Note: All statements reflect empirical and mathematical findings within the defined experimental scope without unsupported primacy or superiority claims.*
+Claims we must not make: "first", "guaranteed" or "certified" without stating the uncertainty set and assumptions, "multimodal" unless several evidence types are actually used in the reported run.
 """
     target_path.write_text(content, encoding="utf-8")
 

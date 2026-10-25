@@ -1,5 +1,9 @@
 # Results: Empirical Evaluation of Budget-Coupled Robust Belief Propagation
 
+> **STATUS: DEVELOPMENT ONLY — NO EMPIRICAL FINDINGS.**
+> 0 ground-truth-labelled claims were evaluated. Nothing in this file is a
+> research result. Do not quote any number below as a finding.
+
 ## 1. Primary Classification Performance
 
 We evaluate Visual Hallucination Detection across three primary formulations:
@@ -17,13 +21,15 @@ We evaluate Visual Hallucination Detection across three primary formulations:
 
 ## 2. Robust Posterior Interval Characterization
 
-Rather than collapsing posterior uncertainty into a single scalar point estimate, Robust BP computes guaranteed upper and lower marginal bounds $[L_i, U_i]$ for each claim $i$. The interval width $w_i = U_i - L_i$ measures epistemic and evidence sensitivity.
+Robust BP computes model-based lower and upper marginal bounds $[L_i, U_i]$ for each claim $i$ over the specified uncertainty set (grid solution plus discretisation certificate). These bounds hold only for that set; they are not calibrated probabilities or confidence intervals unless the set itself is calibrated.
 
 - **Mean Interval Width**: 0.216 ($\pm$ 0.189)
 - **Median Interval Width**: 0.177
 - **Observed Range**: [0.000, 0.587]
-- **Evidence-Sensitive Decisions ($\tau \in [L_i, U_i]$)**: 0 claims (0.0%)
+- **Evidence-Sensitive Decisions ($\tau \in [L_i, U_i]$)**: 106 records (28.3%)
 
 ## 3. Evidence-Sensitive Abstention and Selective Prediction
 
-When claims exhibit $L_i \le \tau \le U_i$, the classification decision is sensitive to allowable perturbations within budget $B$. Treating this condition as an abstention criterion allows the system to defer judgment on ambiguous claims, trading coverage for increased reliability on non-abstaining predictions.
+When $L_i < \tau < U_i$, the decision can flip under some perturbation in the uncertainty set. Whether abstaining on these claims improves reliability is an empirical question that must be answered with labelled data and compared against margin abstention on the point posterior.
+
+- **Records in the root-dominance regime ($B \le \varepsilon_i$)**: 0.840 of all records. For these records the interval equals $\sigma(2(\eta_i \pm B))$ exactly, so it carries no information beyond the point posterior.

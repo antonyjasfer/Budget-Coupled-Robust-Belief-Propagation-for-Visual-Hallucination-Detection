@@ -22,6 +22,7 @@ import json
 import logging
 import sys
 import time
+import numpy as np
 from pathlib import Path
 from typing import List, Optional, Dict, Any
 
@@ -58,6 +59,24 @@ from scripts.validate_m8_artifacts import validate_m8_artifacts
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger("m8_runner")
 
+
+
+def _threshold_decision(p: float, threshold: float) -> str:
+    """Point decision on a posterior: hallucinated if p > threshold, else supported."""
+    return "hallucinated" if p > threshold else "supported"
+
+
+def _nominal_or_mid(out) -> float:
+    """Nominal marginal recorded by the robust solver; falls back to the score."""
+    md = getattr(out, "metadata", None) or {}
+    return float(md.get("nominal_marginal", out.hallucination_score))
+
+
+def _nominal_posterior(ctx, claim_id: str) -> float:
+    """Nominal (delta = 0) marginal of the coupled model for one claim."""
+    from src.pgm.standard_bp import compute_rooted_total_field
+    _, prob, _ = compute_rooted_total_field(ctx.model, root=ctx.claim_to_node[claim_id], delta=None)
+    return float(prob)
 
 def run_experiments(
     config_path: Optional[str] = None,
@@ -216,8 +235,9 @@ def run_experiments(
                     epsilon_scale=1.0,
                     decision_threshold=cfg.pgm.decision_threshold,
                     grid_steps=cfg.pgm.grid_steps,
-                    standard_posterior=nc.hallucination_score,
-                    standard_prediction=nc.predicted_decision.value,
+                    # Nominal (delta = 0) posterior of the SAME J = 0 model the interval comes from.
+                    standard_posterior=_nominal_or_mid(nc),
+                    standard_prediction=_threshold_decision(_nominal_or_mid(nc), cfg.pgm.decision_threshold),
                     robust_lower=nc.interval_lower or nc.hallucination_score,
                     robust_upper=nc.interval_upper or nc.hallucination_score,
                     robust_midpoint=nc.hallucination_score,
@@ -251,12 +271,14 @@ def run_experiments(
                     theta_i=float(ctx.model.theta[ctx.claim_to_node[claim.claim_id]]),
                     epsilon_i=float(ctx.model.epsilon[ctx.claim_to_node[claim.claim_id]]),
                     coupling_j=float(cfg.pgm.base_coupling_j),
-                    budget=0.0,
+                    # Box set = budget set with an inactive budget. B = 0 would mean
+                    # "no perturbation", so record B = sum_i eps_i (constraint never binds).
+                    budget=float(np.sum(ctx.model.epsilon)),
                     epsilon_scale=1.0,
                     decision_threshold=cfg.pgm.decision_threshold,
                     grid_steps=cfg.pgm.grid_steps,
-                    standard_posterior=ib.hallucination_score,
-                    standard_prediction=ib.predicted_decision.value,
+                    standard_posterior=_nominal_posterior(ctx, claim.claim_id),
+                    standard_prediction=_threshold_decision(_nominal_posterior(ctx, claim.claim_id), cfg.pgm.decision_threshold),
                     robust_lower=ib.interval_lower or ib.hallucination_score,
                     robust_upper=ib.interval_upper or ib.hallucination_score,
                     robust_midpoint=ib.hallucination_score,

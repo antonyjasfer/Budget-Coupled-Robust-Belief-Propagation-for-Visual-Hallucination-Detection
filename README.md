@@ -1,5 +1,11 @@
 # Budget-Coupled Robust Belief Propagation for Visual Hallucination Detection
 
+> **Project status (2026-10-25): research phase, no empirical findings yet.**
+> The inference software is implemented and tested, but 0 ground-truth-labelled claims have been evaluated.
+> Files under `reports/` are development outputs, not results. See `docs/PREREG.md` (hypotheses and analysis plan),
+> `docs/DECISIONS.md` (decisions log) and `docs/theory/root_dominance.md` (when the graph and budget affect the interval).
+> Engineering freeze: no new infrastructure unless an experiment is blocked without it.
+
 **Milestone 1: Mathematical Inference Core**  
 **Milestone 2: Dataset Manifests, Label-Safe Claim Schemas, and Leakage-Safe Splits**  
 **Milestone 3: Deterministic Object-Existence Claim Extraction and Raw Evidence Contracts**  

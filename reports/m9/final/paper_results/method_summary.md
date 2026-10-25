@@ -17,7 +17,7 @@ $$\tilde{\theta}_i = \theta_i + \delta_i, \quad \text{subject to } |\delta_i| \l
 Here, $B \ge 0$ enforces a **global uncertainty budget** across the entire claim graph, coupling local potential variations.
 
 ## 3. Robust Posterior Intervals
-Rather than evaluating a single point posterior, we compute guaranteed lower and upper bounds on the marginal hallucination probability:
+Rather than evaluating a single point posterior, we compute the lower and upper marginal hallucination probability over the uncertainty set (model-based bounds; their real-world meaning depends on how $\epsilon$ and $B$ are calibrated):
 $$L_i = \min_{\|\delta\|_1 \le B, |\delta_k| \le \epsilon_k} P_{\theta + \delta}(H_i = +1 \mid E)$$
 $$U_i = \max_{\|\delta\|_1 \le B, |\delta_k| \le \epsilon_k} P_{\theta + \delta}(H_i = +1 \mid E)$$
 

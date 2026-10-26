@@ -1,6 +1,6 @@
 # Pre-registration: Calibrated Robust Claim Inference for VLM Hallucination Detection
 
-**Version:** v1 · **Drafted:** 2026-10-25 · **Freeze:** tag this file's commit as `prereg-v1` after all four authors sign below.
+**Version:** v1 · **Drafted:** 2026-10-25 · **Freeze:** tag this file's commit as `prereg-v1` after the author signs below (and, optionally, the supervising faculty member).
 Any later change goes in a new version (`prereg-v2`, …) with a dated entry in `docs/DECISIONS.md` explaining why. Changes made after looking at test-split results must be reported in the paper as deviations.
 
 ## 1. Research question
@@ -23,7 +23,7 @@ Exploratory (not confirmatory): which graph topology works best; regime analysis
 - **Main:** COCO val2014 images (CHAIR protocol). Claims: object-existence mentions over the 80 COCO categories plus CHAIR synonyms. Labels: COCO instance + caption annotations (CHAIR rule).
 - **Splits (by image, seed 42, fixed before any model fitting):** train 1,500 · validation 300 · Cal-A 300 (shape of the uncertainty set) · Cal-B 400 (conformal scale) · **test 500 (locked)**.
 - **Cross-dataset:** AMBER generative split; POPE (random / popular / adversarial) as secondary.
-- **Human audit:** 400–600 claims from the test split, two independent annotators blind to model outputs, adjudication by a third; Cohen's κ reported. UNKNOWN is excluded from binary metrics and counted.
+- **Human audit:** 400–600 claims from the test split, two independent annotators blind to model outputs; Cohen's κ reported. Annotator A is the author; annotator B is a recruited volunteer (classmate or faculty member, named in the paper's acknowledgements) who labels at least a 150-claim overlap subset for κ. Disagreements are resolved by discussion with the image shown, and recorded. If no second annotator is available, the audit is reported as single-annotator label-noise estimation (agreement with CHAIR labels), and κ is not claimed. UNKNOWN is excluded from binary metrics and counted.
 - **VLMs:** LLaVA-1.5-7B (primary), plus Qwen2.5-VL-7B and one more model. Greedy decoding; prompt "Please describe this image in detail."
 - COCO annotations are never used as model features.
 
@@ -63,9 +63,7 @@ Every reported number is produced by a committed script from a committed results
 
 ## 10. Sign-off
 
-| Author | Date | Signature (initials) |
-|---|---|---|
-| A. Antony Selva Jasfer | | |
-| Nishanth | | |
-| Priyan U | | |
-| Akash Narayanan C | | |
+| Role | Name | Date | Initials |
+|---|---|---|---|
+| Author | A. Antony Selva Jasfer | | |
+| Supervisor (optional) | | | |

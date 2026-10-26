@@ -1,0 +1,207 @@
+{
+  "chair": {
+    "captions": 200,
+    "chair_i": 0.16359918200409,
+    "chair_s": 0.5
+  },
+  "n_boot": 2000,
+  "descriptives": {
+    "images_with_claims": 200,
+    "claims": 660,
+    "claims_per_image_mean": 3.3,
+    "claims_per_image_median": 3.0,
+    "share_images_with_ge3_claims": 0.6,
+    "hallucination_rate": [
+      0.27121212121212124,
+      0.23424699903887444,
+      0.3072513015336992
+    ],
+    "claims_missing_token_span": 0
+  },
+  "dependence": {
+    "within_image_corr": [
+      0.031247594928456652,
+      -0.031006224799159515,
+      0.09147145120652675
+    ],
+    "permutation_p": 0.13143428285857073
+  },
+  "signal": {
+    "owl_score": {
+      "auroc": [
+        0.8842843703178899,
+        0.8563236526954779,
+        0.9113950415143561
+      ],
+      "ece_as_probability": 0.38804830539209595
+    },
+    "clip_crop": {
+      "auroc": [
+        0.7435510284672295,
+        0.7009598437975395,
+        0.785203882081324
+      ]
+    },
+    "clip_global": {
+      "auroc": [
+        0.746628880707093,
+        0.7043727632262825,
+        0.7884340560908978
+      ]
+    },
+    "tok_logprob_mean": {
+      "auroc": [
+        0.6313313743481341,
+        0.5814723700686085,
+        0.6778903324323468
+      ]
+    }
+  },
+  "learned_unary": {
+    "features": [
+      "owl_score",
+      "clip_crop",
+      "clip_global",
+      "tok_logprob_mean"
+    ],
+    "weights_standardised": [
+      -2.216083503219161,
+      -0.32031488895067306,
+      -0.12068166330609631,
+      -0.23616638393768286,
+      -1.9571107519149487
+    ],
+    "n_cal": 332,
+    "n_eval": 328,
+    "auroc": [
+      0.8866745984533017,
+      0.84164146265232,
+      0.92364417369572
+    ],
+    "ece": 0.07090103552591982,
+    "brier": 0.11754079022177928
+  },
+  "selective": {
+    "margin_learned_J0": {
+      "aurc": [
+        0.05327926103273864,
+        0.03527553352482266,
+        0.07433792672777892
+      ],
+      "risk_at_80": 0.11068702290076336,
+      "risk_at_90": 0.13898305084745763
+    },
+    "margin_m8_point": {
+      "aurc": [
+        0.4902013867245707,
+        0.4055445159235172,
+        0.5815366163811972
+      ],
+      "risk_at_80": 0.6145038167938931,
+      "risk_at_90": 0.6203389830508474
+    },
+    "robust_m8_current": {
+      "aurc": [
+        0.4902013867245707,
+        0.4055445159235172,
+        0.5815366163811972
+      ],
+      "risk_at_80": 0.6145038167938931,
+      "risk_at_90": 0.6203389830508474
+    },
+    "box_m8": {
+      "aurc": [
+        0.46475701674725994,
+        0.386730120166567,
+        0.5477598065423948
+      ],
+      "risk_at_80": 0.6068702290076335,
+      "risk_at_90": 0.6237288135593221
+    },
+    "spearman_robust_vs_margin_m8": 1.0
+  },
+  "shifts": {
+    "blur": {
+      "abs_delta_q50": 0.3444708198277653,
+      "abs_delta_q90": 1.057308280117867,
+      "budget_to_box_ratio_q90": [
+        0.5841874919668076,
+        0.457847044759858,
+        0.6546777216180398
+      ]
+    },
+    "jpeg": {
+      "abs_delta_q50": 0.27737392477838774,
+      "abs_delta_q90": 0.9605182210513998,
+      "budget_to_box_ratio_q90": [
+        0.5389206340170213,
+        0.44334861378938156,
+        0.707634181422107
+      ]
+    },
+    "downsample": {
+      "abs_delta_q50": 0.2188581807082223,
+      "abs_delta_q90": 0.8033461404035888,
+      "budget_to_box_ratio_q90": [
+        0.5384737734552972,
+        0.44555032129227484,
+        0.6270534879639371
+      ]
+    },
+    "pooled": {
+      "budget_to_box_ratio_q90": [
+        0.518012971840134,
+        0.48188618570695024,
+        0.6008058838239733
+      ],
+      "t_box_q90": 1.4152722783872724,
+      "t_budget_per_claim_q90": 0.7331293988903484,
+      "share_images_B_gt_eps": 0.87,
+      "width_combined_vs_box": {
+        "ratio": [
+          0.9198405091892433,
+          0.899448620990679,
+          0.9377470915583126
+        ],
+        "ratio_certified": [
+          0.9251624835633919,
+          0.9052072182294227,
+          0.9426309239550545
+        ],
+        "mean_width_box": 0.6530794503187247,
+        "mean_width_combined": 0.6007289341222068,
+        "mean_width_combined_certified": 0.6042046062210862
+      }
+    }
+  },
+  "gate1": [
+    {
+      "check": "Graph exists",
+      "rule": "mean claims per image >= 4",
+      "value": "3.30",
+      "pass": false,
+      "if_fail": "Change prompt/dataset; drop H4 if still < 3"
+    },
+    {
+      "check": "Coupling is real",
+      "rule": "within-image label correlation: 95% CI lower bound > 0",
+      "value": "0.031 [-0.031, 0.091], perm p=0.1314",
+      "pass": false,
+      "if_fail": "Keep J = 0 as the main model; graph becomes an ablation"
+    },
+    {
+      "check": "Shifts not all simultaneously extreme",
+      "rule": "q90 budget/box ratio: 95% CI upper bound < 0.9",
+      "value": "0.518 [0.482, 0.601]",
+      "pass": true,
+      "if_fail": "H2 likely false; reposition around H1 + H3"
+    },
+    {
+      "check": "Signal exists",
+      "rule": "learned unary AUROC on pilot_eval: 95% CI lower bound > 0.6",
+      "value": "0.887 [0.842, 0.924]",
+      "pass": true,
+      "if_fail": "Fix evidence features before anything else"
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+# Paste each block into Zotero: select the folder, click the magic wand (Add Item by Identifier),
+# paste ALL lines of that block (Shift+Enter for new lines), press Enter.
+# Add manually with the browser Connector: ID 39 (Ihler 2005, jmlr.org) and ID 40 (Chow & Liu 1968).
+
+## 1 Closest competitors
+10.18653/v1/2025.emnlp-main.576
+arXiv:2606.16667
+10.1016/j.ijar.2025.109507
+arXiv:2411.11919
+10.18653/v1/2025.naacl-long.158
+arXiv:2604.06165
+10.5281/zenodo.23180934
+arXiv:2502.06884
+
+## 2 VLM hallucination detection
+arXiv:2509.20379
+arXiv:2609.02028
+arXiv:2607.27823
+arXiv:2606.28520
+arXiv:2406.14492
+arXiv:2303.08896
+10.1038/s41586-024-07421-0
+arXiv:2404.18930
+
+## 3 Conformal & selective prediction
+arXiv:2402.10978
+arXiv:2406.09714
+arXiv:2107.07511
+arXiv:2208.02814
+arXiv:1904.06019
+arXiv:2202.13415
+arXiv:1705.08500
+
+## 4 Robust & credal inference
+10.1016/S0004-3702(98)00089-7
+arXiv:1008.2514
+arXiv:1207.4124
+arXiv:1910.14356
+10.1145/3292500.3330905
+10.1287/opre.1030.0065
+
+## 5 Datasets & benchmarks
+arXiv:1809.02156
+arXiv:2305.10355
+arXiv:2311.07397
+arXiv:1405.0312
+arXiv:1903.12261
+arXiv:2310.03744
+arXiv:2306.09683
+arXiv:2103.00020
+arXiv:2303.05499

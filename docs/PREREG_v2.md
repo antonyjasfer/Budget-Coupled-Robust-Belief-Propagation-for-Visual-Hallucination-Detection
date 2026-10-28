@@ -19,7 +19,8 @@ Pilot evidence (exploratory, PREREG train split, `reports/phase3`, `reports/phas
 
 - **Calibration:** COCO val2014 PREREG **Cal-A ∪ Cal-B** (700 images), clean.
 - **Development:** PREREG train/validation (pilot images included); used freely for debugging only.
-- **Confirmatory test:** PREREG **test split (500 images, locked)**, evaluated once after the tag; and **AMBER generative, all 1,004 images** (labels: AMBER `truth` = present, `hallu` = verified absent; other claims excluded and counted).
+- **Confirmatory test:** PREREG **test split (500 images, locked)**, evaluated once after the tag; and **AMBER generative, 804 images** = all 1,004 minus the 200 images already used in the Phase 3b pilot (`reports/phase3b/amber/selected_ids.json`, excluded by code). Labels: AMBER `truth` = present, `hallu` = verified absent; other claims excluded and counted.
+- **Pilot exclusion:** the 200 COCO pilot images are in the PREREG train split and cannot enter the test split (`assert_pilot_isolated`); the 200 AMBER pilot images are excluded as above.
 - Seeds: PREREG splits seed 42; calibration resamples seed 0.
 
 ## 4. Shifts (applied to the test data only)
@@ -38,18 +39,23 @@ Decision rule for "violated": the image-level cluster-bootstrap 95% CI (2,000 re
 
 | ID | Hypothesis | Test |
 |---|---|---|
-| H1 | **Degradation is safe.** For every S1 condition, both filters are preserved. | Risk per condition, both filters, LLaVA source |
-| H2 | **Mechanism.** Under S1, hallucinated claims' scores are stochastically smaller than on clean images (paired), which by Proposition P1 implies validity. | Share of paired score increases < 0.5 and one-sided sign test per condition; P1 stated and proved in `docs/theory/` |
+| H1 | **Degradation is safe.** For every S1 condition, both filters are preserved. Supported by the data only if the share of supported claims kept and the abstention rate are reported for the same conditions (a filter that keeps nothing is trivially "safe"). | Risk, share of supported claims kept and abstention rate per condition, both filters, LLaVA source |
+| H2 | **Mechanism.** Under S1, hallucinated claims' scores are stochastically no larger than on clean images (P1's condition), which by Proposition P1 implies validity. | Per condition: D⁺ = max over t of [P(S̃ > t) − P(S > t)] on hallucinated test claims (one-sided KS statistic, paired cluster bootstrap); H2 supported if the 95% CI upper bound of D⁺ is ≤ 0.03. Also reported: the same difference at the calibrated τ, and the share of paired increases. P1 proved in `docs/theory/` |
 | H3 | **Evidence-source change breaks guarantees.** At least one S2 swap violates the claim-level target without recalibration. | Risk per swap |
 | H4 | **Recalibration repairs.** Recomputing τ on the new detector's scores for the same calibration claims preserves the target under S2. | Risk after recalibration |
 | H5 | **Cross-VLM transfer.** Thresholds calibrated on LLaVA claims are preserved on each S3 VLM. | Risk per VLM (reported either way) |
 | H6 | **Cross-domain transfer.** Preserved on AMBER. | Risk on AMBER |
 
-**Proposition P1 (to be proved before the tag).** If, for hallucinated claims, the shifted score is stochastically no larger than the clean score, then a threshold that is valid on clean data remains valid under the shift. **Proposition P2 (root dominance, credited to Chan & Darwiche 2002, Thm 3.3, for gain ≤ 1).** In the claim tree, coupling cannot change robust bounds when B ≤ ε_root; with the measured coupling (pilot: within-image correlation 0.031), graph-based propagation gives no measurable benefit. Reported descriptively on the test split.
+**Proposition P1 (to be proved before the tag).** Both guaranteed quantities are *unconditional* false-acceptance probabilities, not precision among kept claims.
+(a) Claim level: if the score S̃ of a hallucinated claim under the shift is stochastically no larger than its clean score S (P(S̃ > t) ≤ P(S > t) for all t), then P(S̃ > τ) ≤ P(S > τ) ≤ δ, so the clean guarantee is preserved.
+(b) Image level: the same holds with S replaced by M = the largest score among an image's hallucinated claims (M̃ stochastically ≤ M).
+No condition on supported claims is needed. The precision among kept claims (share of kept claims that are hallucinated) is **not** covered by P1: it can rise if supported claims lose more score than hallucinated ones. It is reported as a secondary metric, not a guarantee. **Proposition P2 (root dominance, credited to Chan & Darwiche 2002, Thm 3.3, for gain ≤ 1).** In the claim tree, coupling cannot change robust bounds when B ≤ ε_root; with the measured coupling (pilot: within-image correlation 0.031), graph-based propagation gives no measurable benefit. Reported descriptively on the test split.
 
 ## 6. Metrics
 
-Realised risk (both filters), share of supported claims kept, AUROC of the evidence score, CHAIR_i / CHAIR_s per VLM, paired score-shift statistics. Averages over 200 calibration resamples (80% of Cal-A ∪ Cal-B each), with image-level cluster-bootstrap CIs on the test data.
+Realised risk (both filters), share of supported claims kept, abstention rate (images with no kept claim), precision among kept claims (not guaranteed; see P1), AURC of the evidence score, AUROC, CHAIR_i / CHAIR_s per VLM, paired score-shift statistics (for P1's condition).
+
+**Graphical model (descriptive, for P2 and the PGM course deliverables).** On calibration and test data: (i) unary model with J = 0; (ii) learned attractive Ising tree over each image's claims (Chow–Liu tree, J fitted on Cal-A) with exact BP; (iii) robust BP intervals with the calibrated (ε, B). Reported: within-image label correlation, learned J, difference in AUROC and interval width between (ii)/(iii) and (i), and for each model accuracy, precision, recall, F1, ROC-AUC and confusion matrices (calibration and test, decision threshold 0.5). These are descriptive and are not hypotheses. Averages over 200 calibration resamples (80% of Cal-A ∪ Cal-B each), with image-level cluster-bootstrap CIs on the test data.
 
 ## 7. Analysis
 

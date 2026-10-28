@@ -1,0 +1,274 @@
+{
+  "settings": {
+    "n_splits": 500,
+    "cal_frac": 0.5,
+    "delta": 0.1,
+    "alpha": 0.1,
+    "beta": 0.05,
+    "seed": 0
+  },
+  "targets": {
+    "claim": 0.1,
+    "image": 0.1,
+    "claim+robust": 0.15000000000000002,
+    "image+robust": 0.15000000000000002
+  },
+  "diagnostics": {
+    "coco_llava_owlv2": {
+      "n_claims": 660,
+      "n_images": 200,
+      "hallucination_rate": 0.27121212121212124,
+      "auroc": 0.8842843703178899,
+      "median_logit_hallucinated": -2.261765523702249,
+      "median_logit_supported": -0.37607299146340134
+    },
+    "coco_llava_owlvit_v1": {
+      "n_claims": 660,
+      "n_images": 200,
+      "hallucination_rate": 0.27121212121212124,
+      "auroc": 0.8565488565488566,
+      "median_logit_hallucinated": -2.813048832382503,
+      "median_logit_supported": -0.9179554369024933,
+      "hallucinated_share_up_vs_owlv2": 0.3016759776536313
+    },
+    "coco_llava_grounding_dino": {
+      "n_claims": 660,
+      "n_images": 200,
+      "hallucination_rate": 0.27121212121212124,
+      "auroc": 0.8401142870416614,
+      "median_logit_hallucinated": -0.7602844982754856,
+      "median_logit_supported": 0.1717038558969214,
+      "hallucinated_share_up_vs_owlv2": 0.9441340782122905
+    },
+    "coco_qwen_owlv2": {
+      "n_claims": 574,
+      "n_images": 200,
+      "hallucination_rate": 0.19686411149825783,
+      "auroc": 0.8840919125410324,
+      "median_logit_hallucinated": -2.3907642290183455,
+      "median_logit_supported": -0.23804380541790476
+    },
+    "amber_llava_owlv2": {
+      "n_claims": 357,
+      "n_images": 200,
+      "hallucination_rate": 0.09523809523809523,
+      "auroc": 0.9287925696594427,
+      "median_logit_hallucinated": -3.205579586786998,
+      "median_logit_supported": 0.35211377461630605
+    }
+  },
+  "results": {
+    "claim/ref": {
+      "risk": {
+        "mean": 0.09592160400047335,
+        "q025": 0.02029187293729373,
+        "q975": 0.20689655172413793,
+        "n": 500
+      },
+      "retained_supported": {
+        "mean": 0.6134892457117185,
+        "q025": 0.5446557626473945,
+        "q975": 0.7148681502870988,
+        "n": 500
+      }
+    },
+    "image/ref": {
+      "risk": {
+        "mean": 0.09910000000000002,
+        "q025": 0.03,
+        "q975": 0.18,
+        "n": 500
+      },
+      "retained_supported": {
+        "mean": 0.6724780604944167,
+        "q025": 0.5847227461335345,
+        "q975": 0.7884241797985017,
+        "n": 500
+      }
+    },
+    "claim/swap_owlvit_v1": {
+      "risk": {
+        "mean": 0.047665779244029156,
+        "q025": 0.011106309420916163,
+        "q975": 0.0874581939799331,
+        "n": 500
+      },
+      "retained_supported": {
+        "mean": 0.45770103730176964,
+        "q025": 0.3864227723130334,
+        "q975": 0.5471992572801667,
+        "n": 500
+      }
+    },
+    "image/swap_owlvit_v1": {
+      "risk": {
+        "mean": 0.053320000000000006,
+        "q025": 0.02,
+        "q975": 0.09,
+        "n": 500
+      },
+      "retained_supported": {
+        "mean": 0.508927823544814,
+        "q025": 0.4288461538461538,
+        "q975": 0.6224275862068965,
+        "n": 500
+      }
+    },
+    "claim/swap_owlvit_v1+robust": {
+      "risk": {
+        "mean": 0.00019753416098710288,
+        "q025": 0.0,
+        "q975": 0.0,
+        "n": 500
+      },
+      "retained_supported": {
+        "mean": 0.1243390149751798,
+        "q025": 0.07276149107019245,
+        "q975": 0.21006682226318593,
+        "n": 500
+      }
+    },
+    "image/swap_owlvit_v1+robust": {
+      "risk": {
+        "mean": 0.00222,
+        "q025": 0.0,
+        "q975": 0.02,
+        "n": 500
+      },
+      "retained_supported": {
+        "mean": 0.18000531523852673,
+        "q025": 0.09572860762025401,
+        "q975": 0.3384067261241174,
+        "n": 500
+      }
+    },
+    "claim/swap_grounding_dino": {
+      "risk": {
+        "mean": 0.5280855199153486,
+        "q025": 0.360291822721598,
+        "q975": 0.8126033591731265,
+        "n": 500
+      },
+      "retained_supported": {
+        "mean": 0.9280306741629908,
+        "q025": 0.8680710565476191,
+        "q975": 0.9959104215456674,
+        "n": 500
+      }
+    },
+    "image/swap_grounding_dino": {
+      "risk": {
+        "mean": 0.41008000000000006,
+        "q025": 0.29,
+        "q975": 0.5252499999999998,
+        "n": 500
+      },
+      "retained_supported": {
+        "mean": 0.9695168031397037,
+        "q025": 0.911316026819141,
+        "q975": 1.0,
+        "n": 500
+      }
+    },
+    "claim/swap_grounding_dino+robust": {
+      "risk": {
+        "mean": 0.0,
+        "q025": 0.0,
+        "q975": 0.0,
+        "n": 500
+      },
+      "retained_supported": {
+        "mean": 0.001941109688655124,
+        "q025": 0.0,
+        "q975": 0.01663381742738589,
+        "n": 500
+      }
+    },
+    "image/swap_grounding_dino+robust": {
+      "risk": {
+        "mean": 0.0,
+        "q025": 0.0,
+        "q975": 0.0,
+        "n": 500
+      },
+      "retained_supported": {
+        "mean": 0.011963309155315639,
+        "q025": 0.0,
+        "q975": 0.05229352572621985,
+        "n": 500
+      }
+    },
+    "claim/vlm_qwen": {
+      "risk": {
+        "mean": 0.09985609741847676,
+        "q025": 0.017241379310344827,
+        "q975": 0.22132768361581917,
+        "n": 500
+      },
+      "retained_supported": {
+        "mean": 0.6329577980918876,
+        "q025": 0.5692854872039421,
+        "q975": 0.7304872284509651,
+        "n": 500
+      }
+    },
+    "image/vlm_qwen": {
+      "risk": {
+        "mean": 0.07318000000000001,
+        "q025": 0.02,
+        "q975": 0.13,
+        "n": 500
+      },
+      "retained_supported": {
+        "mean": 0.6883420842593698,
+        "q025": 0.6012759367636998,
+        "q975": 0.7961232518323297,
+        "n": 500
+      }
+    },
+    "claim/domain_amber": {
+      "risk": {
+        "mean": 0.040411764705882355,
+        "q025": 0.0,
+        "q975": 0.08823529411764706,
+        "n": 500
+      },
+      "retained_supported": {
+        "mean": 0.6551888544891641,
+        "q025": 0.631578947368421,
+        "q975": 0.7027863777089783,
+        "n": 500
+      }
+    },
+    "image/domain_amber": {
+      "risk": {
+        "mean": 0.013590000000000001,
+        "q025": 0.005,
+        "q975": 0.025,
+        "n": 500
+      },
+      "retained_supported": {
+        "mean": 0.6925448916408669,
+        "q025": 0.6470588235294118,
+        "q975": 0.7801857585139319,
+        "n": 500
+      }
+    }
+  },
+  "counts": {
+    "coco_claims_with_swap": 660,
+    "qwen_claims": 574,
+    "qwen_chair": {
+      "captions": 200,
+      "chair_i": 0.08056133056133057,
+      "chair_s": 0.425
+    },
+    "amber": {
+      "captions": 200,
+      "claims": 426,
+      "supported": 323,
+      "hallucinated": 34,
+      "unknown": 69
+    }
+  }
+}

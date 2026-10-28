@@ -1,6 +1,6 @@
 # Pre-registration v2: When do conformal hallucination guarantees survive distribution shift?
 
-**Version:** v2 (DRAFT) · **Drafted:** 2026-10-28 · **Supersedes:** `docs/PREREG.md` (v1), whose H1–H4 were tested on the pilot and are retired (see DECISIONS 2026-10-25 to 2026-10-28).
+**Version:** v2 (frozen at tag `prereg-v2`) · **Drafted:** 2026-10-28 · **Supersedes:** `docs/PREREG.md` (v1), whose H1–H4 were tested on the pilot and are retired (see DECISIONS 2026-10-25 to 2026-10-28).
 **Freeze:** the author signs Section 10; the commit is tagged `prereg-v2`. Nothing in Section 3's locked test data is computed before the tag.
 
 ## 1. Research question
@@ -29,7 +29,7 @@ Pilot evidence (exploratory, PREREG train split, `reports/phase3`, `reports/phas
 |---|---|
 | S1 Degradation | Gaussian blur, JPEG, downsample, Gaussian noise, contrast; severities 1–5 (ImageNet-C style parameters, fixed in code before the tag) |
 | S2 Detector swap | OWLv2 → OWL-ViT v1; OWLv2 → Grounding DINO (base) |
-| S3 VLM swap | LLaVA-1.5-7B → Qwen2.5-VL-7B (4-bit) and → InternVL2.5-4B (or the closest model that runs on a T4; recorded before the tag) |
+| S3 VLM swap | LLaVA-1.5-7B → Qwen2.5-VL-3B-Instruct (fp16) and → InternVL3-2B-hf (fp16); greedy, same prompt, ≤ 512 new tokens (see Section 9a) |
 | S4 Domain | COCO → AMBER |
 | S5 Semantic stress (exploratory) | inpainting-removed objects; added distractor context (defined in code before the tag; no hypothesis) |
 
@@ -61,6 +61,14 @@ Realised risk (both filters), share of supported claims kept, abstention rate (i
 
 All confirmatory tests use the locked test split and AMBER once. Holm correction across H1, H3, H4, H5, H6 within each filter. Effect sizes are always reported. Exploratory analyses (S5, severity trends, other δ) are labelled as such.
 
+## 7a. Implementation (frozen at the tag)
+
+- Code: `scripts/phase4.py`, `src/phase4/{shifts,gpu,analysis}.py`, notebook `notebooks/phase4_confirmatory.ipynb`; tests `tests/test_phase4.py`.
+- S1 parameters: `src/phase4/shifts.py` (ImageNet-C severities; noise seeded by image id and severity). S1 is also computed on Cal-A, only to calibrate (ε, B) for the descriptive robust-BP intervals.
+- S5: one supported LLaVA claim per test image whose category has COCO instance boxes; all its boxes (+10%) are filled with the image's mean colour; the claim is labelled hallucinated. Risk = share of removed objects still kept by the clean-calibrated filter.
+- Calibration resamples: 200 × 80% of Cal-A ∪ Cal-B images, seed 0; bootstrap: 2,000 image-level resamples, seed 1 (H2: seed 2).
+- Descriptive PGM: logistic unary model on the OWLv2 logit fitted on Cal-A; one shared chain coupling J ∈ [0, 2] (step 0.01) chosen by exact likelihood on Cal-A (claims in caption order); exact BP. Robust intervals on the first 150 test images (sorted ids), ε and B = 0.9 quantiles of Cal-A S1 changes in θ.
+
 ## 8. Gates
 
 | Gate | Planned date | Decides |
@@ -71,6 +79,14 @@ All confirmatory tests use the locked test split and AMBER once. Holm correction
 ## 9. Integrity rules
 
 As in v1: every number comes from a committed script and a committed results file. AI tools may write code and suggest text, never results, conclusions or citations the author has not verified. Negative results are reported.
+
+## 9a. Changes made before the tag (no test data had been generated)
+
+| Change | Reason |
+|---|---|
+| Qwen2.5-VL-7B (4-bit) → Qwen2.5-VL-3B (fp16) | 7B in 4-bit on a T4 takes about 3× longer per caption; 3B already ran in the pilot. |
+| InternVL2.5-4B → InternVL3-2B-hf | HF-native implementation (no remote code) that runs on transformers 5.x; fits a T4 in fp16. |
+| VLM caption limit 384 → 512 tokens | 44 / 200 pilot Qwen captions hit 384 tokens. |
 
 ## 10. Sign-off
 

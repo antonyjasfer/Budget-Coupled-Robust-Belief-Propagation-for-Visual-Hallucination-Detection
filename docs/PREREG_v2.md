@@ -76,5 +76,5 @@ As in v1: every number comes from a committed script and a committed results fil
 
 | Role | Name | Date | Initials |
 |---|---|---|---|
-| Author | A. Antony Selva Jasfer | | |
+| Author | A. Antony Selva Jasfer | 2026-10-28 | approved in writing ("PREREG v2 approved"); tag `prereg-v2` applied once P1 proof and Phase 4 code (shift parameters, models, S5) are committed |
 | Supervisor (optional) | | | |

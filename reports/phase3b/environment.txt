@@ -1,0 +1,3 @@
+torch 2.11.0+cu128
+transformers 5.16.1
+5032f8a99472b74a133a582e7c081a48cc7c87c3

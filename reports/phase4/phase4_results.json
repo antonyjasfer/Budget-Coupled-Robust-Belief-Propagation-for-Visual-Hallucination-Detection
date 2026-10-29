@@ -1,0 +1,4286 @@
+{
+  "counts": {
+    "cal": 2179,
+    "test": 1566,
+    "qwen": 1424,
+    "internvl": 1333,
+    "amber": 1257,
+    "s5": 496
+  },
+  "amber_counts": {
+    "claims": 1568,
+    "unknown": 311
+  },
+  "chair": {
+    "llava": {
+      "captions": 500,
+      "chair_i": 0.14458177637252084,
+      "chair_s": 0.466
+    },
+    "qwen": {
+      "captions": 500,
+      "chair_i": 0.09079878665318504,
+      "chair_s": 0.424
+    },
+    "internvl": {
+      "captions": 500,
+      "chair_i": 0.07569444444444444,
+      "chair_s": 0.284
+    }
+  },
+  "truncated_captions": {
+    "llava": 0,
+    "qwen": 47,
+    "internvl": 0
+  },
+  "levels": {
+    "0.1": {
+      "clean": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.1,
+          "point": 0.08,
+          "lo": 0.05655216631747983,
+          "hi": 0.1061123718386876,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 0.9315
+        },
+        "image_risk": {
+          "target": 0.1,
+          "point": 0.0996579476861167,
+          "lo": 0.07522811871227365,
+          "hi": 0.12562650905432596,
+          "decision": "preserved",
+          "p_preserved": 0.0145,
+          "p_violated": 0.5315
+        },
+        "supported_kept": {
+          "point": 0.5874081981212639,
+          "lo": 0.566427954312595,
+          "hi": 0.6098322557311499
+        },
+        "abstention": {
+          "point": 0.03029175050301811,
+          "lo": 0.016839285714285716,
+          "hi": 0.04526307847082495
+        },
+        "kept_hallucinated_share": {
+          "point": 0.0439221355053478,
+          "lo": 0.03066654064576518,
+          "hi": 0.05850946965444893
+        }
+      },
+      "gaussian_blur_1": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.1,
+          "point": 0.09467088607594938,
+          "lo": 0.06869496758635503,
+          "hi": 0.1245689163210572,
+          "decision": "preserved",
+          "p_preserved": 0.0115,
+          "p_violated": 0.681
+        },
+        "image_risk": {
+          "target": 0.1,
+          "point": 0.10010060362173039,
+          "lo": 0.07552238430583501,
+          "hi": 0.12465015090543258,
+          "decision": "preserved",
+          "p_preserved": 0.0095,
+          "p_violated": 0.512
+        },
+        "supported_kept": {
+          "point": 0.6163877028181042,
+          "lo": 0.5962546789310381,
+          "hi": 0.6370329592651216
+        },
+        "abstention": {
+          "point": 0.024869215291750502,
+          "lo": 0.012112424547283701,
+          "hi": 0.03878319919517102
+        },
+        "kept_hallucinated_share": {
+          "point": 0.049256768771775004,
+          "lo": 0.03504336190935569,
+          "hi": 0.0634894736526555
+        }
+      },
+      "gaussian_blur_2": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.1,
+          "point": 0.06322784810126583,
+          "lo": 0.04183641448285475,
+          "hi": 0.08669807781919851,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 0.9965
+        },
+        "image_risk": {
+          "target": 0.1,
+          "point": 0.08041247484909457,
+          "lo": 0.05723264587525151,
+          "hi": 0.10430709255533199,
+          "decision": "preserved",
+          "p_preserved": 0.0005,
+          "p_violated": 0.9475
+        },
+        "supported_kept": {
+          "point": 0.5943168232280102,
+          "lo": 0.5738764151697698,
+          "hi": 0.6156983278307655
+        },
+        "abstention": {
+          "point": 0.029637826961770624,
+          "lo": 0.015674044265593563,
+          "hi": 0.04499069416498993
+        },
+        "kept_hallucinated_share": {
+          "point": 0.034643233645896915,
+          "lo": 0.022537094191523083,
+          "hi": 0.04713670157318561
+        }
+      },
+      "gaussian_blur_3": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.1,
+          "point": 0.04915189873417721,
+          "lo": 0.02959278760621899,
+          "hi": 0.07163306210606386,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 0.9995
+        },
+        "image_risk": {
+          "target": 0.1,
+          "point": 0.05629778672032192,
+          "lo": 0.037180331991951705,
+          "hi": 0.07578571428571429,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "supported_kept": {
+          "point": 0.5487062339880444,
+          "lo": 0.5250466245051204,
+          "hi": 0.5735771881467991
+        },
+        "abstention": {
+          "point": 0.04514084507042254,
+          "lo": 0.028430080482897382,
+          "hi": 0.06397409456740442
+        },
+        "kept_hallucinated_share": {
+          "point": 0.029330009819472768,
+          "lo": 0.017479751108064916,
+          "hi": 0.042640853023779415
+        }
+      },
+      "gaussian_blur_4": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.1,
+          "point": 0.05494936708860759,
+          "lo": 0.032711726606145256,
+          "hi": 0.07692553133487975,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "image_risk": {
+          "target": 0.1,
+          "point": 0.05268611670020121,
+          "lo": 0.03419517102615694,
+          "hi": 0.07280709255533199,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "supported_kept": {
+          "point": 0.5036976942783945,
+          "lo": 0.47893606949026174,
+          "hi": 0.5288003241921769
+        },
+        "abstention": {
+          "point": 0.06478873239436621,
+          "lo": 0.04463732394366197,
+          "hi": 0.08726785714285713
+        },
+        "kept_hallucinated_share": {
+          "point": 0.03549265373200225,
+          "lo": 0.021160334723611618,
+          "hi": 0.0497082229903204
+        }
+      },
+      "gaussian_blur_5": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.1,
+          "point": 0.035924050632911396,
+          "lo": 0.018158673886789514,
+          "hi": 0.054264210246724114,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "image_risk": {
+          "target": 0.1,
+          "point": 0.04072434607645876,
+          "lo": 0.023752012072434606,
+          "hi": 0.05800905432595573,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "supported_kept": {
+          "point": 0.40820666097352687,
+          "lo": 0.3820421142027855,
+          "hi": 0.43329533272701504
+        },
+        "abstention": {
+          "point": 0.15469818913480887,
+          "lo": 0.1241939134808853,
+          "hi": 0.18703621730382292
+        },
+        "kept_hallucinated_share": {
+          "point": 0.028829744006501425,
+          "lo": 0.014673039867203549,
+          "hi": 0.04352699104020297
+        }
+      },
+      "jpeg_1": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.1,
+          "point": 0.09591139240506329,
+          "lo": 0.06606289789346902,
+          "hi": 0.12677822307371492,
+          "decision": "preserved",
+          "p_preserved": 0.0155,
+          "p_violated": 0.6325
+        },
+        "image_risk": {
+          "target": 0.1,
+          "point": 0.09624748490945674,
+          "lo": 0.07049949698189134,
+          "hi": 0.12012097585513079,
+          "decision": "preserved",
+          "p_preserved": 0.0055,
+          "p_violated": 0.623
+        },
+        "supported_kept": {
+          "point": 0.5914859094790778,
+          "lo": 0.5716891717912762,
+          "hi": 0.6126813398948922
+        },
+        "abstention": {
+          "point": 0.028843058350100606,
+          "lo": 0.015039989939637826,
+          "hi": 0.04487072434607645
+        },
+        "kept_hallucinated_share": {
+          "point": 0.05186067363435385,
+          "lo": 0.03574208877275802,
+          "hi": 0.0686109886695694
+        }
+      },
+      "jpeg_2": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.1,
+          "point": 0.06726582278481012,
+          "lo": 0.04550889363461009,
+          "hi": 0.0900738633995916,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 0.994
+        },
+        "image_risk": {
+          "target": 0.1,
+          "point": 0.08555331991951709,
+          "lo": 0.06203093561368209,
+          "hi": 0.10845321931589536,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 0.891
+        },
+        "supported_kept": {
+          "point": 0.5720281810418446,
+          "lo": 0.5498948952652961,
+          "hi": 0.5955169317315434
+        },
+        "abstention": {
+          "point": 0.04019114688128772,
+          "lo": 0.024607142857142855,
+          "hi": 0.05772660965794768
+        },
+        "kept_hallucinated_share": {
+          "point": 0.038152538357157734,
+          "lo": 0.02553662300823398,
+          "hi": 0.050555175067222416
+        }
+      },
+      "jpeg_3": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.1,
+          "point": 0.0630379746835443,
+          "lo": 0.039212204791710496,
+          "hi": 0.0871499664614899,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 0.9975
+        },
+        "image_risk": {
+          "target": 0.1,
+          "point": 0.08516096579476862,
+          "lo": 0.061597585513078465,
+          "hi": 0.10838455734406431,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 0.893
+        },
+        "supported_kept": {
+          "point": 0.5626302305721606,
+          "lo": 0.540201121106475,
+          "hi": 0.585371243841521
+        },
+        "abstention": {
+          "point": 0.042847082494969824,
+          "lo": 0.026670020120724346,
+          "hi": 0.061127012072434615
+        },
+        "kept_hallucinated_share": {
+          "point": 0.03641735162488665,
+          "lo": 0.02267885243316647,
+          "hi": 0.05023949974188591
+        }
+      },
+      "jpeg_4": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.1,
+          "point": 0.04449367088607595,
+          "lo": 0.026071671768331448,
+          "hi": 0.06588284406508205,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "image_risk": {
+          "target": 0.1,
+          "point": 0.06255533199195171,
+          "lo": 0.04290568410462777,
+          "hi": 0.08354979879275648,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 0.999
+        },
+        "supported_kept": {
+          "point": 0.5260674637062339,
+          "lo": 0.5020507613771861,
+          "hi": 0.5506963892714765
+        },
+        "abstention": {
+          "point": 0.06103621730382294,
+          "lo": 0.041687625754527155,
+          "hi": 0.08221428571428564
+        },
+        "kept_hallucinated_share": {
+          "point": 0.027738320707070704,
+          "lo": 0.01600730056331309,
+          "hi": 0.040387027233947825
+        }
+      },
+      "jpeg_5": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.1,
+          "point": 0.039227848101265825,
+          "lo": 0.02236765211741324,
+          "hi": 0.05785555474070862,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "image_risk": {
+          "target": 0.1,
+          "point": 0.05920523138832998,
+          "lo": 0.03971654929577465,
+          "hi": 0.07954099597585512,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "supported_kept": {
+          "point": 0.46033304867634495,
+          "lo": 0.43505645870667037,
+          "hi": 0.4864446145833332
+        },
+        "abstention": {
+          "point": 0.11023138832997988,
+          "lo": 0.08550251509054327,
+          "hi": 0.1372054828973843
+        },
+        "kept_hallucinated_share": {
+          "point": 0.02794182618182474,
+          "lo": 0.01585379474791333,
+          "hi": 0.041545577337765774
+        }
+      },
+      "pixelate_1": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.1,
+          "point": 0.04206329113924051,
+          "lo": 0.02475689814158036,
+          "hi": 0.06183023602356809,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "image_risk": {
+          "target": 0.1,
+          "point": 0.06611670020120725,
+          "lo": 0.04532872233400402,
+          "hi": 0.08781866197183097,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 0.9975
+        },
+        "supported_kept": {
+          "point": 0.5401793339026473,
+          "lo": 0.5180436607892528,
+          "hi": 0.5617734734991291
+        },
+        "abstention": {
+          "point": 0.04753521126760563,
+          "lo": 0.030138581488933603,
+          "hi": 0.06736644869215291
+        },
+        "kept_hallucinated_share": {
+          "point": 0.025594417443947227,
+          "lo": 0.015143298924193378,
+          "hi": 0.037292242410418716
+        }
+      },
+      "pixelate_2": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.1,
+          "point": 0.047341772151898734,
+          "lo": 0.02812541542597479,
+          "hi": 0.0681734068627451,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "image_risk": {
+          "target": 0.1,
+          "point": 0.050835010060362174,
+          "lo": 0.03262223340040242,
+          "hi": 0.07036418511066399,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "supported_kept": {
+          "point": 0.5415414175918019,
+          "lo": 0.5190778050468484,
+          "hi": 0.5647592766116941
+        },
+        "abstention": {
+          "point": 0.05037223340040241,
+          "lo": 0.032584004024144866,
+          "hi": 0.07111820925553318
+        },
+        "kept_hallucinated_share": {
+          "point": 0.02864385880262543,
+          "lo": 0.016690359605230153,
+          "hi": 0.041239868284150466
+        }
+      },
+      "pixelate_3": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.1,
+          "point": 0.03192405063291139,
+          "lo": 0.0160762651499812,
+          "hi": 0.04929440235690235,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "image_risk": {
+          "target": 0.1,
+          "point": 0.03893360160965795,
+          "lo": 0.022833501006036216,
+          "hi": 0.055032696177062364,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "supported_kept": {
+          "point": 0.5117634500426986,
+          "lo": 0.4891609023486535,
+          "hi": 0.5357063548894443
+        },
+        "abstention": {
+          "point": 0.07229376257545271,
+          "lo": 0.05129728370221327,
+          "hi": 0.09607771629778672
+        },
+        "kept_hallucinated_share": {
+          "point": 0.020608447665819558,
+          "lo": 0.010378265501861413,
+          "hi": 0.03150423649993992
+        }
+      },
+      "pixelate_4": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.1,
+          "point": 0.02210126582278481,
+          "lo": 0.009435269332452081,
+          "hi": 0.037476837826526915,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "image_risk": {
+          "target": 0.1,
+          "point": 0.039476861167002004,
+          "lo": 0.023268611670020117,
+          "hi": 0.05686242454728369,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "supported_kept": {
+          "point": 0.41307856532877885,
+          "lo": 0.3891079652600493,
+          "hi": 0.43842340285882114
+        },
+        "abstention": {
+          "point": 0.15329979879275654,
+          "lo": 0.12247283702213281,
+          "hi": 0.18442505030181083
+        },
+        "kept_hallucinated_share": {
+          "point": 0.01772786808679142,
+          "lo": 0.007353750548089994,
+          "hi": 0.029239905721592366
+        }
+      },
+      "pixelate_5": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.1,
+          "point": 0.018797468354430382,
+          "lo": 0.006985310141085549,
+          "hi": 0.03315261511784144,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "image_risk": {
+          "target": 0.1,
+          "point": 0.02551307847082495,
+          "lo": 0.013108400402414486,
+          "hi": 0.038997987927565377,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "supported_kept": {
+          "point": 0.3395602049530316,
+          "lo": 0.31429722958642636,
+          "hi": 0.36511794378053236
+        },
+        "abstention": {
+          "point": 0.2583903420523139,
+          "lo": 0.21993284708249497,
+          "hi": 0.29762952716297775
+        },
+        "kept_hallucinated_share": {
+          "point": 0.018331070238242195,
+          "lo": 0.00697998438342101,
+          "hi": 0.03185559831625001
+        }
+      },
+      "gaussian_noise_1": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.1,
+          "point": 0.09212658227848101,
+          "lo": 0.06738926729299069,
+          "hi": 0.11882375785757339,
+          "decision": "preserved",
+          "p_preserved": 0.003,
+          "p_violated": 0.732
+        },
+        "image_risk": {
+          "target": 0.1,
+          "point": 0.1070824949698189,
+          "lo": 0.08189134808853119,
+          "hi": 0.132807092555332,
+          "decision": "inconclusive",
+          "p_preserved": 0.0435,
+          "p_violated": 0.325
+        },
+        "supported_kept": {
+          "point": 0.6151409052092228,
+          "lo": 0.5930861920367791,
+          "hi": 0.6372074769433463
+        },
+        "abstention": {
+          "point": 0.03453722334004024,
+          "lo": 0.02012072434607646,
+          "hi": 0.05096629778672032
+        },
+        "kept_hallucinated_share": {
+          "point": 0.048089121471614336,
+          "lo": 0.034026818594744664,
+          "hi": 0.06177603292744671
+        }
+      },
+      "gaussian_noise_2": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.1,
+          "point": 0.08383544303797467,
+          "lo": 0.057523503549835674,
+          "hi": 0.11288968799219538,
+          "decision": "preserved",
+          "p_preserved": 0.0025,
+          "p_violated": 0.8645
+        },
+        "image_risk": {
+          "target": 0.1,
+          "point": 0.08861167002012073,
+          "lo": 0.0657867203219316,
+          "hi": 0.11329124748490946,
+          "decision": "preserved",
+          "p_preserved": 0.001,
+          "p_violated": 0.8255
+        },
+        "supported_kept": {
+          "point": 0.5872801024765159,
+          "lo": 0.5649207434457406,
+          "hi": 0.6104768739579939
+        },
+        "abstention": {
+          "point": 0.044456740442655934,
+          "lo": 0.02853848088531187,
+          "hi": 0.06333475855130782
+        },
+        "kept_hallucinated_share": {
+          "point": 0.04594073416386892,
+          "lo": 0.03149549128202281,
+          "hi": 0.06158019403199195
+        }
+      },
+      "gaussian_noise_3": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.1,
+          "point": 0.06720253164556962,
+          "lo": 0.045449842965242536,
+          "hi": 0.09306723207051658,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 0.9955
+        },
+        "image_risk": {
+          "target": 0.1,
+          "point": 0.08038229376257545,
+          "lo": 0.057974849094567404,
+          "hi": 0.10461846076458753,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 0.9415
+        },
+        "supported_kept": {
+          "point": 0.5298932536293766,
+          "lo": 0.5047257167231458,
+          "hi": 0.5564340012722647
+        },
+        "abstention": {
+          "point": 0.07906438631790745,
+          "lo": 0.05752489939637826,
+          "hi": 0.10256841046277665
+        },
+        "kept_hallucinated_share": {
+          "point": 0.04102465033614095,
+          "lo": 0.02738826442897602,
+          "hi": 0.055349043393339736
+        }
+      },
+      "gaussian_noise_4": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.1,
+          "point": 0.05579746835443038,
+          "lo": 0.034946282563364565,
+          "hi": 0.07942926252076744,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "image_risk": {
+          "target": 0.1,
+          "point": 0.06213279678068411,
+          "lo": 0.0428080985915493,
+          "hi": 0.0827771629778672,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "supported_kept": {
+          "point": 0.40246797608881296,
+          "lo": 0.37713316106709566,
+          "hi": 0.42950001115075825
+        },
+        "abstention": {
+          "point": 0.18069416498993965,
+          "lo": 0.1470105633802817,
+          "hi": 0.2139343561368209
+        },
+        "kept_hallucinated_share": {
+          "point": 0.04467597754038879,
+          "lo": 0.02778962011562311,
+          "hi": 0.06296769875986467
+        }
+      },
+      "gaussian_noise_5": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.1,
+          "point": 0.027050632911392408,
+          "lo": 0.011906565656565657,
+          "hi": 0.04489615154237794,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "image_risk": {
+          "target": 0.1,
+          "point": 0.027424547283702215,
+          "lo": 0.014526156941649899,
+          "hi": 0.04200276659959758,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "supported_kept": {
+          "point": 0.21084543125533733,
+          "lo": 0.18678266022258022,
+          "hi": 0.23643727406673795
+        },
+        "abstention": {
+          "point": 0.4798189134808853,
+          "lo": 0.43413229376257545,
+          "hi": 0.5233659456740442
+        },
+        "kept_hallucinated_share": {
+          "point": 0.041481452724343414,
+          "lo": 0.018671750575134878,
+          "hi": 0.0681577906974552
+        }
+      },
+      "contrast_1": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.1,
+          "point": 0.08921518987341773,
+          "lo": 0.06337817099567099,
+          "hi": 0.11792547592191162,
+          "decision": "preserved",
+          "p_preserved": 0.0045,
+          "p_violated": 0.7795
+        },
+        "image_risk": {
+          "target": 0.1,
+          "point": 0.1136317907444668,
+          "lo": 0.08753898390342053,
+          "hi": 0.14043988933601606,
+          "decision": "inconclusive",
+          "p_preserved": 0.1105,
+          "p_violated": 0.1525
+        },
+        "supported_kept": {
+          "point": 0.6032023911187019,
+          "lo": 0.5822291981437709,
+          "hi": 0.6253734247144289
+        },
+        "abstention": {
+          "point": 0.024476861167002012,
+          "lo": 0.012142605633802817,
+          "hi": 0.03822057344064386
+        },
+        "kept_hallucinated_share": {
+          "point": 0.047519518871613695,
+          "lo": 0.03345283360022885,
+          "hi": 0.06267700578381812
+        }
+      },
+      "contrast_2": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.1,
+          "point": 0.09637974683544304,
+          "lo": 0.06893890240884343,
+          "hi": 0.12813637376237622,
+          "decision": "preserved",
+          "p_preserved": 0.019,
+          "p_violated": 0.5965
+        },
+        "image_risk": {
+          "target": 0.1,
+          "point": 0.10625754527162978,
+          "lo": 0.08175930583501008,
+          "hi": 0.1322540241448692,
+          "decision": "inconclusive",
+          "p_preserved": 0.0345,
+          "p_violated": 0.317
+        },
+        "supported_kept": {
+          "point": 0.6120836891545688,
+          "lo": 0.5906420377031538,
+          "hi": 0.6336830611677942
+        },
+        "abstention": {
+          "point": 0.0230784708249497,
+          "lo": 0.011428571428571429,
+          "hi": 0.03638983903420523
+        },
+        "kept_hallucinated_share": {
+          "point": 0.05043586550435866,
+          "lo": 0.036079273447176374,
+          "hi": 0.06671229426685095
+        }
+      },
+      "contrast_3": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.1,
+          "point": 0.07746835443037974,
+          "lo": 0.053372524442999676,
+          "hi": 0.10323128676196856,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 0.947
+        },
+        "image_risk": {
+          "target": 0.1,
+          "point": 0.09659959758551308,
+          "lo": 0.07307645875251507,
+          "hi": 0.12180835010060359,
+          "decision": "preserved",
+          "p_preserved": 0.003,
+          "p_violated": 0.623
+        },
+        "supported_kept": {
+          "point": 0.599133219470538,
+          "lo": 0.5772517127488085,
+          "hi": 0.6216527618532395
+        },
+        "abstention": {
+          "point": 0.025824949698189135,
+          "lo": 0.012944919517102617,
+          "hi": 0.03979024144869214
+        },
+        "kept_hallucinated_share": {
+          "point": 0.04179271632169465,
+          "lo": 0.028384032786082848,
+          "hi": 0.05618901646762508
+        }
+      },
+      "contrast_4": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.1,
+          "point": 0.061253164556962024,
+          "lo": 0.040599221553895434,
+          "hi": 0.08392206257503002,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "image_risk": {
+          "target": 0.1,
+          "point": 0.07480885311871227,
+          "lo": 0.05347837022132796,
+          "hi": 0.09815291750503016,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 0.9815
+        },
+        "supported_kept": {
+          "point": 0.5534201537147737,
+          "lo": 0.531622908454868,
+          "hi": 0.5769679612554718
+        },
+        "abstention": {
+          "point": 0.060140845070422534,
+          "lo": 0.040631539235412475,
+          "hi": 0.08067404426559356
+        },
+        "kept_hallucinated_share": {
+          "point": 0.035991074748977316,
+          "lo": 0.023208226469529893,
+          "hi": 0.0493431647241822
+        }
+      },
+      "contrast_5": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.1,
+          "point": 0.04291139240506329,
+          "lo": 0.02410993451591512,
+          "hi": 0.06552882383966245,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "image_risk": {
+          "target": 0.1,
+          "point": 0.047665995975855135,
+          "lo": 0.02958576458752515,
+          "hi": 0.06582645875251508,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "supported_kept": {
+          "point": 0.3574978650725875,
+          "lo": 0.3304388231513685,
+          "hi": 0.3851896778674921
+        },
+        "abstention": {
+          "point": 0.26186116700201206,
+          "lo": 0.22355105633802813,
+          "hi": 0.3017454728370221
+        },
+        "kept_hallucinated_share": {
+          "point": 0.038913632398181734,
+          "lo": 0.021595441501737256,
+          "hi": 0.058137011862693246
+        }
+      },
+      "swap_owlvit_v1": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.1,
+          "point": 0.011772151898734179,
+          "lo": 0.0027127597254479096,
+          "hi": 0.022527157977185082,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "image_risk": {
+          "target": 0.1,
+          "point": 0.018923541247484913,
+          "lo": 0.008329225352112675,
+          "hi": 0.031017354124748483,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "supported_kept": {
+          "point": 0.5236421861656704,
+          "lo": 0.49451459030212,
+          "hi": 0.5542963345864661
+        },
+        "abstention": {
+          "point": 0.10279678068410462,
+          "lo": 0.07831388329979878,
+          "hi": 0.12878546277665995
+        },
+        "kept_hallucinated_share": {
+          "point": 0.007526281288693583,
+          "lo": 0.0016344708195226735,
+          "hi": 0.01432213276215984
+        }
+      },
+      "swap_owlvit_v1+recalibrated": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.1,
+          "point": 0.029632911392405065,
+          "lo": 0.01479840544329211,
+          "hi": 0.046027991639454986,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "image_risk": {
+          "target": 0.1,
+          "point": 0.0414989939637827,
+          "lo": 0.02593335010060362,
+          "hi": 0.058552313883299796,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "supported_kept": {
+          "point": 0.6059906063193852,
+          "lo": 0.5790360986316183,
+          "hi": 0.6354932648943745
+        },
+        "abstention": {
+          "point": 0.06943661971830986,
+          "lo": 0.04789738430583501,
+          "hi": 0.09301886317907444
+        },
+        "kept_hallucinated_share": {
+          "point": 0.01622719458770033,
+          "lo": 0.007900577754934659,
+          "hi": 0.025425417790501868
+        }
+      },
+      "swap_grounding_dino": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.1,
+          "point": 0.6086708860759494,
+          "lo": 0.5583166558674079,
+          "hi": 0.6566251247992994,
+          "decision": "violated",
+          "p_preserved": 1.0,
+          "p_violated": 0.0
+        },
+        "image_risk": {
+          "target": 0.1,
+          "point": 0.40869215291750505,
+          "lo": 0.36523868209255533,
+          "hi": 0.44972183098591545,
+          "decision": "violated",
+          "p_preserved": 1.0,
+          "p_violated": 0.0
+        },
+        "supported_kept": {
+          "point": 0.9697011101622545,
+          "lo": 0.9593128826141856,
+          "hi": 0.979089731624357
+        },
+        "abstention": {
+          "point": 0.0,
+          "lo": 0.0,
+          "hi": 0.0
+        },
+        "kept_hallucinated_share": {
+          "point": 0.17473445522895176,
+          "lo": 0.15386509715375607,
+          "hi": 0.1934299962383304
+        }
+      },
+      "swap_grounding_dino+recalibrated": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.1,
+          "point": 0.08737974683544304,
+          "lo": 0.05962459033213144,
+          "hi": 0.11666723901098901,
+          "decision": "preserved",
+          "p_preserved": 0.0035,
+          "p_violated": 0.8075
+        },
+        "image_risk": {
+          "target": 0.1,
+          "point": 0.08274647887323944,
+          "lo": 0.05968737424547284,
+          "hi": 0.10670221327967806,
+          "decision": "preserved",
+          "p_preserved": 0.0005,
+          "p_violated": 0.9275
+        },
+        "supported_kept": {
+          "point": 0.5991588385994876,
+          "lo": 0.5713074979924346,
+          "hi": 0.6289358719695245
+        },
+        "abstention": {
+          "point": 0.03561368209255533,
+          "lo": 0.02088506036217304,
+          "hi": 0.052515593561368215
+        },
+        "kept_hallucinated_share": {
+          "point": 0.04688709874614539,
+          "lo": 0.0320780537357874,
+          "hi": 0.06277088864015176
+        }
+      },
+      "vlm_qwen": {
+        "n_images": 497,
+        "n_hallucinated": 301,
+        "n_supported": 1123,
+        "claim_risk": {
+          "target": 0.1,
+          "point": 0.12943521594684385,
+          "lo": 0.09416074115988055,
+          "hi": 0.1653461466165413,
+          "decision": "inconclusive",
+          "p_preserved": 0.4835,
+          "p_violated": 0.0555
+        },
+        "image_risk": {
+          "target": 0.1,
+          "point": 0.09304828973843059,
+          "lo": 0.0697248490945674,
+          "hi": 0.11872334004024146,
+          "decision": "preserved",
+          "p_preserved": 0.0035,
+          "p_violated": 0.7065
+        },
+        "supported_kept": {
+          "point": 0.604154051647373,
+          "lo": 0.5821186593902552,
+          "hi": 0.6254179607290568
+        },
+        "abstention": {
+          "point": 0.06032193158953723,
+          "lo": 0.04065140845070422,
+          "hi": 0.08144441649899392
+        },
+        "kept_hallucinated_share": {
+          "point": 0.05430532808307489,
+          "lo": 0.03825401818145931,
+          "hi": 0.07021037685604407
+        }
+      },
+      "vlm_internvl": {
+        "n_images": 497,
+        "n_hallucinated": 187,
+        "n_supported": 1146,
+        "claim_risk": {
+          "target": 0.1,
+          "point": 0.16008021390374333,
+          "lo": 0.11151552523942537,
+          "hi": 0.2076130268088453,
+          "decision": "violated",
+          "p_preserved": 0.8955,
+          "p_violated": 0.0055
+        },
+        "image_risk": {
+          "target": 0.1,
+          "point": 0.07434607645875252,
+          "lo": 0.053026659959758554,
+          "hi": 0.0980193661971831,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 0.9825
+        },
+        "supported_kept": {
+          "point": 0.6017582897033159,
+          "lo": 0.5798777879196763,
+          "hi": 0.6240087626053726
+        },
+        "abstention": {
+          "point": 0.048189134808853125,
+          "lo": 0.029787726358148893,
+          "hi": 0.0681803319919517
+        },
+        "kept_hallucinated_share": {
+          "point": 0.04160239038287819,
+          "lo": 0.028455029182416457,
+          "hi": 0.05607077262656049
+        }
+      },
+      "domain_amber": {
+        "n_images": 727,
+        "n_hallucinated": 112,
+        "n_supported": 1145,
+        "claim_risk": {
+          "target": 0.1,
+          "point": 0.03633928571428572,
+          "lo": 0.008401610644257703,
+          "hi": 0.07393918105178642,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 0.9985
+        },
+        "image_risk": {
+          "target": 0.1,
+          "point": 0.007221458046767538,
+          "lo": 0.0017125171939477303,
+          "hi": 0.013769257221458045,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "supported_kept": {
+          "point": 0.683353711790393,
+          "lo": 0.6619664921081905,
+          "hi": 0.7042295916282567
+        },
+        "abstention": {
+          "point": 0.1522283356258597,
+          "lo": 0.12809370701513068,
+          "hi": 0.17879969050894087
+        },
+        "kept_hallucinated_share": {
+          "point": 0.005174759380046027,
+          "lo": 0.0012239688081104076,
+          "hi": 0.010383105183044602
+        }
+      },
+      "s5_object_removed": {
+        "n_images": 496,
+        "n_hallucinated": 496,
+        "n_supported": 0,
+        "claim_risk": {
+          "target": 0.1,
+          "point": 0.10455645161290322,
+          "lo": 0.0785680443548387,
+          "hi": 0.13223840725806452,
+          "decision": "inconclusive",
+          "p_preserved": 0.037,
+          "p_violated": 0.3655
+        },
+        "image_risk": {
+          "target": 0.1,
+          "point": 0.1415625,
+          "lo": 0.11213684475806453,
+          "hi": 0.17399899193548382,
+          "decision": "violated",
+          "p_preserved": 0.7735,
+          "p_violated": 0.0035
+        },
+        "supported_kept": {
+          "point": NaN,
+          "lo": NaN,
+          "hi": NaN
+        },
+        "abstention": {
+          "point": 0.8584375,
+          "lo": 0.826001008064516,
+          "hi": 0.8878631552419355
+        },
+        "kept_hallucinated_share": {
+          "point": 1.0,
+          "lo": 1.0,
+          "hi": 1.0
+        }
+      }
+    },
+    "0.05": {
+      "clean": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.05,
+          "point": 0.026886075949367087,
+          "lo": 0.013066739901325933,
+          "hi": 0.04283253710285214,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 0.9975
+        },
+        "image_risk": {
+          "target": 0.05,
+          "point": 0.04168008048289738,
+          "lo": 0.026547283702213282,
+          "hi": 0.05872459758551307,
+          "decision": "preserved",
+          "p_preserved": 0.0005,
+          "p_violated": 0.8385
+        },
+        "supported_kept": {
+          "point": 0.4719854824935952,
+          "lo": 0.4488818081077058,
+          "hi": 0.49588946638158493
+        },
+        "abstention": {
+          "point": 0.06509054325955735,
+          "lo": 0.04562374245472837,
+          "hi": 0.08679175050301811
+        },
+        "kept_hallucinated_share": {
+          "point": 0.018852684554822786,
+          "lo": 0.00910636466287975,
+          "hi": 0.03022561077317296
+        }
+      },
+      "gaussian_blur_1": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.05,
+          "point": 0.025936708860759498,
+          "lo": 0.012576970996234452,
+          "hi": 0.04126570275667888,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 0.9985
+        },
+        "image_risk": {
+          "target": 0.05,
+          "point": 0.03346076458752515,
+          "lo": 0.018822434607645877,
+          "hi": 0.0498075955734406,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 0.975
+        },
+        "supported_kept": {
+          "point": 0.4938514090520922,
+          "lo": 0.4711303624176691,
+          "hi": 0.5177346347176919
+        },
+        "abstention": {
+          "point": 0.04663983903420523,
+          "lo": 0.02964738430583501,
+          "hi": 0.06455860160965794
+        },
+        "kept_hallucinated_share": {
+          "point": 0.017407335038102437,
+          "lo": 0.008420303762591848,
+          "hi": 0.028501900745152565
+        }
+      },
+      "gaussian_blur_2": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.05,
+          "point": 0.015240506329113923,
+          "lo": 0.004782854680265644,
+          "hi": 0.028135882208447104,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "image_risk": {
+          "target": 0.05,
+          "point": 0.02143863179074447,
+          "lo": 0.009939386317907445,
+          "hi": 0.03302037223340039,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "supported_kept": {
+          "point": 0.46820666097352687,
+          "lo": 0.4458413672210723,
+          "hi": 0.4912608417919207
+        },
+        "abstention": {
+          "point": 0.06975855130784708,
+          "lo": 0.04907369215291751,
+          "hi": 0.09180558350100601
+        },
+        "kept_hallucinated_share": {
+          "point": 0.010860740767468293,
+          "lo": 0.003518854353789696,
+          "hi": 0.01987177112776569
+        }
+      },
+      "gaussian_blur_3": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.05,
+          "point": 0.016025316455696204,
+          "lo": 0.005633552423186569,
+          "hi": 0.0288556780475422,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "image_risk": {
+          "target": 0.05,
+          "point": 0.027837022132796783,
+          "lo": 0.014967806841046276,
+          "hi": 0.04199220321931589,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 0.999
+        },
+        "supported_kept": {
+          "point": 0.4245602049530316,
+          "lo": 0.40093653973729115,
+          "hi": 0.4481359148730034
+        },
+        "abstention": {
+          "point": 0.10785714285714285,
+          "lo": 0.0821202213279678,
+          "hi": 0.13581639839034204
+        },
+        "kept_hallucinated_share": {
+          "point": 0.012572245724840612,
+          "lo": 0.00445259821014125,
+          "hi": 0.022428345847340964
+        }
+      },
+      "gaussian_blur_4": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.05,
+          "point": 0.013189873417721518,
+          "lo": 0.003288226938502674,
+          "hi": 0.02549805276894217,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "image_risk": {
+          "target": 0.05,
+          "point": 0.024466800804828975,
+          "lo": 0.012363933601609657,
+          "hi": 0.03712449698189133,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "supported_kept": {
+          "point": 0.3861272416737831,
+          "lo": 0.3616913347733459,
+          "hi": 0.41035101510027533
+        },
+        "abstention": {
+          "point": 0.15650905432595572,
+          "lo": 0.1271426056338028,
+          "hi": 0.1878382796780684
+        },
+        "kept_hallucinated_share": {
+          "point": 0.011391339520951537,
+          "lo": 0.0027297348289983705,
+          "hi": 0.02163270557608324
+        }
+      },
+      "gaussian_blur_5": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.05,
+          "point": 0.011088607594936708,
+          "lo": 0.0027153587782253303,
+          "hi": 0.021826316228758382,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "image_risk": {
+          "target": 0.05,
+          "point": 0.019114688128772636,
+          "lo": 0.008057847082494969,
+          "hi": 0.03173390342052312,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "supported_kept": {
+          "point": 0.28713065755764305,
+          "lo": 0.26362189440993794,
+          "hi": 0.3117745589870256
+        },
+        "abstention": {
+          "point": 0.3095674044265594,
+          "lo": 0.2719939637826962,
+          "hi": 0.3509489436619719
+        },
+        "kept_hallucinated_share": {
+          "point": 0.012859281876633098,
+          "lo": 0.003117023176594805,
+          "hi": 0.025610040408487526
+        }
+      },
+      "jpeg_1": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.05,
+          "point": 0.024,
+          "lo": 0.009090790410633752,
+          "hi": 0.039972768348889784,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 0.9975
+        },
+        "image_risk": {
+          "target": 0.05,
+          "point": 0.0373943661971831,
+          "lo": 0.02183853118712274,
+          "hi": 0.05354149899396378,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 0.937
+        },
+        "supported_kept": {
+          "point": 0.4743680614859095,
+          "lo": 0.4523002403383676,
+          "hi": 0.4970185782722856
+        },
+        "abstention": {
+          "point": 0.0663682092555332,
+          "lo": 0.04609381287726358,
+          "hi": 0.0890746981891348
+        },
+        "kept_hallucinated_share": {
+          "point": 0.0167798005186162,
+          "lo": 0.006518674345061285,
+          "hi": 0.028008586484392077
+        }
+      },
+      "jpeg_2": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.05,
+          "point": 0.012556962025316459,
+          "lo": 0.0037207287589224036,
+          "hi": 0.02322429889704116,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "image_risk": {
+          "target": 0.05,
+          "point": 0.02286720321931589,
+          "lo": 0.010713028169014085,
+          "hi": 0.03594617706237424,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "supported_kept": {
+          "point": 0.464128949615713,
+          "lo": 0.4407715411707398,
+          "hi": 0.4873933306836944
+        },
+        "abstention": {
+          "point": 0.07719315895372234,
+          "lo": 0.05512047283702213,
+          "hi": 0.10134934607645876
+        },
+        "kept_hallucinated_share": {
+          "point": 0.009043586073606771,
+          "lo": 0.0026236406964598477,
+          "hi": 0.016577135016998482
+        }
+      },
+      "jpeg_3": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.05,
+          "point": 0.010430379746835442,
+          "lo": 0.0022164935260463718,
+          "hi": 0.021024109121909627,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "image_risk": {
+          "target": 0.05,
+          "point": 0.02427565392354125,
+          "lo": 0.011929577464788732,
+          "hi": 0.037839537223340027,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 0.9995
+        },
+        "supported_kept": {
+          "point": 0.4499017933390265,
+          "lo": 0.4276139643357344,
+          "hi": 0.47231443054777034
+        },
+        "abstention": {
+          "point": 0.09244466800804829,
+          "lo": 0.06948692152917506,
+          "hi": 0.11886443661971831
+        },
+        "kept_hallucinated_share": {
+          "point": 0.0077596029795368735,
+          "lo": 0.0016716069803147887,
+          "hi": 0.015605151957546132
+        }
+      },
+      "jpeg_4": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.05,
+          "point": 0.01110126582278481,
+          "lo": 0.0029049247418149854,
+          "hi": 0.022631787040594188,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "image_risk": {
+          "target": 0.05,
+          "point": 0.020372233400402416,
+          "lo": 0.008631790744466801,
+          "hi": 0.03367278672032192,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "supported_kept": {
+          "point": 0.41230999146029035,
+          "lo": 0.39006197478991594,
+          "hi": 0.4357577576534151
+        },
+        "abstention": {
+          "point": 0.11032193158953722,
+          "lo": 0.0849011569416499,
+          "hi": 0.13832545271629776
+        },
+        "kept_hallucinated_share": {
+          "point": 0.009000410509031198,
+          "lo": 0.002345574917757043,
+          "hi": 0.018184030719925692
+        }
+      },
+      "jpeg_5": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.05,
+          "point": 0.01048101265822785,
+          "lo": 0.0024326492471525795,
+          "hi": 0.02160177897574123,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "image_risk": {
+          "target": 0.05,
+          "point": 0.015462776659959758,
+          "lo": 0.005812625754527164,
+          "hi": 0.026248239436619716,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "supported_kept": {
+          "point": 0.3401494449188728,
+          "lo": 0.31751465398863127,
+          "hi": 0.36329027533651215
+        },
+        "abstention": {
+          "point": 0.19501006036217305,
+          "lo": 0.16132796780684105,
+          "hi": 0.23127917505030182
+        },
+        "kept_hallucinated_share": {
+          "point": 0.010286864369929557,
+          "lo": 0.0024752322409666693,
+          "hi": 0.02049771528260502
+        }
+      },
+      "pixelate_1": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.05,
+          "point": 0.0110126582278481,
+          "lo": 0.002763519686886521,
+          "hi": 0.021332758368562382,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "image_risk": {
+          "target": 0.05,
+          "point": 0.019537223340040242,
+          "lo": 0.00849874245472837,
+          "hi": 0.03159356136820923,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "supported_kept": {
+          "point": 0.4352561912894962,
+          "lo": 0.41120266282018325,
+          "hi": 0.459999635456421
+        },
+        "abstention": {
+          "point": 0.08577464788732393,
+          "lo": 0.06328621730382293,
+          "hi": 0.11231463782696177
+        },
+        "kept_hallucinated_share": {
+          "point": 0.008462458781989552,
+          "lo": 0.0021517357381446727,
+          "hi": 0.016449910992622416
+        }
+      },
+      "pixelate_2": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.05,
+          "point": 0.015898734177215188,
+          "lo": 0.0053100724160632,
+          "hi": 0.028548544847328203,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "image_risk": {
+          "target": 0.05,
+          "point": 0.02737424547283702,
+          "lo": 0.014396881287726359,
+          "hi": 0.04135965794768611,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 0.997
+        },
+        "supported_kept": {
+          "point": 0.43810845431255335,
+          "lo": 0.4143145310219897,
+          "hi": 0.4614494085372377
+        },
+        "abstention": {
+          "point": 0.09048289738430583,
+          "lo": 0.06646654929577465,
+          "hi": 0.11694315895372231
+        },
+        "kept_hallucinated_share": {
+          "point": 0.012093085951415831,
+          "lo": 0.004141981901511877,
+          "hi": 0.021676296956587682
+        }
+      },
+      "pixelate_3": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.05,
+          "point": 0.006873417721518987,
+          "lo": 0.0007892173615857826,
+          "hi": 0.015061526503034463,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "image_risk": {
+          "target": 0.05,
+          "point": 0.013993963782696177,
+          "lo": 0.004718309859154929,
+          "hi": 0.024366951710261566,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "supported_kept": {
+          "point": 0.38859521776259603,
+          "lo": 0.36457347639511023,
+          "hi": 0.41335522797643875
+        },
+        "abstention": {
+          "point": 0.1317806841046278,
+          "lo": 0.1049690643863179,
+          "hi": 0.16255684104627763
+        },
+        "kept_hallucinated_share": {
+          "point": 0.005931055574973785,
+          "lo": 0.0006720039911567515,
+          "hi": 0.012660472857682258
+        }
+      },
+      "pixelate_4": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.05,
+          "point": 0.00569620253164557,
+          "lo": 0.00024813895781637717,
+          "hi": 0.013600850515463912,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "image_risk": {
+          "target": 0.05,
+          "point": 0.011619718309859155,
+          "lo": 0.0037927565392354124,
+          "hi": 0.021670020120724345,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "supported_kept": {
+          "point": 0.2951793339026473,
+          "lo": 0.27052518584846896,
+          "hi": 0.32108818780582826
+        },
+        "abstention": {
+          "point": 0.2694567404426559,
+          "lo": 0.23107997987927567,
+          "hi": 0.3078938631790744
+        },
+        "kept_hallucinated_share": {
+          "point": 0.0064672827352294454,
+          "lo": 0.0002772284046558673,
+          "hi": 0.014922814876317641
+        }
+      },
+      "pixelate_5": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.05,
+          "point": 0.007949367088607596,
+          "lo": 0.0008014758592629907,
+          "hi": 0.01736600126216494,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "image_risk": {
+          "target": 0.05,
+          "point": 0.008661971830985915,
+          "lo": 0.002012072434607646,
+          "hi": 0.017897887323943658,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "supported_kept": {
+          "point": 0.2454953031596926,
+          "lo": 0.22313508342639427,
+          "hi": 0.2700536525818397
+        },
+        "abstention": {
+          "point": 0.3664587525150905,
+          "lo": 0.3244398893360161,
+          "hi": 0.4103800301810865
+        },
+        "kept_hallucinated_share": {
+          "point": 0.010804672848958244,
+          "lo": 0.001103914826654976,
+          "hi": 0.02327715180472736
+        }
+      },
+      "gaussian_noise_1": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.05,
+          "point": 0.019759493670886075,
+          "lo": 0.00900713232649146,
+          "hi": 0.03323836113125453,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "image_risk": {
+          "target": 0.05,
+          "point": 0.042374245472837024,
+          "lo": 0.02615669014084507,
+          "hi": 0.05989235412474848,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 0.812
+        },
+        "supported_kept": {
+          "point": 0.4661058923996584,
+          "lo": 0.4426946897123802,
+          "hi": 0.49080212485742797
+        },
+        "abstention": {
+          "point": 0.0645774647887324,
+          "lo": 0.04532017102615694,
+          "hi": 0.08613858148893361
+        },
+        "kept_hallucinated_share": {
+          "point": 0.014098245170380138,
+          "lo": 0.006469238153385402,
+          "hi": 0.023493887126144402
+        }
+      },
+      "gaussian_noise_2": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.05,
+          "point": 0.02524050632911392,
+          "lo": 0.011146047942986721,
+          "hi": 0.04172801787243864,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 0.9985
+        },
+        "image_risk": {
+          "target": 0.05,
+          "point": 0.04224346076458753,
+          "lo": 0.026045774647887324,
+          "hi": 0.06023415492957745,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 0.8055
+        },
+        "supported_kept": {
+          "point": 0.44388556789069167,
+          "lo": 0.4207004518584757,
+          "hi": 0.4668291961785092
+        },
+        "abstention": {
+          "point": 0.09127766599597587,
+          "lo": 0.06675980885311872,
+          "hi": 0.11653973843058349
+        },
+        "kept_hallucinated_share": {
+          "point": 0.018819842947749924,
+          "lo": 0.008342526699645064,
+          "hi": 0.030324962358340105
+        }
+      },
+      "gaussian_noise_3": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.05,
+          "point": 0.022734177215189874,
+          "lo": 0.009872106325485375,
+          "hi": 0.03724208390156316,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 0.9995
+        },
+        "image_risk": {
+          "target": 0.05,
+          "point": 0.03796780684104628,
+          "lo": 0.022614688128772636,
+          "hi": 0.05602741448692152,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 0.918
+        },
+        "supported_kept": {
+          "point": 0.38697694278394534,
+          "lo": 0.36432840380490167,
+          "hi": 0.41120460405423626
+        },
+        "abstention": {
+          "point": 0.14516096579476861,
+          "lo": 0.11479879275653923,
+          "hi": 0.17485814889336013
+        },
+        "kept_hallucinated_share": {
+          "point": 0.01943176162551663,
+          "lo": 0.008345869499926165,
+          "hi": 0.03168510278769908
+        }
+      },
+      "gaussian_noise_4": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.05,
+          "point": 0.018556962025316457,
+          "lo": 0.006342607789435528,
+          "hi": 0.031747461773599134,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "image_risk": {
+          "target": 0.05,
+          "point": 0.02846076458752515,
+          "lo": 0.015117706237424549,
+          "hi": 0.04320196177062372,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 0.996
+        },
+        "supported_kept": {
+          "point": 0.29068744662681467,
+          "lo": 0.2681773643023644,
+          "hi": 0.3150973657840756
+        },
+        "abstention": {
+          "point": 0.28858148893360164,
+          "lo": 0.2497635814889336,
+          "hi": 0.3277688631790744
+        },
+        "kept_hallucinated_share": {
+          "point": 0.021079876339061037,
+          "lo": 0.007281429379727228,
+          "hi": 0.036687292153360036
+        }
+      },
+      "gaussian_noise_5": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.05,
+          "point": 0.005936708860759494,
+          "lo": 0.0004077084872946393,
+          "hi": 0.013623875009890022,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "image_risk": {
+          "target": 0.05,
+          "point": 0.01358148893360161,
+          "lo": 0.004064386317907445,
+          "hi": 0.023621730382293763,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "supported_kept": {
+          "point": 0.13257899231426132,
+          "lo": 0.1127318810971917,
+          "hi": 0.15258140366963577
+        },
+        "abstention": {
+          "point": 0.6205432595573441,
+          "lo": 0.5773000503018109,
+          "hi": 0.6631602112676056
+        },
+        "kept_hallucinated_share": {
+          "point": 0.014879913702845905,
+          "lo": 0.0010000521107969517,
+          "hi": 0.03435407963019953
+        }
+      },
+      "contrast_1": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.05,
+          "point": 0.02030379746835443,
+          "lo": 0.008440281747652104,
+          "hi": 0.033448351681832925,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "image_risk": {
+          "target": 0.05,
+          "point": 0.04213279678068411,
+          "lo": 0.026246227364185113,
+          "hi": 0.0598702213279678,
+          "decision": "preserved",
+          "p_preserved": 0.0005,
+          "p_violated": 0.817
+        },
+        "supported_kept": {
+          "point": 0.4872117847993168,
+          "lo": 0.4635106756756757,
+          "hi": 0.5116401239089454
+        },
+        "abstention": {
+          "point": 0.05135814889336016,
+          "lo": 0.033913480885311875,
+          "hi": 0.07054401408450704
+        },
+        "kept_hallucinated_share": {
+          "point": 0.013862361614049037,
+          "lo": 0.0056958338558712384,
+          "hi": 0.023195880150586625
+        }
+      },
+      "contrast_2": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.05,
+          "point": 0.018455696202531645,
+          "lo": 0.006957527321071378,
+          "hi": 0.03144938106540876,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "image_risk": {
+          "target": 0.05,
+          "point": 0.03424547283702213,
+          "lo": 0.01955533199195171,
+          "hi": 0.05112751509054325,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 0.9695
+        },
+        "supported_kept": {
+          "point": 0.4830059777967549,
+          "lo": 0.4596231079577073,
+          "hi": 0.5076906165923896
+        },
+        "abstention": {
+          "point": 0.05643863179074446,
+          "lo": 0.037724597585513074,
+          "hi": 0.0769129778672032
+        },
+        "kept_hallucinated_share": {
+          "point": 0.012724955925221245,
+          "lo": 0.0048930314292153125,
+          "hi": 0.02169804871628517
+        }
+      },
+      "contrast_3": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.05,
+          "point": 0.02072151898734177,
+          "lo": 0.008418016222690753,
+          "hi": 0.034671105501751474,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "image_risk": {
+          "target": 0.05,
+          "point": 0.028370221327967807,
+          "lo": 0.015523138832997987,
+          "hi": 0.043112173038229354,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 0.9975
+        },
+        "supported_kept": {
+          "point": 0.4747950469684031,
+          "lo": 0.45175121277594815,
+          "hi": 0.49926796942291124
+        },
+        "abstention": {
+          "point": 0.06795774647887325,
+          "lo": 0.046428068410462785,
+          "hi": 0.0904836519114688
+        },
+        "kept_hallucinated_share": {
+          "point": 0.014508038357232744,
+          "lo": 0.00569482494250776,
+          "hi": 0.02406115139132969
+        }
+      },
+      "contrast_4": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.05,
+          "point": 0.01617721518987342,
+          "lo": 0.005536501900531379,
+          "hi": 0.028520920794850253,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "image_risk": {
+          "target": 0.05,
+          "point": 0.026750503018108655,
+          "lo": 0.014093058350100603,
+          "hi": 0.04084582494969818,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 0.9985
+        },
+        "supported_kept": {
+          "point": 0.4237617421007686,
+          "lo": 0.4011929787457913,
+          "hi": 0.4474790032028774
+        },
+        "abstention": {
+          "point": 0.12088531187122736,
+          "lo": 0.09307721327967808,
+          "hi": 0.14992002012072428
+        },
+        "kept_hallucinated_share": {
+          "point": 0.012713508351322584,
+          "lo": 0.004407788583484614,
+          "hi": 0.022018068946946964
+        }
+      },
+      "contrast_5": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.05,
+          "point": 0.016443037974683546,
+          "lo": 0.005877192626279032,
+          "hi": 0.030177545818807282,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "image_risk": {
+          "target": 0.05,
+          "point": 0.024124748490945674,
+          "lo": 0.011939637826961771,
+          "hi": 0.038854376257545266,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "supported_kept": {
+          "point": 0.2484756618274979,
+          "lo": 0.22455576456310675,
+          "hi": 0.27286074792218284
+        },
+        "abstention": {
+          "point": 0.3829275653923541,
+          "lo": 0.3395357142857143,
+          "hi": 0.42571453722334
+        },
+        "kept_hallucinated_share": {
+          "point": 0.021834868553755125,
+          "lo": 0.007605033809850757,
+          "hi": 0.03898068463533645
+        }
+      },
+      "swap_owlvit_v1": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.05,
+          "point": 0.002531645569620253,
+          "lo": 0.0,
+          "hi": 0.00821917808219178,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "image_risk": {
+          "target": 0.05,
+          "point": 0.00204225352112676,
+          "lo": 0.0,
+          "hi": 0.006086770623742453,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "supported_kept": {
+          "point": 0.3773783091374893,
+          "lo": 0.3482829695231414,
+          "hi": 0.4068637364812718
+        },
+        "abstention": {
+          "point": 0.18867203219315895,
+          "lo": 0.15625025150905433,
+          "hi": 0.22257394366197178
+        },
+        "kept_hallucinated_share": {
+          "point": 0.002257795037366508,
+          "lo": 0.0,
+          "hi": 0.00709385897179915
+        }
+      },
+      "swap_owlvit_v1+recalibrated": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.05,
+          "point": 0.004721518987341772,
+          "lo": 0.0004907098562435404,
+          "hi": 0.011082260024130073,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "image_risk": {
+          "target": 0.05,
+          "point": 0.010503018108651912,
+          "lo": 0.002686116700201207,
+          "hi": 0.01913581488933601,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "supported_kept": {
+          "point": 0.49716054654141756,
+          "lo": 0.46820526006743196,
+          "hi": 0.5267436919674531
+        },
+        "abstention": {
+          "point": 0.13643863179074447,
+          "lo": 0.10855457746478873,
+          "hi": 0.16580080482897383
+        },
+        "kept_hallucinated_share": {
+          "point": 0.0031932744332579957,
+          "lo": 0.00031515426860185246,
+          "hi": 0.00753496906684974
+        }
+      },
+      "swap_grounding_dino": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.05,
+          "point": 0.2401645569620253,
+          "lo": 0.19963667729591833,
+          "hi": 0.28245896933943543,
+          "decision": "violated",
+          "p_preserved": 1.0,
+          "p_violated": 0.0
+        },
+        "image_risk": {
+          "target": 0.05,
+          "point": 0.27147887323943665,
+          "lo": 0.23391222334004022,
+          "hi": 0.30873792756539237,
+          "decision": "violated",
+          "p_preserved": 1.0,
+          "p_violated": 0.0
+        },
+        "supported_kept": {
+          "point": 0.8180956447480786,
+          "lo": 0.7975735158822641,
+          "hi": 0.8398414326751097
+        },
+        "abstention": {
+          "point": 1.006036217303823e-05,
+          "lo": 0.0,
+          "hi": 3.0181086519114685e-05
+        },
+        "kept_hallucinated_share": {
+          "point": 0.09010262571769141,
+          "lo": 0.07360563452606098,
+          "hi": 0.10705681844753717
+        }
+      },
+      "swap_grounding_dino+recalibrated": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.05,
+          "point": 0.04815189873417722,
+          "lo": 0.027483439587128115,
+          "hi": 0.07110592105263158,
+          "decision": "preserved",
+          "p_preserved": 0.003,
+          "p_violated": 0.582
+        },
+        "image_risk": {
+          "target": 0.05,
+          "point": 0.038088531187122736,
+          "lo": 0.022422786720321934,
+          "hi": 0.05457142857142854,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 0.923
+        },
+        "supported_kept": {
+          "point": 0.4604782237403928,
+          "lo": 0.43327561408296944,
+          "hi": 0.491676677445401
+        },
+        "abstention": {
+          "point": 0.16693158953722334,
+          "lo": 0.13584431589537224,
+          "hi": 0.19801961770623744
+        },
+        "kept_hallucinated_share": {
+          "point": 0.0340713671539123,
+          "lo": 0.01952155685619548,
+          "hi": 0.04988685760693598
+        }
+      },
+      "vlm_qwen": {
+        "n_images": 497,
+        "n_hallucinated": 301,
+        "n_supported": 1123,
+        "claim_risk": {
+          "target": 0.05,
+          "point": 0.04134551495016611,
+          "lo": 0.021118757758316346,
+          "hi": 0.06394068729235877,
+          "decision": "preserved",
+          "p_preserved": 0.001,
+          "p_violated": 0.791
+        },
+        "image_risk": {
+          "target": 0.05,
+          "point": 0.05703219315895372,
+          "lo": 0.03820674044265593,
+          "hi": 0.07653546277665993,
+          "decision": "preserved",
+          "p_preserved": 0.016,
+          "p_violated": 0.2405
+        },
+        "supported_kept": {
+          "point": 0.49513357079252,
+          "lo": 0.47199390963304894,
+          "hi": 0.5183280821641129
+        },
+        "abstention": {
+          "point": 0.08635814889336016,
+          "lo": 0.0635988430583501,
+          "hi": 0.11143259557344062
+        },
+        "kept_hallucinated_share": {
+          "point": 0.021891711229946525,
+          "lo": 0.011209768996070395,
+          "hi": 0.03412606803615106
+        }
+      },
+      "vlm_internvl": {
+        "n_images": 497,
+        "n_hallucinated": 187,
+        "n_supported": 1146,
+        "claim_risk": {
+          "target": 0.05,
+          "point": 0.09272727272727273,
+          "lo": 0.056122895543131504,
+          "hi": 0.13258980967486114,
+          "decision": "violated",
+          "p_preserved": 0.7395,
+          "p_violated": 0.0105
+        },
+        "image_risk": {
+          "target": 0.05,
+          "point": 0.04670020120724346,
+          "lo": 0.029506539235412476,
+          "hi": 0.06515995975855125,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 0.644
+        },
+        "supported_kept": {
+          "point": 0.48913612565445025,
+          "lo": 0.4648018872423126,
+          "hi": 0.5151677167546609
+        },
+        "abstention": {
+          "point": 0.0675251509054326,
+          "lo": 0.04646881287726358,
+          "hi": 0.09101710261569416
+        },
+        "kept_hallucinated_share": {
+          "point": 0.03000571042932046,
+          "lo": 0.017651612432733825,
+          "hi": 0.044313013919008375
+        }
+      },
+      "domain_amber": {
+        "n_images": 727,
+        "n_hallucinated": 112,
+        "n_supported": 1145,
+        "claim_risk": {
+          "target": 0.05,
+          "point": 0.02544642857142857,
+          "lo": 0.0,
+          "hi": 0.059382971938775474,
+          "decision": "preserved",
+          "p_preserved": 0.002,
+          "p_violated": 0.936
+        },
+        "image_risk": {
+          "target": 0.05,
+          "point": 0.004133425034387895,
+          "lo": 6.87757909215956e-06,
+          "hi": 0.009635488308115543,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "supported_kept": {
+          "point": 0.6167772925764192,
+          "lo": 0.5929933611724935,
+          "hi": 0.639779784896623
+        },
+        "abstention": {
+          "point": 0.20543328748280604,
+          "lo": 0.17755140990371387,
+          "hi": 0.2344998280605227
+        },
+        "kept_hallucinated_share": {
+          "point": 0.004019405974106564,
+          "lo": 0.0,
+          "hi": 0.009288685070231778
+        }
+      },
+      "s5_object_removed": {
+        "n_images": 496,
+        "n_hallucinated": 496,
+        "n_supported": 0,
+        "claim_risk": {
+          "target": 0.05,
+          "point": 0.04178427419354839,
+          "lo": 0.02621774193548387,
+          "hi": 0.0597585685483871,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 0.815
+        },
+        "image_risk": {
+          "target": 0.05,
+          "point": 0.06732862903225807,
+          "lo": 0.046228074596774194,
+          "hi": 0.09032358870967741,
+          "decision": "inconclusive",
+          "p_preserved": 0.134,
+          "p_violated": 0.0535
+        },
+        "supported_kept": {
+          "point": NaN,
+          "lo": NaN,
+          "hi": NaN
+        },
+        "abstention": {
+          "point": 0.932671370967742,
+          "lo": 0.9096764112903227,
+          "hi": 0.9537719254032259
+        },
+        "kept_hallucinated_share": {
+          "point": 1.0,
+          "lo": 1.0,
+          "hi": 1.0
+        }
+      }
+    },
+    "0.2": {
+      "clean": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.2,
+          "point": 0.19708860759493668,
+          "lo": 0.15788908855016828,
+          "hi": 0.2350132277834525,
+          "decision": "inconclusive",
+          "p_preserved": 0.0415,
+          "p_violated": 0.5445
+        },
+        "image_risk": {
+          "target": 0.2,
+          "point": 0.18890342052313883,
+          "lo": 0.15554074446680083,
+          "hi": 0.2226677565392354,
+          "decision": "preserved",
+          "p_preserved": 0.0085,
+          "p_violated": 0.7555
+        },
+        "supported_kept": {
+          "point": 0.7220239111870197,
+          "lo": 0.7009742330683832,
+          "hi": 0.74311471624763
+        },
+        "abstention": {
+          "point": 0.008511066398390343,
+          "lo": 0.002012072434607646,
+          "hi": 0.016982394366197178
+        },
+        "kept_hallucinated_share": {
+          "point": 0.08431347066086166,
+          "lo": 0.06687395458046874,
+          "hi": 0.10118986832054629
+        }
+      },
+      "gaussian_blur_1": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.2,
+          "point": 0.21826582278481013,
+          "lo": 0.1765873102055289,
+          "hi": 0.2592937681610627,
+          "decision": "inconclusive",
+          "p_preserved": 0.2805,
+          "p_violated": 0.1895
+        },
+        "image_risk": {
+          "target": 0.2,
+          "point": 0.19133802816901407,
+          "lo": 0.15831941649899398,
+          "hi": 0.22338053319919518,
+          "decision": "preserved",
+          "p_preserved": 0.009,
+          "p_violated": 0.7095
+        },
+        "supported_kept": {
+          "point": 0.782801024765158,
+          "lo": 0.7614956017708804,
+          "hi": 0.8030600597824412
+        },
+        "abstention": {
+          "point": 0.006509054325955734,
+          "lo": 0.0004728370221327968,
+          "hi": 0.014084507042253521
+        },
+        "kept_hallucinated_share": {
+          "point": 0.08596784245294778,
+          "lo": 0.06845960270645063,
+          "hi": 0.1027167627953975
+        }
+      },
+      "gaussian_blur_2": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.2,
+          "point": 0.15137974683544303,
+          "lo": 0.11649217832393706,
+          "hi": 0.18788945379818425,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 0.996
+        },
+        "image_risk": {
+          "target": 0.2,
+          "point": 0.14842052313883297,
+          "lo": 0.11756941649899397,
+          "hi": 0.1770523138832998,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "supported_kept": {
+          "point": 0.7642314261315115,
+          "lo": 0.7405470118047901,
+          "hi": 0.7871536225002554
+        },
+        "abstention": {
+          "point": 0.01006036217303823,
+          "lo": 0.002012072434607646,
+          "hi": 0.02012072434607646
+        },
+        "kept_hallucinated_share": {
+          "point": 0.06263158446020256,
+          "lo": 0.04723983366667532,
+          "hi": 0.07821283257792669
+        }
+      },
+      "gaussian_blur_3": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.2,
+          "point": 0.10268354430379747,
+          "lo": 0.07472003042965952,
+          "hi": 0.13213513246862585,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "image_risk": {
+          "target": 0.2,
+          "point": 0.1151307847082495,
+          "lo": 0.08806488933601608,
+          "hi": 0.14129803822937625,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "supported_kept": {
+          "point": 0.7205550811272416,
+          "lo": 0.6951243038528165,
+          "hi": 0.7465668479204788
+        },
+        "abstention": {
+          "point": 0.015633802816901406,
+          "lo": 0.006036217303822937,
+          "hi": 0.027525150905432595
+        },
+        "kept_hallucinated_share": {
+          "point": 0.045865231305055806,
+          "lo": 0.0329557897659879,
+          "hi": 0.05923781075002474
+        }
+      },
+      "gaussian_blur_4": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.2,
+          "point": 0.0740759493670886,
+          "lo": 0.048127922206134,
+          "hi": 0.10063081597222222,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "image_risk": {
+          "target": 0.2,
+          "point": 0.0786116700201207,
+          "lo": 0.056184607645875254,
+          "hi": 0.10080155935613677,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "supported_kept": {
+          "point": 0.6759137489325363,
+          "lo": 0.6492630303362039,
+          "hi": 0.7038185207087133
+        },
+        "abstention": {
+          "point": 0.021961770623742452,
+          "lo": 0.010150402414486922,
+          "hi": 0.036046277665995975
+        },
+        "kept_hallucinated_share": {
+          "point": 0.03565010264938989,
+          "lo": 0.02344401697741539,
+          "hi": 0.04782693236367965
+        }
+      },
+      "gaussian_blur_5": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.2,
+          "point": 0.06296202531645569,
+          "lo": 0.03899105116037576,
+          "hi": 0.08828182316041022,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "image_risk": {
+          "target": 0.2,
+          "point": 0.07421529175050302,
+          "lo": 0.0521260060362173,
+          "hi": 0.09678068410462776,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "supported_kept": {
+          "point": 0.5540606319385142,
+          "lo": 0.5233851936025569,
+          "hi": 0.5828545851080383
+        },
+        "abstention": {
+          "point": 0.07443661971830987,
+          "lo": 0.052452464788732396,
+          "hi": 0.0988963782696177
+        },
+        "kept_hallucinated_share": {
+          "point": 0.03691691097339221,
+          "lo": 0.02307079580159844,
+          "hi": 0.050507641540178894
+        }
+      },
+      "jpeg_1": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.2,
+          "point": 0.18453164556962026,
+          "lo": 0.14676674184594032,
+          "hi": 0.22171584253927207,
+          "decision": "preserved",
+          "p_preserved": 0.0085,
+          "p_violated": 0.799
+        },
+        "image_risk": {
+          "target": 0.2,
+          "point": 0.17984909456740442,
+          "lo": 0.14795598591549294,
+          "hi": 0.2111961770623742,
+          "decision": "preserved",
+          "p_preserved": 0.0015,
+          "p_violated": 0.9005
+        },
+        "supported_kept": {
+          "point": 0.7555380017079419,
+          "lo": 0.732386862365764,
+          "hi": 0.777893475147722
+        },
+        "abstention": {
+          "point": 0.008018108651911469,
+          "lo": 0.0014285714285714286,
+          "hi": 0.01579577464788732
+        },
+        "kept_hallucinated_share": {
+          "point": 0.07611538963581778,
+          "lo": 0.05994442303876643,
+          "hi": 0.09193135741849168
+        }
+      },
+      "jpeg_2": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.2,
+          "point": 0.1777974683544304,
+          "lo": 0.14010434195130103,
+          "hi": 0.21534732049266245,
+          "decision": "preserved",
+          "p_preserved": 0.0035,
+          "p_violated": 0.8735
+        },
+        "image_risk": {
+          "target": 0.2,
+          "point": 0.1821830985915493,
+          "lo": 0.1474901911468813,
+          "hi": 0.21282067404426558,
+          "decision": "preserved",
+          "p_preserved": 0.0025,
+          "p_violated": 0.869
+        },
+        "supported_kept": {
+          "point": 0.7300939368061486,
+          "lo": 0.7073677311196894,
+          "hi": 0.7514257176162745
+        },
+        "abstention": {
+          "point": 0.008983903420523139,
+          "lo": 0.0021126760563380284,
+          "hi": 0.01766700201207243
+        },
+        "kept_hallucinated_share": {
+          "point": 0.07591037322870392,
+          "lo": 0.058778306374880435,
+          "hi": 0.09284973080219207
+        }
+      },
+      "jpeg_3": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.2,
+          "point": 0.17644303797468353,
+          "lo": 0.14028206521739128,
+          "hi": 0.2118448807565789,
+          "decision": "preserved",
+          "p_preserved": 0.0015,
+          "p_violated": 0.8945
+        },
+        "image_risk": {
+          "target": 0.2,
+          "point": 0.1817605633802817,
+          "lo": 0.1490435110663984,
+          "hi": 0.21412650905432593,
+          "decision": "preserved",
+          "p_preserved": 0.002,
+          "p_violated": 0.8715
+        },
+        "supported_kept": {
+          "point": 0.7156959863364645,
+          "lo": 0.6920807328722003,
+          "hi": 0.737826143739829
+        },
+        "abstention": {
+          "point": 0.013742454728370221,
+          "lo": 0.005090543259557345,
+          "hi": 0.02456866197183098
+        },
+        "kept_hallucinated_share": {
+          "point": 0.0767756327283743,
+          "lo": 0.05979432413083782,
+          "hi": 0.09244733494329035
+        }
+      },
+      "jpeg_4": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.2,
+          "point": 0.14530379746835442,
+          "lo": 0.1091060673513197,
+          "hi": 0.18043600577557753,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 0.9985
+        },
+        "image_risk": {
+          "target": 0.2,
+          "point": 0.15731388329979878,
+          "lo": 0.1251405935613682,
+          "hi": 0.1883161468812877,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 0.9955
+        },
+        "supported_kept": {
+          "point": 0.6860333048676345,
+          "lo": 0.6619505798387219,
+          "hi": 0.7099944777559112
+        },
+        "abstention": {
+          "point": 0.01783702213279678,
+          "lo": 0.007776659959758552,
+          "hi": 0.02988983903420523
+        },
+        "kept_hallucinated_share": {
+          "point": 0.06668099542254338,
+          "lo": 0.04919317815852172,
+          "hi": 0.08388506390771966
+        }
+      },
+      "jpeg_5": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.2,
+          "point": 0.11729113924050633,
+          "lo": 0.08548616315498495,
+          "hi": 0.15131060998343,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "image_risk": {
+          "target": 0.2,
+          "point": 0.14691146881287726,
+          "lo": 0.1161763078470825,
+          "hi": 0.1764499496981891,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 0.999
+        },
+        "supported_kept": {
+          "point": 0.6287617421007685,
+          "lo": 0.6031602099520732,
+          "hi": 0.6545851749331317
+        },
+        "abstention": {
+          "point": 0.03446680080482897,
+          "lo": 0.019805835010060363,
+          "hi": 0.050161720321931585
+        },
+        "kept_hallucinated_share": {
+          "point": 0.059199345778868144,
+          "lo": 0.042479169292241985,
+          "hi": 0.07651063074063168
+        }
+      },
+      "pixelate_1": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.2,
+          "point": 0.11467088607594937,
+          "lo": 0.08558974714648065,
+          "hi": 0.14595677684184827,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "image_risk": {
+          "target": 0.2,
+          "point": 0.1414285714285714,
+          "lo": 0.11107595573440643,
+          "hi": 0.17203571428571426,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "supported_kept": {
+          "point": 0.6582749786507259,
+          "lo": 0.6357515233950339,
+          "hi": 0.681923137181116
+        },
+        "abstention": {
+          "point": 0.010150905432595574,
+          "lo": 0.0031084004024144875,
+          "hi": 0.01872484909456739
+        },
+        "kept_hallucinated_share": {
+          "point": 0.05549939654591459,
+          "lo": 0.041107160961477617,
+          "hi": 0.07021144387348925
+        }
+      },
+      "pixelate_2": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.2,
+          "point": 0.10358227848101266,
+          "lo": 0.07607545106815039,
+          "hi": 0.1344244079767345,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "image_risk": {
+          "target": 0.2,
+          "point": 0.13964788732394368,
+          "lo": 0.10935261569416499,
+          "hi": 0.1697200704225352,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "supported_kept": {
+          "point": 0.6789069171648164,
+          "lo": 0.6561264473498414,
+          "hi": 0.7014257012731374
+        },
+        "abstention": {
+          "point": 0.008943661971830986,
+          "lo": 0.0021919014084507047,
+          "hi": 0.018240694164989933
+        },
+        "kept_hallucinated_share": {
+          "point": 0.048946364163820484,
+          "lo": 0.03543164154630924,
+          "hi": 0.06283199332367784
+        }
+      },
+      "pixelate_3": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.2,
+          "point": 0.0899113924050633,
+          "lo": 0.061201850165212235,
+          "hi": 0.11833815789473683,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "image_risk": {
+          "target": 0.2,
+          "point": 0.12608651911468813,
+          "lo": 0.09850050301810864,
+          "hi": 0.15337701207243457,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "supported_kept": {
+          "point": 0.6462894961571306,
+          "lo": 0.6210757302167855,
+          "hi": 0.6696601465700396
+        },
+        "abstention": {
+          "point": 0.01939637826961771,
+          "lo": 0.008028169014084508,
+          "hi": 0.03346076458752515
+        },
+        "kept_hallucinated_share": {
+          "point": 0.04482406098546043,
+          "lo": 0.03021220412210365,
+          "hi": 0.05859472610603291
+        }
+      },
+      "pixelate_4": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.2,
+          "point": 0.08369620253164557,
+          "lo": 0.053350315824468086,
+          "hi": 0.11666326683826682,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "image_risk": {
+          "target": 0.2,
+          "point": 0.09948692152917506,
+          "lo": 0.0738226861167002,
+          "hi": 0.12430759557344064,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "supported_kept": {
+          "point": 0.5382749786507259,
+          "lo": 0.5105193992390404,
+          "hi": 0.5656233951534743
+        },
+        "abstention": {
+          "point": 0.06103621730382294,
+          "lo": 0.041589034205231384,
+          "hi": 0.08282344064386316
+        },
+        "kept_hallucinated_share": {
+          "point": 0.049835689951460704,
+          "lo": 0.0320157476775633,
+          "hi": 0.06780148887625645
+        }
+      },
+      "pixelate_5": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.2,
+          "point": 0.06254430379746835,
+          "lo": 0.039724208275543224,
+          "hi": 0.08954117094762257,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "image_risk": {
+          "target": 0.2,
+          "point": 0.09077464788732394,
+          "lo": 0.06686846076458752,
+          "hi": 0.11452339034205229,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "supported_kept": {
+          "point": 0.4618573868488472,
+          "lo": 0.43418627853933295,
+          "hi": 0.4908073555907103
+        },
+        "abstention": {
+          "point": 0.11706237424547283,
+          "lo": 0.08901282696177062,
+          "hi": 0.14496076458752516
+        },
+        "kept_hallucinated_share": {
+          "point": 0.04368391272058564,
+          "lo": 0.027569122983567045,
+          "hi": 0.060991648197577804
+        }
+      },
+      "gaussian_noise_1": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.2,
+          "point": 0.2128987341772152,
+          "lo": 0.1728182389768836,
+          "hi": 0.2519831054004198,
+          "decision": "inconclusive",
+          "p_preserved": 0.199,
+          "p_violated": 0.2625
+        },
+        "image_risk": {
+          "target": 0.2,
+          "point": 0.2070523138832998,
+          "lo": 0.17273415492957744,
+          "hi": 0.24039059356136816,
+          "decision": "inconclusive",
+          "p_preserved": 0.082,
+          "p_violated": 0.3595
+        },
+        "supported_kept": {
+          "point": 0.7914560204953032,
+          "lo": 0.7689038732955269,
+          "hi": 0.8126377608614015
+        },
+        "abstention": {
+          "point": 0.0055130784708249505,
+          "lo": 0.0,
+          "hi": 0.013038229376257546
+        },
+        "kept_hallucinated_share": {
+          "point": 0.08318907101662891,
+          "lo": 0.0663193242668434,
+          "hi": 0.09949644213907619
+        }
+      },
+      "gaussian_noise_2": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.2,
+          "point": 0.18049367088607596,
+          "lo": 0.14189953703703703,
+          "hi": 0.21895904036729705,
+          "decision": "preserved",
+          "p_preserved": 0.004,
+          "p_violated": 0.8385
+        },
+        "image_risk": {
+          "target": 0.2,
+          "point": 0.18300804828973846,
+          "lo": 0.14929401408450704,
+          "hi": 0.21608551307847082,
+          "decision": "preserved",
+          "p_preserved": 0.0025,
+          "p_violated": 0.862
+        },
+        "supported_kept": {
+          "point": 0.7754739538855678,
+          "lo": 0.7531366402403231,
+          "hi": 0.7976648557736438
+        },
+        "abstention": {
+          "point": 0.01135814889336016,
+          "lo": 0.003449698189134809,
+          "hi": 0.02151961770623742
+        },
+        "kept_hallucinated_share": {
+          "point": 0.07279642629227825,
+          "lo": 0.05710622410982431,
+          "hi": 0.08912277076850877
+        }
+      },
+      "gaussian_noise_3": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.2,
+          "point": 0.15872151898734174,
+          "lo": 0.12082837785520713,
+          "hi": 0.1960909390938128,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 0.984
+        },
+        "image_risk": {
+          "target": 0.2,
+          "point": 0.16699195171026157,
+          "lo": 0.1350196177062374,
+          "hi": 0.19769290744466797,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 0.983
+        },
+        "supported_kept": {
+          "point": 0.7249615713065757,
+          "lo": 0.6986393480663344,
+          "hi": 0.751714788140113
+        },
+        "abstention": {
+          "point": 0.0308148893360161,
+          "lo": 0.01688128772635815,
+          "hi": 0.04676433601609656
+        },
+        "kept_hallucinated_share": {
+          "point": 0.06877279583161935,
+          "lo": 0.052022014064177925,
+          "hi": 0.08487679441130613
+        }
+      },
+      "gaussian_noise_4": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.2,
+          "point": 0.12270886075949367,
+          "lo": 0.09224503817032335,
+          "hi": 0.15495355555555554,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "image_risk": {
+          "target": 0.2,
+          "point": 0.12251509054325956,
+          "lo": 0.09534758551307847,
+          "hi": 0.1491966800804829,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "supported_kept": {
+          "point": 0.5802220324508968,
+          "lo": 0.5488731938576938,
+          "hi": 0.6132345704948645
+        },
+        "abstention": {
+          "point": 0.10429577464788732,
+          "lo": 0.07909054325955735,
+          "hi": 0.131238430583501
+        },
+        "kept_hallucinated_share": {
+          "point": 0.0665879023505653,
+          "lo": 0.049084428279976604,
+          "hi": 0.0841344086907173
+        }
+      },
+      "gaussian_noise_5": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.2,
+          "point": 0.04962025316455697,
+          "lo": 0.02920260382554625,
+          "hi": 0.07267409045153862,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "image_risk": {
+          "target": 0.2,
+          "point": 0.05865191146881287,
+          "lo": 0.039432847082494976,
+          "hi": 0.0793158953722334,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "supported_kept": {
+          "point": 0.35133219470537996,
+          "lo": 0.3196148305084746,
+          "hi": 0.3833756606257429
+        },
+        "abstention": {
+          "point": 0.31898390342052313,
+          "lo": 0.2773438128772636,
+          "hi": 0.35992027162977863
+        },
+        "kept_hallucinated_share": {
+          "point": 0.045474582956311925,
+          "lo": 0.026571544617007486,
+          "hi": 0.06660945720243627
+        }
+      },
+      "contrast_1": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.2,
+          "point": 0.23189873417721518,
+          "lo": 0.1915065287327797,
+          "hi": 0.2741413155403007,
+          "decision": "inconclusive",
+          "p_preserved": 0.541,
+          "p_violated": 0.0585
+        },
+        "image_risk": {
+          "target": 0.2,
+          "point": 0.1916398390342052,
+          "lo": 0.1577791750503018,
+          "hi": 0.22354703219315888,
+          "decision": "preserved",
+          "p_preserved": 0.0125,
+          "p_violated": 0.7015
+        },
+        "supported_kept": {
+          "point": 0.7657472245943637,
+          "lo": 0.7451206290440365,
+          "hi": 0.7867994631240943
+        },
+        "abstention": {
+          "point": 0.008048289738430584,
+          "lo": 0.002012072434607646,
+          "hi": 0.01609657947686117
+        },
+        "kept_hallucinated_share": {
+          "point": 0.09268534539457042,
+          "lo": 0.07437469954389618,
+          "hi": 0.1107552552973257
+        }
+      },
+      "contrast_2": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.2,
+          "point": 0.21406329113924052,
+          "lo": 0.17487548290376517,
+          "hi": 0.25399856988249836,
+          "decision": "inconclusive",
+          "p_preserved": 0.211,
+          "p_violated": 0.2395
+        },
+        "image_risk": {
+          "target": 0.2,
+          "point": 0.19214285714285714,
+          "lo": 0.1586413480885312,
+          "hi": 0.2252552816901408,
+          "decision": "preserved",
+          "p_preserved": 0.015,
+          "p_violated": 0.6935
+        },
+        "supported_kept": {
+          "point": 0.7733432963279249,
+          "lo": 0.7519796726611437,
+          "hi": 0.7943559435275113
+        },
+        "abstention": {
+          "point": 0.008762575452716298,
+          "lo": 0.002012072434607646,
+          "hi": 0.017525150905432597
+        },
+        "kept_hallucinated_share": {
+          "point": 0.08539701456359708,
+          "lo": 0.0685142159483269,
+          "hi": 0.10210885028666519
+        }
+      },
+      "contrast_3": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.2,
+          "point": 0.18864556962025317,
+          "lo": 0.15352180921813557,
+          "hi": 0.22647259485945556,
+          "decision": "preserved",
+          "p_preserved": 0.0165,
+          "p_violated": 0.748
+        },
+        "image_risk": {
+          "target": 0.2,
+          "point": 0.1866599597585513,
+          "lo": 0.15360890342052314,
+          "hi": 0.2181124245472837,
+          "decision": "preserved",
+          "p_preserved": 0.002,
+          "p_violated": 0.798
+        },
+        "supported_kept": {
+          "point": 0.7714175918018787,
+          "lo": 0.748774110337337,
+          "hi": 0.7947172249793216
+        },
+        "abstention": {
+          "point": 0.010633802816901409,
+          "lo": 0.0027263581488933602,
+          "hi": 0.020124496981891327
+        },
+        "kept_hallucinated_share": {
+          "point": 0.0762032837515148,
+          "lo": 0.06056637817217428,
+          "hi": 0.0916989463636872
+        }
+      },
+      "contrast_4": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.2,
+          "point": 0.13964556962025315,
+          "lo": 0.10646222540181875,
+          "hi": 0.17357517425984473,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 0.9995
+        },
+        "image_risk": {
+          "target": 0.2,
+          "point": 0.1500201207243461,
+          "lo": 0.11905734406438633,
+          "hi": 0.17854703219315893,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "supported_kept": {
+          "point": 0.7254739538855679,
+          "lo": 0.7006182488334011,
+          "hi": 0.7497906580095527
+        },
+        "abstention": {
+          "point": 0.02240442655935614,
+          "lo": 0.010572937625754527,
+          "hi": 0.03634004024144868
+        },
+        "kept_hallucinated_share": {
+          "point": 0.06097116139230012,
+          "lo": 0.04532407760375862,
+          "hi": 0.07687652793717875
+        }
+      },
+      "contrast_5": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.2,
+          "point": 0.09418987341772152,
+          "lo": 0.06358852592496092,
+          "hi": 0.127307210549515,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "image_risk": {
+          "target": 0.2,
+          "point": 0.09945674044265594,
+          "lo": 0.07442605633802818,
+          "hi": 0.12568460764587522,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "supported_kept": {
+          "point": 0.5058368915456875,
+          "lo": 0.4754278714960827,
+          "hi": 0.5368036547809149
+        },
+        "abstention": {
+          "point": 0.1727464788732394,
+          "lo": 0.1419605130784708,
+          "hi": 0.20559456740442658
+        },
+        "kept_hallucinated_share": {
+          "point": 0.05909870699240716,
+          "lo": 0.04043412131205861,
+          "hi": 0.07874713901932326
+        }
+      },
+      "swap_owlvit_v1": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.2,
+          "point": 0.04536708860759494,
+          "lo": 0.02747398431518133,
+          "hi": 0.06520001390433813,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "image_risk": {
+          "target": 0.2,
+          "point": 0.058098591549295774,
+          "lo": 0.03921478873239437,
+          "hi": 0.07765895372233399,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "supported_kept": {
+          "point": 0.6392356959863364,
+          "lo": 0.6113694997627931,
+          "hi": 0.6684325903998928
+        },
+        "abstention": {
+          "point": 0.05649899396378269,
+          "lo": 0.03701710261569417,
+          "hi": 0.07670145875251508
+        },
+        "kept_hallucinated_share": {
+          "point": 0.023380063016576105,
+          "lo": 0.01374157224206318,
+          "hi": 0.03331716481231558
+        }
+      },
+      "swap_owlvit_v1+recalibrated": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.2,
+          "point": 0.08582278481012658,
+          "lo": 0.05879950977294748,
+          "hi": 0.11516746515679441,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "image_risk": {
+          "target": 0.2,
+          "point": 0.14744466800804829,
+          "lo": 0.1176036217303823,
+          "hi": 0.17660035211267608,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 0.9995
+        },
+        "supported_kept": {
+          "point": 0.7265755764304013,
+          "lo": 0.7008905290264921,
+          "hi": 0.7531187878914958
+        },
+        "abstention": {
+          "point": 0.032515090543259566,
+          "lo": 0.01758450704225352,
+          "hi": 0.048050301810865184
+        },
+        "kept_hallucinated_share": {
+          "point": 0.038317207704132376,
+          "lo": 0.025763166089586186,
+          "hi": 0.051202700413901146
+        }
+      },
+      "swap_grounding_dino": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.2,
+          "point": 0.8739240506329113,
+          "lo": 0.8403661497942702,
+          "hi": 0.9060680768492002,
+          "decision": "violated",
+          "p_preserved": 1.0,
+          "p_violated": 0.0
+        },
+        "image_risk": {
+          "target": 0.2,
+          "point": 0.45262575452716297,
+          "lo": 0.40812072434607644,
+          "hi": 0.4950573440643863,
+          "decision": "violated",
+          "p_preserved": 1.0,
+          "p_violated": 0.0
+        },
+        "supported_kept": {
+          "point": 0.9945217762596072,
+          "lo": 0.9901926167920337,
+          "hi": 0.998312323807212
+        },
+        "abstention": {
+          "point": 0.0,
+          "lo": 0.0,
+          "hi": 0.0
+        },
+        "kept_hallucinated_share": {
+          "point": 0.22864182648522802,
+          "lo": 0.20601582953884492,
+          "hi": 0.24926932886919187
+        }
+      },
+      "swap_grounding_dino+recalibrated": {
+        "n_images": 497,
+        "n_hallucinated": 395,
+        "n_supported": 1171,
+        "claim_risk": {
+          "target": 0.2,
+          "point": 0.16930379746835442,
+          "lo": 0.13190235368956743,
+          "hi": 0.20848699091478698,
+          "decision": "preserved",
+          "p_preserved": 0.003,
+          "p_violated": 0.943
+        },
+        "image_risk": {
+          "target": 0.2,
+          "point": 0.18375251509054324,
+          "lo": 0.15134481891348087,
+          "hi": 0.21811996981891346,
+          "decision": "preserved",
+          "p_preserved": 0.0065,
+          "p_violated": 0.836
+        },
+        "supported_kept": {
+          "point": 0.7617976088812981,
+          "lo": 0.7385722496723505,
+          "hi": 0.7866952863541874
+        },
+        "abstention": {
+          "point": 0.0037022132796780687,
+          "lo": 0.0,
+          "hi": 0.009356136820925554
+        },
+        "kept_hallucinated_share": {
+          "point": 0.06973846121759442,
+          "lo": 0.05372455642776379,
+          "hi": 0.08566712989212773
+        }
+      },
+      "vlm_qwen": {
+        "n_images": 497,
+        "n_hallucinated": 301,
+        "n_supported": 1123,
+        "claim_risk": {
+          "target": 0.2,
+          "point": 0.20461794019933555,
+          "lo": 0.1615356235863656,
+          "hi": 0.24900755340875938,
+          "decision": "inconclusive",
+          "p_preserved": 0.1285,
+          "p_violated": 0.4185
+        },
+        "image_risk": {
+          "target": 0.2,
+          "point": 0.15225352112676058,
+          "lo": 0.12089361167002012,
+          "hi": 0.18548742454728367,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 0.997
+        },
+        "supported_kept": {
+          "point": 0.7278495102404274,
+          "lo": 0.7058768341896606,
+          "hi": 0.7486733324262932
+        },
+        "abstention": {
+          "point": 0.014507042253521127,
+          "lo": 0.004968309859154929,
+          "hi": 0.025986418511066398
+        },
+        "kept_hallucinated_share": {
+          "point": 0.07007104947295968,
+          "lo": 0.054205575696822175,
+          "hi": 0.08646606640502025
+        }
+      },
+      "vlm_internvl": {
+        "n_images": 497,
+        "n_hallucinated": 187,
+        "n_supported": 1146,
+        "claim_risk": {
+          "target": 0.2,
+          "point": 0.2621657754010695,
+          "lo": 0.1986963927424902,
+          "hi": 0.32364611607142857,
+          "decision": "inconclusive",
+          "p_preserved": 0.861,
+          "p_violated": 0.028
+        },
+        "image_risk": {
+          "target": 0.2,
+          "point": 0.1135513078470825,
+          "lo": 0.08736217303822938,
+          "hi": 0.1421443661971831,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "supported_kept": {
+          "point": 0.7325,
+          "lo": 0.7113608916498533,
+          "hi": 0.7531595398073023
+        },
+        "abstention": {
+          "point": 0.011448692152917503,
+          "lo": 0.003873239436619718,
+          "hi": 0.020905935613682092
+        },
+        "kept_hallucinated_share": {
+          "point": 0.05517912816414735,
+          "lo": 0.04064151495549637,
+          "hi": 0.0711530321333853
+        }
+      },
+      "domain_amber": {
+        "n_images": 727,
+        "n_hallucinated": 112,
+        "n_supported": 1145,
+        "claim_risk": {
+          "target": 0.2,
+          "point": 0.0759375,
+          "lo": 0.03078728070175439,
+          "hi": 0.1293816964285714,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "image_risk": {
+          "target": 0.2,
+          "point": 0.01995185694635488,
+          "lo": 0.010900962861072902,
+          "hi": 0.029718363136176065,
+          "decision": "preserved",
+          "p_preserved": 0.0,
+          "p_violated": 1.0
+        },
+        "supported_kept": {
+          "point": 0.8105414847161572,
+          "lo": 0.7911909224363954,
+          "hi": 0.8292336437386194
+        },
+        "abstention": {
+          "point": 0.06295735900962861,
+          "lo": 0.045829951856946355,
+          "hi": 0.0812589408528198
+        },
+        "kept_hallucinated_share": {
+          "point": 0.009080959880415344,
+          "lo": 0.0035991901878912607,
+          "hi": 0.015486051831297871
+        }
+      },
+      "s5_object_removed": {
+        "n_images": 496,
+        "n_hallucinated": 496,
+        "n_supported": 0,
+        "claim_risk": {
+          "target": 0.2,
+          "point": 0.17480846774193545,
+          "lo": 0.14312121975806455,
+          "hi": 0.2088041834677419,
+          "decision": "preserved",
+          "p_preserved": 0.002,
+          "p_violated": 0.927
+        },
+        "image_risk": {
+          "target": 0.2,
+          "point": 0.22492943548387095,
+          "lo": 0.19001612903225806,
+          "hi": 0.2605463709677419,
+          "decision": "inconclusive",
+          "p_preserved": 0.385,
+          "p_violated": 0.084
+        },
+        "supported_kept": {
+          "point": NaN,
+          "lo": NaN,
+          "hi": NaN
+        },
+        "abstention": {
+          "point": 0.775070564516129,
+          "lo": 0.739453629032258,
+          "hi": 0.8099838709677418
+        },
+        "kept_hallucinated_share": {
+          "point": 1.0,
+          "lo": 1.0,
+          "hi": 1.0
+        }
+      }
+    }
+  },
+  "hypotheses": {
+    "claim_risk": {
+      "H1": {
+        "supported": true,
+        "p": 0.019,
+        "p_holm": 0.038
+      },
+      "H3": {
+        "supported": true,
+        "p": 0.0,
+        "p_holm": 0.0
+      },
+      "H4": {
+        "supported": true,
+        "p": 0.0035,
+        "p_holm": 0.0105
+      },
+      "H5": {
+        "supported": false,
+        "p": 0.8955,
+        "p_holm": 0.8955
+      },
+      "H6": {
+        "supported": true,
+        "p": 0.0,
+        "p_holm": 0.0
+      }
+    },
+    "image_risk": {
+      "H1": {
+        "supported": false,
+        "p": 0.1105,
+        "p_holm": 0.1105
+      },
+      "H3": {
+        "supported": true,
+        "p": 0.0,
+        "p_holm": 0.0
+      },
+      "H4": {
+        "supported": true,
+        "p": 0.0005,
+        "p_holm": 0.0015
+      },
+      "H5": {
+        "supported": true,
+        "p": 0.0035,
+        "p_holm": 0.007
+      },
+      "H6": {
+        "supported": true,
+        "p": 0.0,
+        "p_holm": 0.0
+      }
+    },
+    "H2": {
+      "supported": false,
+      "per_condition": {
+        "gaussian_blur_1": {
+          "d_plus": 0.03797468354430378,
+          "lo": 0.02645154553049295,
+          "hi": 0.08122033758408648,
+          "supported": false,
+          "diff_at_tau": 0.01772151898734177,
+          "share_up": 0.5037974683544304,
+          "n_hallucinated": 395
+        },
+        "gaussian_blur_2": {
+          "d_plus": 0.0025316455696202536,
+          "lo": 0.0,
+          "hi": 0.03062213257395977,
+          "supported": false,
+          "diff_at_tau": -0.017721518987341776,
+          "share_up": 0.37721518987341773,
+          "n_hallucinated": 395
+        },
+        "gaussian_blur_3": {
+          "d_plus": 0.002531645569620253,
+          "lo": 0.0,
+          "hi": 0.019901738191833846,
+          "supported": true,
+          "diff_at_tau": -0.03291139240506329,
+          "share_up": 0.31645569620253167,
+          "n_hallucinated": 395
+        },
+        "gaussian_blur_4": {
+          "d_plus": 0.0050632911392405056,
+          "lo": 0.0,
+          "hi": 0.019004155151546524,
+          "supported": true,
+          "diff_at_tau": -0.022784810126582282,
+          "share_up": 0.2759493670886076,
+          "n_hallucinated": 395
+        },
+        "gaussian_blur_5": {
+          "d_plus": 0.0,
+          "lo": 0.0,
+          "hi": 0.01272264631043257,
+          "supported": true,
+          "diff_at_tau": -0.043037974683544304,
+          "share_up": 0.2379746835443038,
+          "n_hallucinated": 395
+        },
+        "jpeg_1": {
+          "d_plus": 0.032911392405063356,
+          "lo": 0.027776028547439137,
+          "hi": 0.07932787698412704,
+          "supported": false,
+          "diff_at_tau": 0.015189873417721517,
+          "share_up": 0.49873417721518987,
+          "n_hallucinated": 395
+        },
+        "jpeg_2": {
+          "d_plus": 0.04303797468354431,
+          "lo": 0.027776028547439137,
+          "hi": 0.08334923664122126,
+          "supported": false,
+          "diff_at_tau": -0.015189873417721517,
+          "share_up": 0.5113924050632911,
+          "n_hallucinated": 395
+        },
+        "jpeg_3": {
+          "d_plus": 0.040506329113924044,
+          "lo": 0.024750947316953938,
+          "hi": 0.08483586866997783,
+          "supported": false,
+          "diff_at_tau": -0.017721518987341776,
+          "share_up": 0.4708860759493671,
+          "n_hallucinated": 395
+        },
+        "jpeg_4": {
+          "d_plus": 0.03544303797468362,
+          "lo": 0.017368652187799476,
+          "hi": 0.07748654176167753,
+          "supported": false,
+          "diff_at_tau": -0.035443037974683546,
+          "share_up": 0.49873417721518987,
+          "n_hallucinated": 395
+        },
+        "jpeg_5": {
+          "d_plus": 0.030379746835442978,
+          "lo": 0.011778540385838483,
+          "hi": 0.0839564436885866,
+          "supported": false,
+          "diff_at_tau": -0.043037974683544304,
+          "share_up": 0.44050632911392407,
+          "n_hallucinated": 395
+        },
+        "pixelate_1": {
+          "d_plus": 0.0025316455696202667,
+          "lo": 0.0,
+          "hi": 0.014855198019801973,
+          "supported": true,
+          "diff_at_tau": -0.04050632911392405,
+          "share_up": 0.25316455696202533,
+          "n_hallucinated": 395
+        },
+        "pixelate_2": {
+          "d_plus": 0.0075949367088608,
+          "lo": 0.002673441233359894,
+          "hi": 0.030152652430920353,
+          "supported": false,
+          "diff_at_tau": -0.03037974683544304,
+          "share_up": 0.3493670886075949,
+          "n_hallucinated": 395
+        },
+        "pixelate_3": {
+          "d_plus": 0.0075949367088608,
+          "lo": 0.0046948356807511304,
+          "hi": 0.03342117642381998,
+          "supported": false,
+          "diff_at_tau": -0.04810126582278482,
+          "share_up": 0.3620253164556962,
+          "n_hallucinated": 395
+        },
+        "pixelate_4": {
+          "d_plus": 0.0075949367088608,
+          "lo": 0.0025062656641604564,
+          "hi": 0.03770776961731725,
+          "supported": false,
+          "diff_at_tau": -0.06075949367088608,
+          "share_up": 0.3670886075949367,
+          "n_hallucinated": 395
+        },
+        "pixelate_5": {
+          "d_plus": 0.012658227848101222,
+          "lo": 0.0024875621890547706,
+          "hi": 0.04076348244147157,
+          "supported": false,
+          "diff_at_tau": -0.06075949367088608,
+          "share_up": 0.3620253164556962,
+          "n_hallucinated": 395
+        },
+        "gaussian_noise_1": {
+          "d_plus": 0.08860759493670889,
+          "lo": 0.06954372331012197,
+          "hi": 0.13730679193457773,
+          "supported": false,
+          "diff_at_tau": 0.007594936708860758,
+          "share_up": 0.6050632911392405,
+          "n_hallucinated": 395
+        },
+        "gaussian_noise_2": {
+          "d_plus": 0.07848101265822782,
+          "lo": 0.05513735125214611,
+          "hi": 0.129586638538129,
+          "supported": false,
+          "diff_at_tau": 0.0025316455696202528,
+          "share_up": 0.5974683544303797,
+          "n_hallucinated": 395
+        },
+        "gaussian_noise_3": {
+          "d_plus": 0.06329113924050633,
+          "lo": 0.039059963474025974,
+          "hi": 0.12121579876434244,
+          "supported": false,
+          "diff_at_tau": -0.015189873417721517,
+          "share_up": 0.5620253164556962,
+          "n_hallucinated": 395
+        },
+        "gaussian_noise_4": {
+          "d_plus": 0.02278481012658229,
+          "lo": 0.0072289156626506035,
+          "hi": 0.06990395526017171,
+          "supported": false,
+          "diff_at_tau": -0.025316455696202535,
+          "share_up": 0.43037974683544306,
+          "n_hallucinated": 395
+        },
+        "gaussian_noise_5": {
+          "d_plus": 0.0,
+          "lo": 0.0,
+          "hi": 0.005063612414058984,
+          "supported": true,
+          "diff_at_tau": -0.05063291139240507,
+          "share_up": 0.2911392405063291,
+          "n_hallucinated": 395
+        },
+        "contrast_1": {
+          "d_plus": 0.040506329113924044,
+          "lo": 0.03703216374269011,
+          "hi": 0.07711339122074332,
+          "supported": false,
+          "diff_at_tau": 0.007594936708860758,
+          "share_up": 0.5518987341772152,
+          "n_hallucinated": 395
+        },
+        "contrast_2": {
+          "d_plus": 0.03544303797468354,
+          "lo": 0.030848329048843267,
+          "hi": 0.07711475865354081,
+          "supported": false,
+          "diff_at_tau": 0.015189873417721517,
+          "share_up": 0.5367088607594936,
+          "n_hallucinated": 395
+        },
+        "contrast_3": {
+          "d_plus": 0.02278481012658229,
+          "lo": 0.018372703412073532,
+          "hi": 0.0694861215303826,
+          "supported": false,
+          "diff_at_tau": -0.0050632911392405056,
+          "share_up": 0.4810126582278481,
+          "n_hallucinated": 395
+        },
+        "contrast_4": {
+          "d_plus": 0.0,
+          "lo": 0.0,
+          "hi": 0.038073487813383905,
+          "supported": false,
+          "diff_at_tau": -0.017721518987341776,
+          "share_up": 0.43037974683544306,
+          "n_hallucinated": 395
+        },
+        "contrast_5": {
+          "d_plus": 0.002531645569620253,
+          "lo": 0.0,
+          "hi": 0.01827750924592671,
+          "supported": true,
+          "diff_at_tau": -0.035443037974683546,
+          "share_up": 0.30632911392405066,
+          "n_hallucinated": 395
+        }
+      }
+    }
+  },
+  "pgm": {
+    "J_learned": 0.14,
+    "loglik_gain_vs_J0": 5.452308795703914,
+    "within_image_corr": {
+      "cal": 0.016710233881090504,
+      "test": 0.015168677509235803
+    },
+    "robust_intervals": {
+      "eps": 0.9100537931825962,
+      "B": 2.7107210314903187,
+      "images": 150,
+      "share_B_gt_eps": 1.0,
+      "J_learned": {
+        "mean_width_robust": 0.5063468300675324,
+        "mean_width_box": 0.50221643857686
+      },
+      "J0": {
+        "mean_width_robust": 0.47737079180832576,
+        "mean_width_box": 0.47236704981238836
+      }
+    },
+    "train_cal_a": {
+      "unary_J0": {
+        "accuracy": 0.8198294243070362,
+        "precision": 0.7529411764705882,
+        "recall": 0.5019607843137255,
+        "f1": 0.6023529411764706,
+        "roc_auc": 0.8588866879108891,
+        "confusion": {
+          "tp": 128,
+          "fp": 42,
+          "tn": 641,
+          "fn": 127
+        }
+      },
+      "ising_tree_J": {
+        "accuracy": 0.8230277185501066,
+        "precision": 0.7947019867549668,
+        "recall": 0.47058823529411764,
+        "f1": 0.5911330049261083,
+        "roc_auc": 0.8607871845663595,
+        "confusion": {
+          "tp": 120,
+          "fp": 31,
+          "tn": 652,
+          "fn": 135
+        }
+      },
+      "max_abs_posterior_change": 0.12662929325091316
+    },
+    "test": {
+      "unary_J0": {
+        "accuracy": 0.8416347381864623,
+        "precision": 0.7837837837837838,
+        "recall": 0.5139240506329114,
+        "f1": 0.620795107033639,
+        "roc_auc": 0.869826719562421,
+        "confusion": {
+          "tp": 203,
+          "fp": 56,
+          "tn": 1115,
+          "fn": 192
+        }
+      },
+      "ising_tree_J": {
+        "accuracy": 0.8358876117496807,
+        "precision": 0.7974137931034483,
+        "recall": 0.46835443037974683,
+        "f1": 0.5901116427432217,
+        "roc_auc": 0.8711411862629582,
+        "confusion": {
+          "tp": 185,
+          "fp": 47,
+          "tn": 1124,
+          "fn": 210
+        }
+      },
+      "max_abs_posterior_change": 0.12267279357084171
+    }
+  }
+}

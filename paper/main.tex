@@ -110,10 +110,10 @@ The proof uses dominance only at $t=\hat\tau$, so the condition is sufficient bu
 \end{remark}
 
 \subsection{Why coupling claims does not narrow robust intervals}
-\authornote{Section to be completed with the full statement from \texttt{docs/theory/root\_dominance.md}; the proof is there.} Model the labels $h_i\in\{-1,+1\}$ of an image's claims as an attractive Ising tree, $p(h)\propto\exp(\sum_i\theta_ih_i+\sum_{(i,j)}J_{ij}h_ih_j)$ with $J_{ij}\ge0$, so that $\Pr(h_r=+1)=\sigma(2\eta_r)$ for the effective field $\eta_r$ computed by belief propagation. Let the fields be perturbed within $|\delta_i|\le\varepsilon_i$ and $\sum_i|\delta_i|\le B$.
+\authornote{Section to be completed with the full statement from \url{docs/theory/root_dominance.md}; the proof is there.} Model the labels $h_i\in\{-1,+1\}$ of an image's claims as an attractive Ising tree, $p(h)\propto\exp(\sum_i\theta_ih_i+\sum_{(i,j)}J_{ij}h_ih_j)$ with $J_{ij}\ge0$, so that $\Pr(h_r=+1)=\sigma(2\eta_r)$ for the effective field $\eta_r$ computed by belief propagation. Let the fields be perturbed within $|\delta_i|\le\varepsilon_i$ and $\sum_i|\delta_i|\le B$.
 
 \begin{proposition}[P2, root dominance]\label{prop:p2}
-Let $\gamma_{\max}=\max_{i\neq r}\prod_{e\in\mathrm{path}(i\to r)}\tanh J_e<1$ and $a=\min(\varepsilon_r,B)$. Then $\eta_r+a\le\sup_\delta\eta_r(\delta)\le\eta_r+a+\gamma_{\max}(B-\varepsilon_r)_+$, and symmetrically for the infimum. In particular, if $B\le\varepsilon_r$ the robust interval is exactly $[\sigma(2(\eta_r-B)),\sigma(2(\eta_r+B))]$ and does not depend on the graph.
+Let $\gamma_{\max}=\max_{i\neq r}\prod_{e\in\mathrm{path}(i\to r)}\tanh J_e<1$ and $a=\min(\varepsilon_r,B)$. Then\[\eta_r+a\;\le\;\sup_\delta\eta_r(\delta)\;\le\;\eta_r+a+\gamma_{\max}(B-\varepsilon_r)_+,\]and symmetrically for the infimum. In particular, if $B\le\varepsilon_r$ the robust interval is exactly\[\big[\sigma(2(\eta_r-B)),\ \sigma(2(\eta_r+B))\big]\]and does not depend on the graph.
 \end{proposition}
 The ``gain $\le 1$'' ingredient is known: for a binary variable $X$ in any Bayesian network, co-varying the parameters $\theta_{x|u}$ and $\theta_{\bar x|u}=1-\theta_{x|u}$ (with $\theta_{x|u}\notin\{0,1\}$) changes the log-odds of any query $y$ given evidence $e$ by at most the change in the log-odds of $\theta_{x|u}$, ``with no assumptions whatsoever about the structure'' of the network \citep[Theorem~3.3, pp.~275--276]{chan2002numbers}. Chan and Darwiche also remark that a network with ``a specific topology'' can be more robust than this bound \citep[p.~281]{chan2002numbers}. Proposition~\ref{prop:p2} is such a case: perturbing a node's field in an attractive Ising tree is the analogue of their single-parameter change, and on a tree the gain from a non-target node is at most $\prod_e\tanh J_e<1$; the shared-budget analysis is also ours.
 
@@ -147,9 +147,9 @@ The study was pre-registered: hypotheses, decision rules, shift parameters and a
 
 \begin{table}[t]\centering\small
 \caption{Pre-registered hypotheses (target 0.10). Holm-adjusted p-values in parentheses.}\label{tab:hyp}
-\begin{tabular}{@{}lp{0.38\linewidth}ll@{}}\toprule
+\resizebox{\linewidth}{!}{\begin{tabular}{@{}lp{6.2cm}ll@{}}\toprule
  & Hypothesis & Claim-level filter & Image-level filter\\\midrule
-\input{tables/tab_hyp.tex}\end{tabular}
+\input{tables/tab_hyp.tex}\end{tabular}}
 \end{table}
 
 \subsection{Clean reference}
@@ -191,9 +191,9 @@ On AMBER both filters were preserved and conservative (\AmberClaim{} and \AmberI
 
 \begin{table}[t]\centering\footnotesize\setlength{\tabcolsep}{3.5pt}
 \caption{Non-degradation shifts (target 0.10). Risk [95\% CI], pre-registered decision, share of supported claims kept by the claim-level filter and abstention rate of the image-level filter.}\label{tab:main}
-\begin{tabular}{@{}lllllll@{}}\toprule
+\resizebox{\linewidth}{!}{\begin{tabular}{@{}lllllll@{}}\toprule
 Condition & Claim risk & Decision & Image risk & Decision & Kept & Abst.\\\midrule
-\input{tables/tab_main.tex}\end{tabular}
+\input{tables/tab_main.tex}\end{tabular}}
 \end{table}
 
 \subsection{Graphical-model view (descriptive)}
@@ -201,9 +201,9 @@ Claim labels within a caption were almost uncorrelated (\CorrCal{} on calibratio
 
 \begin{table}[t]\centering\footnotesize\setlength{\tabcolsep}{3.5pt}
 \caption{Classification of claims as supported (threshold 0.5 on the posterior), unary model vs.\ chain Ising model.}\label{tab:pgm}
-\begin{tabular}{@{}llrrrrrrrrr@{}}\toprule
+\resizebox{\linewidth}{!}{\begin{tabular}{@{}llrrrrrrrrr@{}}\toprule
 Data & Model & Acc. & Prec. & Rec. & F1 & AUC & TP & FP & TN & FN\\\midrule
-\input{tables/tab_pgm.tex}\end{tabular}
+\input{tables/tab_pgm.tex}\end{tabular}}
 \end{table}
 
 \begin{figure}[t]\centering
@@ -231,9 +231,9 @@ Data & Model & Acc. & Prec. & Rec. & F1 & AUC & TP & FP & TN & FN\\\midrule
 \section{Results for every degradation}
 \begin{table}[h]\centering\scriptsize\setlength{\tabcolsep}{3pt}
 \caption{All S1 conditions (target 0.10).}\label{tab:s1}
-\begin{tabular}{@{}llllllll@{}}\toprule
+\resizebox{\linewidth}{!}{\begin{tabular}{@{}llllllll@{}}\toprule
 Corruption & Sev. & Claim risk & Decision & Image risk & Decision & Kept & Abst.\\\midrule
-\input{tables/tab_s1.tex}\end{tabular}
+\input{tables/tab_s1.tex}\end{tabular}}
 \end{table}
 
 \IfFileExists{elsarticle-harv.bst}{\bibliographystyle{elsarticle-harv}}{\bibliographystyle{plainnat}}

@@ -1,0 +1,5 @@
+Pre-registered audit of conformal hallucination filters under 30 realistic shifts
+Image degradation and a domain shift left the guarantees intact
+A detector swap broke them; label-free recalibration restored them
+A VLM swap broke the claim-level guarantee but not the image-level one
+A root-dominance bound explains why coupling claims adds no robustness

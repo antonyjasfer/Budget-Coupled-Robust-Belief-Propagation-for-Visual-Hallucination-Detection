@@ -1,0 +1,75 @@
+% IEEE version of the manuscript (two-column IEEEtran). Shares body.tex, abstract.tex,
+% numbers.tex, figures/ and tables/ with main.tex (Elsevier). Build: latexmk -pdf ieee.tex
+\documentclass[conference]{IEEEtran}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,mathtools}
+\let\proof\relax\let\endproof\relax
+\usepackage{amsthm}
+\usepackage{graphicx,booktabs,multirow,xcolor,enumitem}
+\usepackage[numbers,sort&compress]{natbib}
+\usepackage{xurl}
+\usepackage[hidelinks]{hyperref}
+\usepackage[capitalise,noabbrev]{cleveref}
+\input{numbers.tex}
+\newtheorem{proposition}{Proposition}
+\newtheorem{lemma}{Lemma}
+\theoremstyle{remark}\newtheorem{remark}{Remark}
+\theoremstyle{definition}\newtheorem{definition}{Definition}
+\newcommand{\todo}[1]{{\color{red}[TODO: #1]}}
+\newcommand{\authornote}[1]{{\color{blue}[Author: #1]}}
+\newcommand{\Sh}{\tilde S}
+\newcommand{\Mh}{\tilde M}
+\renewcommand{\Pr}{\mathbb{P}}
+\newenvironment{widetable}{\begin{table*}}{\end{table*}}
+\newenvironment{widefigure}{\begin{figure*}}{\end{figure*}}
+\newcommand{\smallfig}{\linewidth}
+\begin{document}
+\title{When Do Conformal Hallucination Guarantees Survive Distribution Shift? An Audit of Claim-Level and Image-Level Filters for Vision--Language Models}
+% Author order to be confirmed by the authors.
+\author{
+\IEEEauthorblockN{A. Antony Selva Jasfer}
+\IEEEauthorblockA{\textit{Dept. of Artificial Intelligence and Data Science}\\
+\textit{Amrita School of Computing}\\
+\textit{Amrita Vishwa Vidyapeetham}\\
+Nagercoil 629001, India\\
+nc.ai.u4aid24068@nc.students.amrita.edu}
+\and
+\IEEEauthorblockN{Akash Narayanan C}
+\IEEEauthorblockA{\textit{Dept. of Artificial Intelligence and Data Science}\\
+\textit{Amrita School of Computing}\\
+\textit{Amrita Vishwa Vidyapeetham}\\
+Nagercoil 629001, India\\
+\todo{email}}
+\and
+\IEEEauthorblockN{U. Priyan}
+\IEEEauthorblockA{\textit{Dept. of Artificial Intelligence and Data Science}\\
+\textit{Amrita School of Computing}\\
+\textit{Amrita Vishwa Vidyapeetham}\\
+Nagercoil 629001, India\\
+\todo{email}}
+\and
+\IEEEauthorblockN{Nisanth S}
+\IEEEauthorblockA{\textit{Dept. of Artificial Intelligence and Data Science}\\
+\textit{Amrita School of Computing}\\
+\textit{Amrita Vishwa Vidyapeetham}\\
+Nagercoil 629001, India\\
+\todo{email}}
+\and
+\IEEEauthorblockN{S. Raja}
+\IEEEauthorblockA{\textit{Department of Mathematics}\\
+\textit{Amrita School of Computing}\\
+\textit{Amrita Vishwa Vidyapeetham}\\
+Nagercoil 629001, India\\
+nellairajaa@yahoo.com\\ ORCID 0000-0003-1281-9948}
+}
+\maketitle
+\begin{abstract}
+\input{abstract.tex}
+\end{abstract}
+\begin{IEEEkeywords}
+conformal prediction, distribution shift, hallucination, vision--language models, stochastic dominance, belief propagation
+\end{IEEEkeywords}
+\input{body.tex}
+\bibliographystyle{IEEEtranN}
+\bibliography{refs}
+\end{document}

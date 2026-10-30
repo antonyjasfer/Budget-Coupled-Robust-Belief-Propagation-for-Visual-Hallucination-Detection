@@ -1,0 +1,241 @@
+% Manuscript draft for the International Journal of Approximate Reasoning (IJAR).
+% Build: latexmk -pdf main.tex   (run `python paper/make_figures.py` first)
+% Uses elsarticle when it is installed (Overleaf has it); falls back to article otherwise.
+\IfFileExists{elsarticle.cls}{%
+  \documentclass[preprint,11pt,authoryear]{elsarticle}\def\ELS{1}}{%
+  \documentclass[11pt]{article}\usepackage[margin=1in]{geometry}\usepackage[authoryear,round]{natbib}}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{graphicx,booktabs,multirow,xcolor,enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage[capitalise,noabbrev]{cleveref}
+\input{numbers.tex}
+
+\newtheorem{proposition}{Proposition}
+\newtheorem{lemma}{Lemma}
+\theoremstyle{remark}\newtheorem{remark}{Remark}
+\theoremstyle{definition}\newtheorem{definition}{Definition}
+
+% Draft markers: every \todo must be gone before submission.
+\newcommand{\todo}[1]{{\color{red}[TODO: #1]}}
+\newcommand{\authornote}[1]{{\color{blue}[Author: #1]}}
+\newcommand{\Sh}{\tilde S}
+\newcommand{\Mh}{\tilde M}
+\renewcommand{\Pr}{\mathbb{P}}
+
+\begin{document}
+
+\ifdefined\ELS
+\begin{frontmatter}
+\title{When do conformal hallucination guarantees survive distribution shift?\\ An audit of claim-level and image-level filters for vision--language models}
+\author{A.\ Antony Selva Jasfer}
+\address{\todo{affiliation}}
+\fi
+\ifdefined\ELS\else
+\title{When do conformal hallucination guarantees survive distribution shift?\\ An audit of claim-level and image-level filters for vision--language models}
+\author{A.\ Antony Selva Jasfer\\ \todo{affiliation}}
+\date{Draft, \today}
+\maketitle
+\fi
+
+\begin{abstract}
+\textbf{[DRAFT]} Conformal filters for vision--language model (VLM) captions keep an object claim only when an open-vocabulary detector finds enough evidence for it, and guarantee that at most a fraction $\delta$ of hallucinated claims is kept --- provided test data are exchangeable with calibration data. Deployed systems violate that assumption. We pre-registered and ran an audit of two such filters, a claim-level filter and an image-level filter, both calibrated on clean COCO captions from LLaVA-1.5-7B scored by OWLv2, under four families of realistic shift: 25 image degradations, two detector swaps, two VLM swaps and a domain shift to AMBER. We give a one-line sufficient condition for the guarantee to survive (hallucinated claims' scores become stochastically no larger) and show it is far from necessary: all degradations preserved the claim-level target although the condition held in only \NHtwo{} of 25. Swapping the detector for Grounding DINO broke both filters (claim-level risk \GdinoClaim{} against a target of 0.10) and recalibrating the threshold on the same labelled claims repaired them without new labels. Swapping the VLM broke the claim-level guarantee (InternVL3-2B: \InternClaim{}) but not the image-level one: the stronger VLM hallucinates less often, but its hallucinations are more often objects the detector partly sees. We also show, via a root-dominance bound for Ising trees that refines a result of Chan and Darwiche, why coupling claims in a graphical model cannot narrow robust posterior intervals at the measured coupling strength. \todo{final abstract after Introduction/Discussion; check IJAR word limit}
+\end{abstract}
+
+\ifdefined\ELS
+\begin{keyword}
+conformal prediction \sep distribution shift \sep hallucination \sep vision--language models \sep stochastic dominance \sep belief propagation
+\end{keyword}
+\end{frontmatter}
+\fi
+
+% =====================================================================
+\section{Introduction}\label{sec:intro}
+\authornote{Draft. Statements about CEBC, ConfLVLM, Chan \& Darwiche, ImageNet-C, AMBER and Holm come from quotes you checked; all other citations still need your check against the PDF (entries marked UNVERIFIED in \texttt{refs.bib}).}
+
+Vision--language models (VLMs) describe images fluently but often mention objects that are not there. This \emph{object hallucination} has been measured for years with CHAIR, which compares the objects named in a caption with an image's annotated objects \citep{rohrbach2018chair}, and with benchmarks such as POPE and AMBER \citep{li2023pope,wang2023amber}. A practical response is to check each mentioned object against an external source of visual evidence and to drop the mentions that the evidence does not support. Two recent methods make this step statistically principled. CEBC sets the evidence threshold at the $(1-\delta)$ quantile of a detector's scores on hallucinated mentions from a calibration set, so that ``only a small fraction (about $\delta$) of hallucinated mentions'' pass \citep[Sec.~3.3]{cebc}. ConfLVLM filters the claims of a VLM's response so that, with probability at least $1-\alpha$, the retained response contains no more than a tolerated amount of error \citep[Eq.~1]{conflvlm}. With a conformal choice of threshold, such filters carry finite-sample guarantees that hold without any model of the VLM or the detector \citep{vovk2005algorithmic,angelopoulos2023gentle}.
+
+These guarantees rest on one assumption: the calibration data and the data the filter later sees are exchangeable. Deployed systems break it routinely. Images arrive blurred, compressed or noisy; the detector that supplies the evidence is upgraded or replaced; the filter is put in front of a newer VLM; the images come from a different source. The ConfLVLM authors name this as their main limitation: the framework ``assumes exchangeability of the calibration and test datasets'' and ``may not always hold in applications where distribution shifts frequently occur'' \citep[Limitations]{conflvlm}. CEBC observes reduced robustness ``under domain shift'' and recalibrates its threshold separately for each dataset \citep[Secs.~5.1--5.2]{cebc}. Robust conformal methods exist, but they assume the shift lies in a known set, such as an $\ell_2$ ball around each input or an $f$-divergence ball around the training distribution \citep{gendler2022adversarially,cauchois2024robust}, or that the likelihood ratio between the two distributions is known or estimable \citep{tibshirani2019covariate,barber2023beyond}. A detector swap or a new caption generator is not naturally described in any of these ways.
+
+We therefore ask an empirical and a theoretical question. \emph{Which realistic shifts leave the clean guarantee of a calibrated hallucination filter intact without recalibration, which ones break it, why, and what is the cheapest repair that restores it?} We study the claim-level filter of CEBC and the image-level filter of ConfLVLM, both calibrated on clean COCO captions from LLaVA-1.5 scored by OWLv2, under four families of shift: 25 image degradations, two detector swaps, two VLM swaps and a move to AMBER's images.
+
+Our contributions are:
+\begin{enumerate}[leftmargin=*,itemsep=1pt]
+  \item \textbf{A pre-registered audit.} Hypotheses, decision rules, shift parameters and analysis code were frozen in a public repository before any test caption or score was computed; every number in this paper is produced by that code (\cref{sec:design}).
+  \item \textbf{A sufficient condition, and evidence that it is far from necessary.} If a shift makes the scores of hallucinated claims stochastically no larger, the clean guarantee survives (Proposition~\ref{prop:p1}). All 25 degradations preserved the claim-level target, yet the condition held in only \NHtwo{} of them; what matters is the change at the calibrated threshold (\cref{sec:res-s1}).
+  \item \textbf{Changing the evidence source breaks the guarantee; a label-free recalibration repairs it.} Replacing OWLv2 with Grounding DINO raised the claim-level risk from \CleanClaim{} to \GdinoClaim{} against a target of 0.10. Recomputing the threshold on the new detector's scores for the same labelled calibration claims restored the target, without new annotation.
+  \item \textbf{Changing the VLM breaks the claim-level guarantee but not the image-level one.} Thresholds calibrated on LLaVA-1.5 were violated on InternVL3-2B (\InternClaim{}). An exploratory analysis suggests why: newer VLMs hallucinate less often, but the objects they do hallucinate are more often ones the detector partly sees.
+  \item \textbf{A graphical-model explanation of why coupling claims does not help.} For an attractive Ising tree over a caption's claims we prove a root-dominance bound (Proposition~\ref{prop:p2}): a perturbation's influence on a claim through its neighbours is damped by $\tanh J$ per edge, so with the coupling we measure ($J=\Jlearned{}$) graph-based propagation cannot narrow robust posterior intervals. This refines, for trees, a structure-free sensitivity bound of \citet{chan2002numbers}.
+\end{enumerate}
+
+% =====================================================================
+\section{Related work}\label{sec:related}
+
+\paragraph{Object hallucination and its measurement.} CHAIR \citep{rohrbach2018chair} counts the COCO objects \citep{lin2014microsoft} that a caption mentions but the image's annotations do not contain; it is the labelling rule we use. POPE \citep{li2023pope} turns hallucination into yes/no questions, and AMBER \citep{wang2023amber} provides an LLM-free benchmark with annotated present objects and annotated ``hallucinatory target objects'' that models are likely to imagine. Detection methods use the VLM's own signals, such as uncertainty over sampled answers \citep{zhang2024vluncertainty} or attention patterns \citep{wen2026cadmp}, external grounding \citep{zohrabi2026haloprobe}, or combinations of evidence; in this journal, \citet{huang2025evidential} detect visual hallucinations from the conflict between bodies of evidence in Dempster--Shafer theory. These methods produce scores; our concern is what happens to a \emph{guarantee} attached to such a score when conditions change.
+
+\paragraph{Conformal guarantees for generated content.} Split conformal prediction turns any score into a decision rule with a finite-sample guarantee under exchangeability \citep{vovk2005algorithmic,angelopoulos2023gentle}; conformal risk control extends this from coverage to expected losses \citep{angelopoulos2022conformal}. For language models, \citet{mohri2024language} and \citet{cherian2024large} filter or weaken the claims of a response until it is correct with a chosen probability. For VLMs, ConfLVLM applies the same idea to claims about images \citep{conflvlm}, CEBC calibrates a detector-evidence threshold on hallucinated object mentions and combines it with candidate selection and constrained rewriting \citep{cebc}, and BCEA lets a VLM abstain or look again at the image within a budget \citep{xu2026bcea}. Their guarantees are stated for exchangeable calibration and test data, and CEBC, for example, recalibrates when the dataset changes \citep[Sec.~5.2]{cebc} \todo{author: check this sentence against Mohri, Cherian and BCEA}. We take one step back and ask when recalibration is needed at all.
+
+\paragraph{Conformal prediction under distribution shift.} Under covariate shift with a known likelihood ratio, weighting the calibration scores restores validity \citep{tibshirani2019covariate}; without exchangeability, the coverage loss can be bounded in terms of how far the data are from exchangeable \citep{barber2023beyond}. Robust approaches guarantee coverage for every test distribution in an $f$-divergence ball \citep{cauchois2024robust} or under bounded $\ell_2$ perturbations of the input \citep{gendler2022adversarially}. These results need either the shift's size and form in advance or an estimate of the likelihood ratio. Our shifts are discrete changes of pipeline component (detector, VLM) or realistic corruptions \citep{hendrycks2019benchmarking}; instead of bounding them, we measure them, give a simple sufficient condition (stochastic dominance of hallucinated scores) under which nothing needs to be done, and test it.
+
+\paragraph{Sensitivity of probabilistic graphical models.} How much a posterior can move when a parameter moves is a classical question for Bayesian networks. \citet{chan2002numbers} show that, for a binary variable, a change in one parameter changes the log-odds of any query by at most the parameter's own log-odds change, for any network structure, and note that specific topologies can be more robust. For belief propagation, \citet{ihler2005loopy} bound how message errors propagate and contract along edges. Our Proposition~\ref{prop:p2} uses the same contraction on attractive Ising trees, together with a shared perturbation budget, to show that coupling a caption's claims cannot narrow their robust intervals at the coupling strengths we measure.
+
+% =====================================================================
+\section{Setting and filters}\label{sec:setting}
+
+A VLM writes a caption for image $x$. Following CHAIR \citep{rohrbach2018chair} we extract the COCO object categories mentioned in the caption; each mention is a \emph{claim}. A claim is \emph{hallucinated} ($Y=1$) if its category is not among the image's ground-truth objects and \emph{supported} ($Y=0$) otherwise. An open-vocabulary detector scores each claim; we use the logit of the detector's maximum box probability for the query ``a photo of a $\langle$category$\rangle$'', so a larger score $S$ means more visual evidence that the object is present.
+
+\paragraph{Claim-level filter (CEBC-style).} Let $S_1,\dots,S_m$ be the scores of the hallucinated claims in the calibration set and $k=\lceil (m+1)(1-\delta)\rceil$. The threshold is the $k$-th smallest score, $\hat\tau=S_{(k)}$ ($\hat\tau=+\infty$ if $k>m$), and a claim is kept iff $S>\hat\tau$. Its \emph{risk} is the probability that a hallucinated test claim is kept, $R_{\mathrm{c}}=\Pr(S>\hat\tau\mid Y=1)$. This is the threshold component of CEBC \citep[Sec.~3.3]{cebc}, which sets $\tau=\mathrm{clip}(\mathrm{Quantile}_{1-\delta}(\mathcal H),\tau_{\min},\tau_{\max})$ over the detector scores $\mathcal H$ of hallucinated calibration mentions (their Eq.~4) and argues that ``only a small fraction (about $\delta$) of hallucinated mentions'' then pass. We drop the clipping and use the finite-sample conformal index $k$, which turns ``about $\delta$'' into the guarantee below; CEBC states no formal guarantee or exchangeability assumption. We study only this filtering step, not CEBC's candidate selection and constrained rewriting \citep[Sec.~3.6]{cebc}.
+
+\paragraph{Image-level filter (ConfLVLM-style, $\lambda=0$).} For image $j$ let $M_j$ be the largest score among its hallucinated claims ($-\infty$ if there are none). The threshold is the conformal $(1-\alpha)$ upper quantile of $M_1,\dots,M_n$ over calibration images, and the risk is the probability that a test image keeps at least one hallucinated claim, $R_{\mathrm{i}}=\Pr(M>\hat\tau)$. This is the guarantee $\Pr(L\le\lambda)\ge1-\alpha$ of \citet[Eq.~1]{conflvlm} with $L$ the indicator that a kept claim is hallucinated and tolerance $\lambda=0$; as there, an empty output (abstention) has zero loss. Our implementation differs from theirs in using CHAIR labels and detector scores instead of LLM-decomposed claims and model-based confidence \todo{author: confirm against ConfLVLM Sec.~3}.
+
+\paragraph{Clean guarantee.} If the test claim (image) is exchangeable with the calibration claims (images), $R_{\mathrm{c}}\le\delta$ and $R_{\mathrm{i}}\le\alpha$ \citep{vovk2005algorithmic,angelopoulos2023gentle}. Both risks are \emph{unconditional false-acceptance probabilities}; neither controls the share of hallucinated claims among the claims that are kept.
+
+\section{Theory}\label{sec:theory}
+
+\subsection{A sufficient condition for a guarantee to survive a shift}
+Under a shift, a hallucinated test claim has score $\Sh$ instead of $S$ (image level: $\Mh$ instead of $M$); the calibration data, and so $\hat\tau$, are unchanged.
+
+\begin{proposition}[P1]\label{prop:p1}
+(a) If $\Pr(\Sh>t)\le\Pr(S>t)$ for all $t\in\mathbb{R}$ (the shifted score of a hallucinated claim is stochastically no larger than its clean score), then $\Pr(\Sh>\hat\tau)\le\Pr(S>\hat\tau)\le\delta$.
+(b) The same holds at image level with $M,\Mh,\alpha$.
+(c) If the shift never raises the score of a hallucinated claim ($\Sh\le S$ almost surely), the conditions of (a) and (b) hold.
+\end{proposition}
+\begin{proof}
+The test point is independent of the calibration sample and hence of $\hat\tau$. Conditioning on $\hat\tau=t$ and applying the dominance condition at that $t$,
+$\Pr(\Sh>\hat\tau)=\mathbb{E}\big[\Pr(\Sh>t)|_{t=\hat\tau}\big]\le\mathbb{E}\big[\Pr(S>t)|_{t=\hat\tau}\big]=\Pr(S>\hat\tau)\le\delta$, where the last step is the clean guarantee. Part (b) is identical. For (c), $\{\Sh>t\}\subseteq\{S>t\}$ for every $t$, and $\Mh=\max_i\Sh_i\le\max_i S_i=M$.
+\end{proof}
+
+\begin{remark}
+The proof uses dominance only at $t=\hat\tau$, so the condition is sufficient but far from necessary; \cref{sec:res-s1} shows that this gap matters in practice. Nothing is assumed about supported claims: a shift that lowers supported scores more than hallucinated ones keeps the risk below $\delta$ while raising the share of hallucinated claims among those kept.
+\end{remark}
+
+\subsection{Why coupling claims does not narrow robust intervals}
+\authornote{Section to be completed with the full statement from \texttt{docs/theory/root\_dominance.md}; the proof is there.} Model the labels $h_i\in\{-1,+1\}$ of an image's claims as an attractive Ising tree, $p(h)\propto\exp(\sum_i\theta_ih_i+\sum_{(i,j)}J_{ij}h_ih_j)$ with $J_{ij}\ge0$, so that $\Pr(h_r=+1)=\sigma(2\eta_r)$ for the effective field $\eta_r$ computed by belief propagation. Let the fields be perturbed within $|\delta_i|\le\varepsilon_i$ and $\sum_i|\delta_i|\le B$.
+
+\begin{proposition}[P2, root dominance]\label{prop:p2}
+Let $\gamma_{\max}=\max_{i\neq r}\prod_{e\in\mathrm{path}(i\to r)}\tanh J_e<1$ and $a=\min(\varepsilon_r,B)$. Then $\eta_r+a\le\sup_\delta\eta_r(\delta)\le\eta_r+a+\gamma_{\max}(B-\varepsilon_r)_+$, and symmetrically for the infimum. In particular, if $B\le\varepsilon_r$ the robust interval is exactly $[\sigma(2(\eta_r-B)),\sigma(2(\eta_r+B))]$ and does not depend on the graph.
+\end{proposition}
+The ``gain $\le 1$'' ingredient is known: for a binary variable $X$ in any Bayesian network, co-varying the parameters $\theta_{x|u}$ and $\theta_{\bar x|u}=1-\theta_{x|u}$ (with $\theta_{x|u}\notin\{0,1\}$) changes the log-odds of any query $y$ given evidence $e$ by at most the change in the log-odds of $\theta_{x|u}$, ``with no assumptions whatsoever about the structure'' of the network \citep[Theorem~3.3, pp.~275--276]{chan2002numbers}. Chan and Darwiche also remark that a network with ``a specific topology'' can be more robust than this bound \citep[p.~281]{chan2002numbers}. Proposition~\ref{prop:p2} is such a case: perturbing a node's field in an attractive Ising tree is the analogue of their single-parameter change, and on a tree the gain from a non-target node is at most $\prod_e\tanh J_e<1$; the shared-budget analysis is also ours.
+
+% =====================================================================
+\section{Experimental design}\label{sec:design}
+The study was pre-registered: hypotheses, decision rules, shift parameters and analysis code were frozen in a public repository under the tag \texttt{prereg-v2} before any test caption or score was computed \todo{repository URL and archived DOI}. Exploratory analyses are labelled as such.
+
+\paragraph{Data.} Calibration uses 700 clean COCO val2014 images \citep{lin2014microsoft} (\NCal{} claims), and the locked test split has 500 images (\NTest{} claims, \NTestHall{} hallucinated). The domain test uses the 804 AMBER generative images \citep{wang2023amber} not used in our pilot; claims are labelled with the \texttt{truth} (present objects, $A_{obj}$ in the paper) and \texttt{hallu} (annotated hallucinatory target objects, $H_{obj}$) lists of AMBER's annotation file, and the \NAmberUnknown{} of \NAmberClaims{} claims in neither list are excluded. This differs from AMBER's own CHAIR, which counts every vocabulary object not in $A_{obj}$ as hallucinated \citep[Eq.~2]{wang2023amber}; we keep only claims whose label was annotated, because AMBER's authors note that $H_{obj}$ is incomplete and that noun extraction can mislabel words such as ``orange'' \citep[Sec.~6]{wang2023amber}. The AMBER hallucinations we evaluate are therefore the ``likely to be imagined'' objects AMBER annotated. The 200 COCO and 200 AMBER images used in exploratory pilots are excluded by code.
+
+\paragraph{Source pipeline.} Captions from LLaVA-1.5-7B \citep{liu2024improved} (greedy decoding, prompt ``Please describe this image in detail.'', at most 512 new tokens); claims and labels with our re-implementation of CHAIR; scores from OWLv2 \citep{minderer2023scaling} (checkpoint \texttt{owlv2-base-}\allowbreak\texttt{patch16-ensemble}). Primary targets $\delta=\alpha=0.10$; 0.05 and 0.20 are secondary.
+
+\paragraph{Shifts} (applied to test data only).
+\begin{itemize}[leftmargin=*,itemsep=1pt]
+  \item \textbf{S1, degradation:} four of the 15 ImageNet-C corruptions (Gaussian noise, contrast, pixelate, JPEG) and Gaussian blur, which ImageNet-C places in its extra validation set \citep[Sec.~4.1 and App.~B]{hendrycks2019benchmarking}, at five severities each. The paper does not print the severity parameters; we use those of the authors' code (\url{https://github.com/hendrycks/robustness}), re-implemented with PIL and NumPy \todo{appendix table of S1 parameters; author to check against the repository}.
+  \item \textbf{S2, detector swap:} OWLv2 $\to$ OWL-ViT v1 \citep{minderer2022simple}; OWLv2 $\to$ Grounding DINO base \citep{liu2024grounding}. Also with the threshold recalibrated on the new detector's scores for the same calibration claims (labels do not depend on the detector).
+  \item \textbf{S3, VLM swap:} LLaVA-1.5-7B $\to$ Qwen2.5-VL-3B-Instruct \citep{bai2025qwen25} and InternVL3-2B \citep{zhu2025internvl3}, same prompt, greedy, at most 512 new tokens.
+  \item \textbf{S4, domain:} COCO val2014 $\to$ AMBER. AMBER's images come from the MS-COCO 2014 \emph{test} set and Unsplash \citep[App.~A.1.1]{wang2023amber}, so this is a partial domain shift (new images and annotations, a partly shared image source), not a disjoint domain.
+  \item \textbf{S5, object removal (exploratory):} for one supported claim per test image, all COCO boxes of that category (enlarged by 10\%) are filled with the image's mean colour, making the claim hallucinated by construction.
+\end{itemize}
+
+\paragraph{Hypotheses.} H1: every S1 condition preserves both targets (reported together with the share of supported claims kept and the abstention rate). H2: under S1, $\Sh$ is stochastically no larger than $S$. H3: at least one S2 swap violates the claim-level target. H4: recalibration repairs S2. H5: LLaVA-calibrated thresholds transfer to each S3 VLM. H6: they transfer to AMBER.
+
+\paragraph{Estimation and decisions.} Thresholds are averaged over 200 calibration resamples, each using 80\% of the calibration images. Uncertainty is quantified by an image-level cluster bootstrap with 2{,}000 resamples \citep{efron1993introduction}, since claims from one caption are not independent. A condition is \emph{violated} if the 95\% CI lies entirely above the target, \emph{preserved} if its upper bound is at most target $+\,0.03$, and \emph{inconclusive} otherwise. H2 is assessed per condition by $D^+=\max_t[\Pr(\Sh>t)-\Pr(S>t)]$ on paired hallucinated test claims and is supported if the upper bound of its 95\% CI is at most 0.03. P-values for H1 and H3--H6 are Holm-adjusted within each filter \citep{holm1979simple}.
+
+\paragraph{Graphical model (descriptive).} A logistic unary model on the OWLv2 score and a chain Ising model over each caption's claims (in caption order) with one shared coupling $J\in[0,2]$, chosen by exact likelihood on Cal-A; inference by exact belief propagation. Robust intervals use $(\varepsilon,B)$ set to the 0.9 quantiles of the field changes caused by S1 on Cal-A.
+
+% =====================================================================
+\section{Results}\label{sec:results}
+
+\Cref{tab:hyp} summarises the pre-registered hypotheses, \cref{fig:forest,tab:main} the non-degradation shifts and \cref{fig:s1,tab:s1} the degradations.
+
+\begin{table}[t]\centering\small
+\caption{Pre-registered hypotheses (target 0.10). Holm-adjusted p-values in parentheses.}\label{tab:hyp}
+\begin{tabular}{@{}lp{0.38\linewidth}ll@{}}\toprule
+ & Hypothesis & Claim-level filter & Image-level filter\\\midrule
+\input{tables/tab_hyp.tex}\end{tabular}
+\end{table}
+
+\subsection{Clean reference}
+On the clean test split the claim-level filter kept \CleanClaim{} of hallucinated claims and the image-level filter let \CleanImage{} of images keep a hallucination, both within the target; the claim-level filter kept \CleanKept{} of supported claims.
+
+\subsection{Image degradation is safe, but not for the reason one might expect}\label{sec:res-s1}
+All 25 degradations preserved the claim-level target (\cref{fig:s1}); risk generally \emph{fell} with severity, because degradation lowers detector evidence for all claims. At image level, three mild conditions (Gaussian noise 1, contrast 1 and 2) were inconclusive, with point estimates of 0.107--0.114 and CI upper bounds just above 0.13, so H1 was supported for the claim-level filter only. Safety came at a cost in utility: at the highest severities the claim-level filter kept as few as 21\% of supported claims and the image-level filter abstained on up to 48\% of images (\cref{fig:utility}), so a ``preserved'' guarantee alone does not certify a usable filter.
+
+Proposition~\ref{prop:p1}'s condition held in only \NHtwo{} of 25 conditions (\cref{fig:h2}, left): mild JPEG, noise and contrast raised some hallucinated scores somewhere in the distribution. What matters for validity is the change at the calibrated threshold, which was small and mostly negative (\cref{fig:h2}, right). Where it was positive (e.g.\ Gaussian blur 1, $+0.018$) the clean filter's slack below the target absorbed it.
+
+\begin{figure}[t]\centering
+\includegraphics[width=\linewidth]{figures/fig_s1_severity.pdf}
+\caption{Realised risk under image degradation (S1) for both filters, with image-level cluster-bootstrap 95\% CIs. Dashed line: target 0.10; shaded band: preservation margin (0.10--0.13); dotted line: clean risk.}\label{fig:s1}
+\end{figure}
+
+\begin{figure}[t]\centering
+\includegraphics[width=\linewidth]{figures/fig_h2.pdf}
+\caption{H2. Left: one-sided Kolmogorov--Smirnov gap $D^+$ between shifted and clean scores of hallucinated test claims (95\% CI; H2 requires the upper bound $\le0.03$). Right: the same difference evaluated only at the calibrated threshold, which is what Proposition~\ref{prop:p1} needs.}\label{fig:h2}
+\end{figure}
+
+\subsection{Changing the evidence source breaks the guarantee; relabelling-free recalibration repairs it}
+Swapping OWLv2 for Grounding DINO broke both filters (claim level \GdinoClaim{}, image level \GdinoImage{}): Grounding DINO assigns high scores to absent objects --- its authors note that it ``will produce false positive results in some cases'' \citep[Sec.~5]{liu2024grounding} --- and its scores are not on OWLv2's scale. OWL-ViT v1, which gives hallucinated claims lower scores, made the filters conservative (\OwlvOneClaim{}). Recomputing the threshold on Grounding DINO's scores for the same labelled calibration claims restored both targets (\GdinoRecClaim{} and \GdinoRecImage{}) without any new annotation, because a claim's label does not depend on the detector.
+
+\begin{figure}[t]\centering
+\includegraphics[width=\linewidth]{figures/fig_forest.pdf}
+\caption{Realised risk (log scale, 95\% CI) for detector swaps (with and without recalibration), VLM swaps and the AMBER domain shift. Marker shape and colour give the pre-registered decision.}\label{fig:forest}
+\end{figure}
+
+\subsection{Changing the VLM breaks the claim-level guarantee but not the image-level one}
+Thresholds calibrated on LLaVA did not transfer at claim level: InternVL3-2B was violated (\InternClaim{}) and Qwen2.5-VL-3B inconclusive (\QwenClaim{}). The image-level filter was preserved for both (\InternImage{} and \QwenImage{}). \textbf{Exploratory:} the two newer VLMs hallucinate less often (\HallRateIntern{} and \HallRateQwen{} of their claims, against \HallRateLlava{} for LLaVA; CHAIR$_i$ \ChairIntern{}, \ChairQwen{}, \ChairLlava{}), but the hallucinations they do make have a heavier upper tail of detector scores (90th percentile \HallQninetyIntern{} and \HallQninetyQwen{} against \HallQninetyLlava{} logits; \cref{fig:vlm}). The distribution of ``what gets hallucinated'' is part of what the threshold is calibrated to, and it changes with the VLM. For a user the consequence is mild: among claims kept from InternVL captions, the share that is hallucinated was \InternKeptHall{}, against \CleanKeptHall{} for LLaVA. \todo{Discussion: per-hallucination vs per-output guarantees.}
+
+\begin{figure}[t]\centering
+\includegraphics[width=0.55\linewidth]{figures/fig_vlm_tails.pdf}
+\caption{Exploratory. Survival function of OWLv2 scores of hallucinated claims on the test images for each VLM, with the threshold calibrated on LLaVA. The newer VLMs' hallucinations cross the threshold more often.}\label{fig:vlm}
+\end{figure}
+
+\subsection{Domain shift and object removal}
+On AMBER both filters were preserved and conservative (\AmberClaim{} and \AmberImage{}). In the exploratory object-removal stress test, the clean-calibrated filters still kept the removed object's claim with probability \SfiveClaim{} (claim level) and \SfiveImage{} (image level): masking an object's boxes with the mean colour does not always remove the detector's evidence for it \todo{interpretation; context outside the boxes?}.
+
+\begin{table}[t]\centering\footnotesize\setlength{\tabcolsep}{3.5pt}
+\caption{Non-degradation shifts (target 0.10). Risk [95\% CI], pre-registered decision, share of supported claims kept by the claim-level filter and abstention rate of the image-level filter.}\label{tab:main}
+\begin{tabular}{@{}lllllll@{}}\toprule
+Condition & Claim risk & Decision & Image risk & Decision & Kept & Abst.\\\midrule
+\input{tables/tab_main.tex}\end{tabular}
+\end{table}
+
+\subsection{Graphical-model view (descriptive)}
+Claim labels within a caption were almost uncorrelated (\CorrCal{} on calibration, \CorrTest{} on test data). The learned chain coupling was $J=\Jlearned{}$, so a neighbour can move a claim's field by at most $\tanh J=\TanhJ{}$ per unit of its own change; the log-likelihood gain over $J=0$ was \LLgain{} nats, and test ROC-AUC was essentially unchanged (\AucIsing{} against \AucUnary{}; \cref{tab:pgm}). Robust intervals over \RobImgs{} test images ($\varepsilon=\RobEps{}$, $B=\RobB{}$, so every claim was in the regime $B>\varepsilon_r$) were \emph{wider} with the learned coupling (mean width \WidthJ{}) than without (\WidthJzero{}), as Proposition~\ref{prop:p2} predicts: coupling gives the perturbation an extra channel and never removes the target's own.
+
+\begin{table}[t]\centering\footnotesize\setlength{\tabcolsep}{3.5pt}
+\caption{Classification of claims as supported (threshold 0.5 on the posterior), unary model vs.\ chain Ising model.}\label{tab:pgm}
+\begin{tabular}{@{}llrrrrrrrrr@{}}\toprule
+Data & Model & Acc. & Prec. & Rec. & F1 & AUC & TP & FP & TN & FN\\\midrule
+\input{tables/tab_pgm.tex}\end{tabular}
+\end{table}
+
+\begin{figure}[t]\centering
+\includegraphics[width=0.5\linewidth]{figures/fig_utility.pdf}
+\caption{Utility under degradation: share of supported claims kept against claim-level risk; points along each line are severities 1--5.}\label{fig:utility}
+\end{figure}
+
+% =====================================================================
+\section{Discussion}\label{sec:discussion}
+\authornote{Drafted with you after Phase 6. Planned points:}
+\begin{enumerate}[leftmargin=*,itemsep=1pt]
+  \item Practical rule: recalibrate when the evidence source or the generator changes; degradations and the domain shift tested here did not need it.
+  \item Dominance is sufficient, not necessary; a sharper diagnostic is the change at $\hat\tau$, which can be estimated from a few labelled shifted claims.
+  \item Per-hallucination vs per-output guarantees (the VLM result).
+  \item Limitations: one source VLM and detector; one dataset family plus AMBER (partly the same image source); AMBER labels restricted to annotated objects; CHAIR's synonym-based labels; 2--3B VLMs only; \TruncQwen{} Qwen captions hit the token limit; S5 masking is crude.
+\end{enumerate}
+
+\section{Conclusion}
+\todo{after Discussion}
+
+\section*{Data and code availability}
+\todo{GitHub URL, tag \texttt{prereg-v2}, Zenodo DOI; raw shard files.}
+
+\appendix
+\section{Results for every degradation}
+\begin{table}[h]\centering\scriptsize\setlength{\tabcolsep}{3pt}
+\caption{All S1 conditions (target 0.10).}\label{tab:s1}
+\begin{tabular}{@{}llllllll@{}}\toprule
+Corruption & Sev. & Claim risk & Decision & Image risk & Decision & Kept & Abst.\\\midrule
+\input{tables/tab_s1.tex}\end{tabular}
+\end{table}
+
+\IfFileExists{elsarticle-harv.bst}{\bibliographystyle{elsarticle-harv}}{\bibliographystyle{plainnat}}
+\bibliography{refs}
+\end{document}

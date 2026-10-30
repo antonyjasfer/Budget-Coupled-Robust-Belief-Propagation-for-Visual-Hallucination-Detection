@@ -8,3 +8,4 @@
 *.synctex.gz
 main.pdf
 figures/*.png
+journal_preview.*

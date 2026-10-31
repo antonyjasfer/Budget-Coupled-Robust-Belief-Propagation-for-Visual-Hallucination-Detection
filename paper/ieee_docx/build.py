@@ -89,40 +89,59 @@ VENUE = {  # IEEE-style abbreviations of the venues in refs.bib
         "in Proc. 64th Annu. Meeting Assoc. Comput. Linguistics (ACL), vol. 1",
     "Proceedings of the 2025 Conference on Empirical Methods in Natural Language Processing":
         "in Proc. Conf. Empirical Methods Natural Lang. Process. (EMNLP)",
+    "Proceedings of the 2023 Conference on Empirical Methods in Natural Language Processing":
+        "in Proc. Conf. Empirical Methods Natural Lang. Process. (EMNLP)",
+    "Proceedings of the 2018 Conference on Empirical Methods in Natural Language Processing":
+        "in Proc. Conf. Empirical Methods Natural Lang. Process. (EMNLP)",
     "International Conference on Learning Representations": "in Proc. Int. Conf. Learn. Represent. (ICLR)",
     "European Conference on Computer Vision (ECCV)": "in Proc. Eur. Conf. Comput. Vis. (ECCV)",
+    "Computer Vision -- ECCV 2014": "in Proc. Eur. Conf. Comput. Vis. (ECCV)",
+    "Computer Vision -- ECCV 2022": "in Proc. Eur. Conf. Comput. Vis. (ECCV)",
+    "Computer Vision -- ECCV 2024": "in Proc. Eur. Conf. Comput. Vis. (ECCV)",
+    "Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)":
+        "in Proc. IEEE/CVF Conf. Comput. Vis. Pattern Recognit. (CVPR)",
+    "Advances in Neural Information Processing Systems": "in Proc. Adv. Neural Inf. Process. Syst. (NeurIPS)",
     "Proceedings of the 43rd International Conference on Machine Learning (PMLR 306)":
         "in Proc. 43rd Int. Conf. Mach. Learn. (ICML), PMLR, vol. 306",
+    "Proceedings of the 41st International Conference on Machine Learning":
+        "in Proc. 41st Int. Conf. Mach. Learn. (ICML), PMLR",
 }
 JOUR = {"Journal of Artificial Intelligence Research": "J. Artif. Intell. Res.",
         "Journal of Machine Learning Research": "J. Mach. Learn. Res.",
         "Scandinavian Journal of Statistics": "Scand. J. Statist.",
-        "International Journal of Approximate Reasoning": "Int. J. Approx. Reason."}
+        "International Journal of Approximate Reasoning": "Int. J. Approx. Reason.",
+        "Foundations and Trends in Machine Learning": "Found. Trends Mach. Learn.",
+        "The Annals of Statistics": "Ann. Statist.",
+        "Journal of the American Statistical Association": "J. Amer. Statist. Assoc.",
+        "ACM Journal of Data Science": "ACM J. Data Sci."}
 
 
 def ref_runs(key, f):
-    """Return a list of (text, italic) for one reference."""
+    """Return a list of (text, italic) for one reference, in IEEE style."""
     au = ieee_authors(f["author"])
     title = detex(f["title"])
     y = f.get("year", "")
     t = f["_type"]
+    pg = detex(f.get("pages", ""))
     R = [(au + ", ", False)]
     if t == "book":
         R += [(title, True), (f", {f.get('address', '')}: {detex(f['publisher'])}, {y}", False)]
     else:
-        R.append((f"“{title},” ", False))
+        R.append((f"\u201c{title},\u201d ", False))
         if t == "article":
             R.append((JOUR.get(f["journal"], f["journal"]), True))
-            s = f", vol. {f['volume']}"
+            s = ""
+            if "volume" in f:
+                s += f", vol. {f['volume']}"
             if "number" in f:
                 s += f", no. {f['number']}"
-            pg = detex(f.get("pages", ""))
             s += (f", pp. {pg}" if "–" in pg else f", Art. no. {pg}") if pg else ""
             R.append((s + f", {y}", False))
         elif t == "inproceedings":
-            R.append((VENUE.get(f["booktitle"], "in " + f["booktitle"]), False))
-            pg = detex(f.get("pages", ""))
-            R.append(((f", pp. {pg}" if pg else "") + f", {y}", False))
+            v = VENUE.get(f["booktitle"], "in " + f["booktitle"])
+            if "volume" in f and "vol." not in v:
+                v += (", LNCS" if f.get("series") == "LNCS" else "") + f", vol. {f['volume']}"
+            R.append((v + f", {y}" + (f", pp. {pg}" if pg else ""), False))
         else:
             hp = f.get("howpublished", "")
             if key == "chan2005markov":
@@ -325,28 +344,35 @@ class Doc:
     def table(self, caption, header, rows, widths, font, wide):
         sz = int(round(font * 2))
         tw = [int(round(x * 1440)) for x in widths]
-        bord = ''.join(f'<w:{s} w:val="single" w:sz="4" w:space="0" w:color="000000"/>' for s in ("top", "left", "bottom", "right"))
+        # IEEE table rules: horizontal lines only, above the header, below the header and below the last row
+        def rule(side, w):
+            return f'<w:{side} w:val="single" w:sz="{w}" w:space="0" w:color="000000"/>'
         mar = ('<w:tblCellMar><w:top w:w="15" w:type="dxa"/><w:left w:w="43" w:type="dxa"/>'
                '<w:bottom w:w="15" w:type="dxa"/><w:right w:w="43" w:type="dxa"/></w:tblCellMar>')
         x = [self.para("tablehead", self.inline(caption), '<w:keepNext/>')]
         x.append(f'<w:tbl><w:tblPr><w:tblW w:w="{sum(tw)}" w:type="dxa"/><w:jc w:val="center"/>'
+                 f'<w:tblBorders><w:top w:val="nil"/><w:left w:val="nil"/><w:bottom w:val="nil"/><w:right w:val="nil"/>'
+                 f'<w:insideH w:val="nil"/><w:insideV w:val="nil"/></w:tblBorders>'
                  f'<w:tblLayout w:type="fixed"/>{mar}<w:tblLook w:val="0000"/></w:tblPr><w:tblGrid>'
                  + "".join(f'<w:gridCol w:w="{w}"/>' for w in tw) + "</w:tblGrid>")
 
         def row(cells, head, last=False):
             r = '<w:tr><w:trPr><w:cantSplit/>' + ('<w:tblHeader/>' if head else '') + '</w:trPr>'
+            bord = ((rule("top", 8) if head else '<w:top w:val="nil"/>') + '<w:left w:val="nil"/>'
+                    + (rule("bottom", 4) if head else rule("bottom", 8) if last else '<w:bottom w:val="nil"/>')
+                    + '<w:right w:val="nil"/>')
             for i, (c, w) in enumerate(zip(cells, tw)):
                 jc = "left" if i == 0 and not head else "center"
                 style = "tablecolhead" if head else "tablecopy"
                 body = self.inline(c, sz=sz)
                 r += (f'<w:tc><w:tcPr><w:tcW w:w="{w}" w:type="dxa"/><w:tcBorders>{bord}</w:tcBorders>'
                       f'<w:vAlign w:val="center"/></w:tcPr>'
-                      + self.para(style, body, f'<w:keepNext/><w:spacing w:before="0" w:after="0"/><w:jc w:val="{jc}"/>'
+                      + self.para(style, body, ('<w:keepNext/>' if head or len(rows) < 12 else '') + f'<w:spacing w:before="0" w:after="0"/><w:jc w:val="{jc}"/>'
                                   f'<w:rPr><w:sz w:val="{sz}"/><w:szCs w:val="{sz}"/></w:rPr>') + "</w:tc>")
             return r + "</w:tr>"
         x.append(row(header, True))
         for i, rr in enumerate(rows):
-            x.append(row(rr, False))
+            x.append(row(rr, False, last=(i == len(rows) - 1)))
         x.append("</w:tbl>")
         return x
 
@@ -436,14 +462,14 @@ def build(template: Path, out: Path):
     X.append(d.para("Abstract", d.run("Abstract", True) + d.run("—" + d.typo(C.ABSTRACT))))
     X.append(d.para("Keywords", d.run("Keywords—" + C.KEYWORDS)))
     X += d.render(C.B)
-    # back matter: data availability, appendices, acknowledgment, references (IEEE order)
+    # back matter: data availability, appendices, references (IEEE order)
     title, txt = C.BACK[0]
     X.append(d.para("Heading5", d.run(title), '<w:keepNext/><w:jc w:val="center"/>'))
     X.append(d.para("BodyText", d.inline(txt)))
     X += d.render(C.APPX)
-    title, txt = C.BACK[1]
-    X.append(d.para("Heading5", d.run(title), '<w:keepNext/><w:jc w:val="center"/>'))
-    X.append(d.para("BodyText", d.inline(txt)))
+    for title, txt in C.BACK[1:]:
+        X.append(d.para("Heading5", d.run(title), '<w:keepNext/><w:jc w:val="center"/>'))
+        X.append(d.para("BodyText", d.inline(txt)))
     X.append(d.para("Heading5", d.run("References"), '<w:keepNext/><w:jc w:val="center"/>'))
     for key, n in sorted(d.cite.items(), key=lambda kv: kv[1]):
         body = "".join(d.run(t, it) for t, it in ref_runs(key, bib[key]))

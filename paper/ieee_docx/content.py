@@ -41,6 +41,8 @@ def dec(c, m="claim_risk"):
 
 
 H2 = HY["H2"]["per_condition"]
+S1KEYS = [f"{c}_{k}" for c in ("gaussian_blur", "jpeg", "pixelate", "gaussian_noise", "contrast") for k in range(1, 6)]
+S1MAXCLAIM = f"{max(LV[k]['claim_risk']['point'] for k in S1KEYS):.3f}"
 
 TITLE = ("When Do Conformal Hallucination Guarantees Survive Distribution Shift? "
          "A Pre-Registered Audit of Filters for Vision-Language Models")
@@ -66,11 +68,12 @@ ABSTRACT = (
     "are exchangeable with the calibration data, which deployed systems routinely violate. We pre-registered and ran "
     "an audit of two such filters, one acting on individual claims and one on whole images, calibrated on COCO "
     "captions from LLaVA-1.5-7B scored by OWLv2, under 25 image degradations, two detector swaps, two VLM swaps and "
-    "a move to the AMBER benchmark. All 25 degradations kept the claim-level guarantee, although a simple "
-    f"stochastic-dominance condition that suffices for this held in only {N['NHtwo']} of them. Replacing the detector "
+    "a move to the AMBER benchmark. Under all 25 degradations the claim-level risk stayed within the pre-registered "
+    "margin around its target, although a simple stochastic-dominance condition that would guarantee this held in "
+    f"only {N['NHtwo']} of them. Replacing the detector "
     f"with Grounding DINO broke both filters, raising the claim-level risk to {r('swap_grounding_dino')} against a "
     "target of 0.10; recomputing the threshold on the new detector's scores for the same labelled calibration claims "
-    "restored the guarantee without new annotation. Replacing the VLM broke the claim-level guarantee "
+    "brought both risks back within target without any new annotation. Replacing the VLM broke the claim-level guarantee "
     f"({r('vlm_internvl')} for InternVL3-2B) but not the image-level one: the newer model hallucinates less often, but "
     "the objects it does hallucinate are more often ones the detector partly sees. A root-dominance bound for Ising "
     "trees under a shared perturbation budget explains why linking a caption's claims in a graphical model does not "
@@ -138,12 +141,13 @@ bullets([
     "A checkable sufficient condition, and evidence that it is far from necessary. Adapting known one-sided "
     "arguments for conformal prediction under shift and contamination [[clarkson2024split,doula2026conformal]] "
     "to the scores of hallucinated claims, a shift that makes those scores stochastically no larger keeps the "
-    f"clean guarantee (Proposition 1). All 25 degradations kept the claim-level guarantee, yet the condition held "
-    f"in only {N['NHtwo']}; what matters is the change at the calibrated threshold.",
-    f"A detector swap breaks the guarantee and a label-free recalibration repairs it. Replacing OWLv2 with "
+    f"clean guarantee (Proposition 1). The claim-level risk stayed within the pre-registered margin under all 25 "
+    f"degradations, yet the condition held in only {N['NHtwo']} of them; what matters is the change at the "
+    "calibrated threshold.",
+    f"A detector swap breaks the guarantee, and recalibrating on the existing labelled claims repairs it. Replacing OWLv2 with "
     f"Grounding DINO raised the claim-level risk from {N['CleanClaim']} to {N['GdinoClaim']} against a target of "
     f"0.10. Recomputing the threshold on the new detector's scores for the same calibration claims brought it "
-    f"back to {N['GdinoRecClaim']}.",
+    f"back to {N['GdinoRecClaim']} without any new annotation.",
     f"A VLM swap breaks the claim-level guarantee but not the image-level one. Thresholds calibrated on "
     f"LLaVA-1.5 were violated on InternVL3-2B ({N['InternClaim']}), which is the VLM counterpart of cross-generator "
     "failures reported for language models [[chen2026conformalrag]]. An exploratory analysis suggests why: the "
@@ -252,7 +256,7 @@ eq("R_c=P(S>\\hat\\tau\\mid Y=1).", "eq:rc")
 p("This is the threshold component of CEBC, which sets $\\tau=\\operatorname{clip}(\\operatorname{Quantile}_{1-\\delta}(ℋ),"
   "\\tau_{\\min},\\tau_{\\max})$ over the detector scores $ℋ$ of hallucinated calibration mentions and argues "
   "that only \"about $\\delta$\" of them then pass [[cebc]]. We drop the clipping and use the finite-sample index $k$ "
-  "in {eq:tau}, which turns \"about $\\delta$\" into the guarantee below; CEBC states no formal guarantee. We study "
+  "in {eq:tau}, which turns \"about $\\delta$\" into the bound below; CEBC states no formal guarantee. We study "
   "only this filtering step, not CEBC's candidate selection and rewriting.")
 h2("Image-level filter")
 p("For image $j$, let $M_j$ be the largest score among its hallucinated claims ($M_j=-\\infty$ if it has none). The "
@@ -264,10 +268,21 @@ p("This is the guarantee $P(L\\le\\lambda)\\ge1-\\alpha$ of ConfLVLM [[conflvlm]
   "implementation differs from theirs in using CHAIR labels and detector scores, where ConfLVLM decomposes answers "
   "into claims by prompting a language model and scores them with internal or external confidence such as token "
   "log-probabilities or CLIP [[conflvlm]].")
-h2("The clean guarantee")
-p("If a test claim is exchangeable with the calibration claims, the standard conformal argument gives $R_c\\le\\delta$; "
-  "if a test image is exchangeable with the calibration images, $R_I\\le\\alpha$ "
-  "[[vovk2005algorithmic,angelopoulos2023gentle]]. Both are unconditional false-acceptance probabilities. Neither "
+h2("The clean guarantee and the exchangeable unit", "sec:clean")
+p("The exchangeable unit in our data is the image: calibration and test images are drawn from the same pool and "
+  "split at random. If a test image is exchangeable with the calibration images, the standard conformal argument "
+  "gives $R_I\\le\\alpha$ exactly, in finite samples [[vovk2005algorithmic,angelopoulos2023gentle]].")
+p("The claim-level bound needs more care. Claims from the same image are dependent and images contribute different "
+  "numbers of hallucinated claims, so a hallucinated test claim is not exchangeable with the pooled calibration "
+  "claims, and $R_c\\le\\delta$ is not an exact finite-sample guarantee. $R_c$ is defined over the population of "
+  "hallucinated claims, each counted once, and the pooled order statistic in {eq:tau} estimates the corresponding "
+  "quantile consistently as the number of calibration images grows, so the bound holds only approximately. We know of no finite-sample bound for this pooled form; as Dunn et al. note, when the calibration data "
+  "contain several observations from the same group, a point from a new group is not exchangeable with them "
+  "[[dunn2023hierarchical]]. Exact versions exist for grouped data, for example calibrating on one randomly chosen "
+  "claim per image [[dunn2023hierarchical]] or weighting each claim by the inverse of its image's claim count "
+  "[[lee2026hierarchical]]. We keep the pooled form because it is the one CEBC uses, and we check it empirically: on "
+  "clean test data its risk was " + N['CleanClaim'] + ", below the target. Both $R_c$ and $R_I$ are unconditional "
+  "false-acceptance probabilities, averaged over the draw of the calibration set. Neither "
   "controls the share of hallucinated claims among the claims that are kept, a point we return to in "
   "{sec:discussion}. We use $\\delta=\\alpha=0.10$ throughout, with 0.05 and 0.20 as secondary targets.")
 
@@ -286,7 +301,8 @@ p("~~Proof.~~ Write $f(t)=P(S>t)$ and $g(t)=P(\\tilde S>t)$, so that {eq:dom} sa
   "independent of the calibration sample, and hence of $\\hat\\tau$, so conditioning on $\\hat\\tau$ gives")
 eq("P(\\tilde S>\\hat\\tau)=E\\,g(\\hat\\tau)\\le E\\,f(\\hat\\tau)=P(S>\\hat\\tau)\\le\\delta,",
    "eq:p1")
-p("where the last step is the clean guarantee. Part (b) is identical. For (c), $\\{\\tilde S>t\\}\\subseteq\\{S>t\\}$ for "
+p("where the last step is the clean bound; at claim level it inherits the approximation discussed in {sec:clean}, "
+  "while the first inequality is exact. Part (b) is identical. For (c), $\\{\\tilde S>t\\}\\subseteq\\{S>t\\}$ for "
   "every $t$, and $\\tilde M=\\max_i\\tilde S_i\\le\\max_i S_i=M$. $\\square$")
 p("Two remarks matter for the experiments. First, one-sided arguments of this kind are known for conformal "
   "prediction under shift and contamination [[doula2026conformal,clarkson2024split]]; what is useful here is that "
@@ -298,26 +314,27 @@ p("Two remarks matter for the experiments. First, one-sided arguments of this ki
 h2("Why coupling claims does not narrow robust intervals", "sec:p2")
 p("One could hope to make the filter more robust by modelling the claims of a caption jointly, so that confident "
   "neighbours support or contradict an uncertain claim. We model the labels $h_i\\in\\{-1,+1\\}$ of an image's claims "
-  "($+1$ for supported) as an attractive Ising tree,")
+  "($+1$ for hallucinated, matching $Y=1$; $-1$ for supported) as an attractive Ising tree,")
 eq("p(h)\\propto\\exp\\Big(\\sum_i\\theta_ih_i+\\sum_{(i,j)}J_{ij}h_ih_j\\Big),\\qquad J_{ij}\\ge0,", "eq:ising")
 p("where $\\theta_i$ is the evidence for claim $i$ alone and $J_{ij}$ couples neighbouring claims. Belief propagation "
-  "is exact on a tree and gives $P(h_r=+1)=\\sigma(2\\eta_r)$, where the effective field $\\eta_r$ of a target claim $r$ "
-  "is its own field plus the messages from its neighbours,")
-eq("\\eta_r=\\theta_r+\\delta_r+\\sum_{c}\\nu_{c\\to r},", "eq:bp")
-p("where $\\delta_r$ is a perturbation of the target's field, introduced below, and the message from a neighbour $c$ is "
-  "$\\nu_{c\\to r}=\\tanh^{-1}(\\tanh J_{cr}\\tanh\\eta_{c\\to r})$, with $\\eta_{c\\to r}$ the field of $c$ in the "
-  "subtree on its side of the edge.")
-p("Suppose the fields are perturbed by $\\delta_i$ with $|\\delta_i|\\le\\varepsilon_i$ for each claim and "
+  "is exact on a tree. If every field $\\theta_i$ is perturbed by $\\delta_i$, the effective field of a target claim $r$ "
+  "is its own perturbed field plus the messages from its neighbours,")
+eq("\\eta_r(\\delta)=\\theta_r+\\delta_r+\\sum_{c}\\nu_{c\\to r}(\\delta),", "eq:bp")
+p("where the message from a neighbour $c$ is $\\nu_{c\\to r}=\\tanh^{-1}(\\tanh J_{cr}\\tanh\\eta_{c\\to r})$, with "
+  "$\\eta_{c\\to r}$ the field of $c$ in the subtree on its side of the edge. We write $\\eta_r=\\eta_r(0)$ for the "
+  "unperturbed field, so that $P(h_r=+1)=\\sigma(2\\eta_r)$ without perturbation and "
+  "$\\sigma(2\\eta_r(\\delta))$ with it.")
+p("Suppose the perturbations satisfy $|\\delta_i|\\le\\varepsilon_i$ for each claim and "
   "$|\\delta_1|+\\dots+|\\delta_n|\\le B$ in total. For each claim $i\\ne r$ let")
 eq("\\gamma_i=\\prod_{e\\in\\operatorname{path}(i\\to r)}\\tanh J_e,", "eq:gamma")
 p("let $\\gamma_{\\max}<1$ be the largest $\\gamma_i$, and let $a=\\min(\\varepsilon_r,B)$.")
-p("~~Proposition 2 (root dominance).~~ The largest effective field $\\eta_r^{\\operatorname{sup}}$ reachable under the "
-  "budget satisfies")
+p("~~Proposition 2 (root dominance).~~ The largest effective field $\\eta_r^{\\operatorname{sup}}=\\sup_{\\delta}\\eta_r(\\delta)$ "
+  "reachable under the budget satisfies")
 eq("\\eta_r+a\\le\\eta_r^{\\operatorname{sup}}\\le\\eta_r+a+\\gamma_{\\max}\\max(0,B-\\varepsilon_r),", "eq:p2")
 p("and symmetrically for the infimum. In particular, if $B\\le\\varepsilon_r$ the robust interval for $P(h_r=+1)$ is "
   "exactly")
 eq("[\\sigma(2(\\eta_r-B)),\\ \\sigma(2(\\eta_r+B))],", "eq:p2int")
-p("which does not depend on the graph. The proof is in Appendix A. In words: under a shared budget, spending "
+p("which does not depend on the graph. The proof is in Appendix A. Intuitively, under a shared budget, spending "
   "perturbation on the target claim moves its field one-for-one, while spending it on a neighbour moves it by at most "
   "$\\tanh J<1$ per edge, so the worst case always puts as much budget as allowed on the target itself. The graph can "
   "only add a further channel of size at most $\\gamma_{\\max}(B-\\varepsilon_r)$. The \"gain $\\le1$\" ingredient is the "
@@ -387,16 +404,22 @@ p("Six hypotheses were frozen before testing. H1: every S1 condition preserves b
   "condition of Proposition 1. H3: at least one S2 swap violates the claim-level target. H4: recalibration repairs "
   "every S2 swap. H5: thresholds calibrated on LLaVA transfer to each S3 VLM. H6: they transfer to AMBER.")
 h2("Estimation and decision rules")
-p("Thresholds are averaged over 200 calibration resamples, each using 80% of the calibration images. Uncertainty is "
+p("We draw 200 calibration resamples, each a random 80% of the calibration images. For each resample we compute both "
+  "thresholds as in {eq:tau} and evaluate them on the test data; reported risks are the average over the 200 "
+  "resamples. Thresholds are never averaged. Each resample is itself a valid calibration set, so the average "
+  "estimates the expected risk over draws of the calibration set, which is the quantity the guarantees bound. "
+  "Uncertainty is "
   "quantified by an image-level cluster bootstrap with 2,000 resamples [[efron1993introduction]], because claims from "
   "one caption are not independent. A condition is violated if the 95% confidence interval of its risk lies entirely "
   "above the target, preserved if the upper bound is at most the target plus 0.03, and inconclusive otherwise. H2 is "
   "assessed per condition by")
 eq("D^{+}=\\max_t\\,(P(\\tilde S>t)-P(S>t))", "eq:dplus")
 p("on paired hallucinated test claims, and it holds for a condition if the upper bound of its 95% interval is at most "
-  "0.03. A hypothesis is supported if all its conditions meet the rule. For H1 and H3 to H6 we also report a bootstrap "
-  "p-value, the share of resamples on the wrong side of the margin taken over the hypothesis's conditions, "
-  "Holm-adjusted within each filter [[holm1979simple]].")
+  "0.03. A hypothesis is supported if all its conditions meet the rule, and every decision in this paper rests on "
+  "this interval rule. As pre-registered, we also report for H1 and H3 to H6 the share of bootstrap resamples that "
+  "fall on the wrong side of the margin, taking the largest share over the hypothesis's conditions and "
+  "Holm-adjusting within each filter [[holm1979simple]]. This share is an approximate one-sided bootstrap p-value, "
+  "not an exact one, so we treat it as a secondary summary of how clear each decision is.")
 h2("Graphical-model analysis (descriptive)")
 p("We fit a logistic model of each claim's label on its OWLv2 score on Cal-A, and a chain Ising model over each "
   "caption's claims in caption order with one shared coupling $J\\in[0,2]$, chosen by exact likelihood on Cal-A. "
@@ -418,7 +441,7 @@ for h in ["H1", "H3", "H4", "H5", "H6"]:
                      f"{'Yes' if b['supported'] else 'No'} ({b['p_holm']:.3f})"])
 nh2 = sum(v["supported"] for v in H2.values())
 hyp_rows.insert(1, ["H2", "Hallucinated scores do not rise under S1", f"No ({nh2} of 25 hold)", "n/a"])
-table("Pre-registered hypotheses (target 0.10). Supported? (Holm-adjusted p-value)", "tab:hyp",
+table("Pre-registered hypotheses (target 0.10). Supported under the interval rule? (Holm-adjusted bootstrap tail share)", "tab:hyp",
       ["", "Hypothesis", "Claim level", "Image level"], hyp_rows, [0.3, 1.65, 0.75, 0.75])
 h2("Clean reference")
 p(f"On the clean test set the claim-level filter kept {N['CleanClaim']} of hallucinated claims and the image-level "
@@ -427,7 +450,8 @@ p(f"On the clean test set the claim-level filter kept {N['CleanClaim']} of hallu
   "because of sampling: its 95% interval, "
   f"[{LV['clean']['claim_risk']['lo']:.3f}, {LV['clean']['claim_risk']['hi']:.3f}], contains the target.")
 h2("Image degradation is safe even where the sufficient condition fails", "sec:res-s1")
-p("All 25 degradations preserved the claim-level target ({fig:s1}). Risk generally fell as severity rose, because "
+p(f"All 25 degradations were judged preserved at claim level ({{fig:s1}}): every point estimate was at most "
+  f"{S1MAXCLAIM} and every upper bound was within the 0.13 margin. Risk generally fell as severity rose, because "
   "degradation lowers the detector's evidence for every object, present or not. At image level, three mild "
   f"conditions were inconclusive: Gaussian noise at severity 1 ({ci('gaussian_noise_1', 'image_risk')}) and contrast "
   f"at severities 1 and 2 ({ci('contrast_1', 'image_risk')} and {ci('contrast_2', 'image_risk')}). Their upper bounds "
@@ -446,7 +470,7 @@ fig("col_h2.png", "Hypothesis H2. (a) One-sided Kolmogorov-Smirnov gap between s
     "difference evaluated only at the calibrated threshold, which is all that Proposition 1 needs.", "fig:h2")
 fig("col_utility.png", "Utility under degradation: share of supported claims kept against claim-level risk; "
     "points along each line are severities 1 to 5.", "fig:utility")
-h2("Changing the evidence source breaks the guarantee; label-free recalibration repairs it")
+h2("Changing the evidence source breaks the guarantee; recalibration without new labels repairs it")
 p(f"Replacing OWLv2 with Grounding DINO broke both filters, with claim-level risk {N['GdinoClaim']} and image-level "
   f"risk {N['GdinoImage']} ({{fig:forest}}). Grounding DINO gives high scores to absent "
   "objects (its authors note that it \"will produce false positive results in some cases\" [[liu2024grounding]]), "
@@ -461,14 +485,13 @@ fig("col_forest.png", "Realised risk (log scale, 95% interval) under detector sw
 h2("Changing the VLM breaks the claim-level guarantee but not the image-level one")
 p(f"Thresholds calibrated on LLaVA did not transfer at claim level: InternVL3-2B was violated ({N['InternClaim']}) and "
   f"Qwen2.5-VL-3B was inconclusive ({N['QwenClaim']}). The image-level filter was preserved for both "
-  f"({N['InternImage']} and {N['QwenImage']}). The ordering held at the secondary targets: at 0.05, InternVL3-2B was "
-  f"again violated ({lv('0.05', 'vlm_internvl')}) while Qwen2.5-VL-3B was preserved ({lv('0.05', 'vlm_qwen')}).")
+  f"({N['InternImage']} and {N['QwenImage']}).")
 p(f"~~Exploratory.~~ The two newer VLMs hallucinate less often: {N['HallRateIntern']} and {N['HallRateQwen']} of their "
   f"claims, against {N['HallRateLlava']} for LLaVA (instance-level CHAIR {N['ChairIntern']}, {N['ChairQwen']} and "
   f"{N['ChairLlava']}). The hallucinations they do make have a heavier upper tail of detector scores; the 90th "
   f"percentile is {N['HallQninetyIntern']} and {N['HallQninetyQwen']} logits against {N['HallQninetyLlava']} "
-  f"({{fig:vlm}}). In other words, which objects get hallucinated is part of what the threshold "
-  "is calibrated to, and that changes with the VLM. For a user the consequence is mild: among the claims kept from "
+  f"({{fig:vlm}}). The set of objects a VLM hallucinates is part of what the threshold "
+  "is calibrated to, and that set changes with the VLM. For a user the consequence is mild: among the claims kept from "
   f"InternVL3-2B captions, the share that was hallucinated was {N['InternKeptHall']}, against {N['CleanKeptHall']} for "
   f"LLaVA. {N['TruncQwen']} of the 500 Qwen2.5-VL captions reached the 512-token limit.")
 fig("col_vlm.png", "Exploratory. Survival function of OWLv2 scores of hallucinated claims on the test images for each "
@@ -481,6 +504,32 @@ p(f"On AMBER both filters were preserved and conservative ({N['AmberClaim']} at 
   f"with probability {N['SfiveClaim']}, and {N['SfiveImage']} of images kept at least one hallucinated claim. Filling an object's boxes with the "
   "mean colour does not always remove the detector's evidence for it; a plausible but untested explanation is that "
   "the object's outline and its context outside the boxes remain visible.")
+h2("Secondary targets")
+
+
+def _dec(level, c, m="claim_risk"):
+    return RES["levels"][level][c][m]["decision"]
+
+
+def _ns1(level, m, d):
+    return sum(_dec(level, k, m) == d for k in S1KEYS)
+
+
+_all05 = _ns1("0.05", "claim_risk", "preserved") == 25 and _ns1("0.05", "image_risk", "preserved") == 25
+p(f"At the stricter target of 0.05 the picture was the same as at 0.10. "
+  + ("All 25 degradations were preserved at both levels. " if _all05 else "")
+  + f"The clean claim-level risk was {lv('0.05', 'clean')}; Grounding DINO raised it to "
+  f"{lv('0.05', 'swap_grounding_dino')} ({_dec('0.05', 'swap_grounding_dino')}) and recalibration brought it back to "
+  f"{lv('0.05', 'swap_grounding_dino+recalibrated')}; InternVL3-2B was {_dec('0.05', 'vlm_internvl')} "
+  f"({lv('0.05', 'vlm_internvl')}), while Qwen2.5-VL-3B ({lv('0.05', 'vlm_qwen')}) and AMBER "
+  f"({lv('0.05', 'domain_amber')}) were preserved. At the looser target of 0.20 the margin rule has less resolution, "
+  f"because even the clean claim-level risk, {lv('0.2', 'clean')}, was {_dec('0.2', 'clean')}. "
+  f"{_ns1('0.2', 'claim_risk', 'inconclusive')} of the 25 degradations were inconclusive at claim level and "
+  f"{_ns1('0.2', 'image_risk', 'inconclusive')} at image level, and none was violated. Grounding DINO was again "
+  f"{_dec('0.2', 'swap_grounding_dino')} ({lv('0.2', 'swap_grounding_dino')}) and recalibration repaired it "
+  f"({lv('0.2', 'swap_grounding_dino+recalibrated')}); both VLM swaps were {_dec('0.2', 'vlm_internvl')} "
+  f"(InternVL3-2B {lv('0.2', 'vlm_internvl')}, Qwen2.5-VL-3B {lv('0.2', 'vlm_qwen')}), and AMBER was "
+  f"{_dec('0.2', 'domain_amber')} ({lv('0.2', 'domain_amber')}).")
 h2("Graphical-model view")
 p(f"Claim labels within a caption were almost uncorrelated ({N['CorrCal']} on calibration data, {N['CorrTest']} on "
   f"test data). The learned chain coupling was $J={N['Jlearned']}$, so a neighbour can move a claim's field by at most "
@@ -514,7 +563,7 @@ for split, sname in (("train_cal_a", "Cal-A"), ("test", "Test")):
         cf = m["confusion"]
         pgm_rows.append([sname, mname, f"{m['accuracy']:.3f}", f"{m['precision']:.3f}", f"{m['recall']:.3f}",
                          f"{m['f1']:.3f}", f"{m['roc_auc']:.3f}", str(cf['tp']), str(cf['fp']), str(cf['tn']), str(cf['fn'])])
-table("Claim classification (supported if posterior above 0.5): unary model (J = 0) against chain Ising model",
+table("Claim classification (positive class: hallucinated, predicted when the posterior is at least 0.5): unary model (J = 0) against chain Ising model",
       "tab:pgm", ["Data", "Model", "Acc.", "Prec.", "Rec.", "F1", "AUC", "TP", "FP", "TN", "FN"], pgm_rows,
       [0.4, 0.4, 0.33, 0.33, 0.33, 0.31, 0.33, 0.27, 0.24, 0.3, 0.27], font=6.5)
 
@@ -522,8 +571,8 @@ table("Claim classification (supported if posterior above 0.5): unary model (J =
 h1("Discussion", "sec:discussion")
 h2("A practical rule")
 p(f"For detector-evidence filters, the shifts we tested fall into two groups. Changes to the images, namely the 25 "
-  f"degradations and the move to AMBER, left the clean-calibrated guarantee in place: the claim-level target was "
-  f"preserved in {N['NClaimPreservedSone']} of 25 degradations and the image-level target in "
+  f"degradations and the move to AMBER, kept the risk of the clean-calibrated filters within the pre-registered "
+  f"margin: the claim-level target was preserved in {N['NClaimPreservedSone']} of 25 degradations and the image-level target in "
   f"{N['NImagePreservedSone']}, with the other three inconclusive and close to the margin. Changes to the pipeline, "
   "meaning the detector that supplies the evidence and, at claim level, the VLM that writes the captions, broke it. "
   "A threshold is a property of the detector's score scale and of the population of hallucinations it was calibrated "
@@ -533,12 +582,12 @@ p(f"For detector-evidence filters, the shifts we tested fall into two groups. Ch
 h2("Why degradation was benign")
 p(f"Degradation lowers detector evidence for every object and so moves hallucinated claims away from the threshold. "
   f"Proposition 1 formalises the safe direction, but its condition, dominance at every threshold, held in only "
-  f"{N['NHtwo']} of 25 conditions while the guarantee held in all of them. Two facts explain the gap. The proof only "
-  "needs dominance at the calibrated threshold, and the change there was small or negative throughout. And standard "
+  f"{N['NHtwo']} of 25 conditions while all 25 were judged preserved. The gap has two causes. The proof only "
+  "needs dominance at the calibrated threshold, and the change there was small or negative throughout. Also, standard "
   "split conformal prediction degrades gracefully when the test distribution is close to the calibration "
   "distribution [[barber2023beyond]], so the small increases we did see were absorbed by the clean filter's slack. "
   "For practitioners, this suggests checking the change at the threshold on a few labelled shifted claims rather than "
-  "testing full dominance. The other side of safety is utility: under the strongest noise the claim-level filter kept "
+  "testing full dominance. Safety also cost utility: under the strongest noise the claim-level filter kept "
   f"only {N['MinKeptSone']} of supported claims and the image-level filter abstained on {N['MaxAbstSone']} of images, "
   "so a preserved guarantee does not by itself make a filter useful.")
 h2("Per-hallucination and per-output guarantees")
@@ -568,13 +617,15 @@ p(f"The audit uses one source pipeline (LLaVA-1.5-7B and OWLv2) and COCO images,
 # ======================================================================== VIII
 h1("Conclusion")
 p("Conformal filters for VLM hallucinations carry guarantees only under exchangeability. In a pre-registered audit "
-  "we found that this assumption can be relaxed for image degradation and for a partial domain shift, where the clean "
-  "guarantee survived, but not for changes to the pipeline. Swapping the detector broke both filters until the "
+  "we found that this assumption can be relaxed for image degradation and for a partial domain shift, where the risk "
+  "of the clean-calibrated filters stayed within the pre-registered margin, but not for changes to the pipeline. Swapping the detector broke both filters until the "
   "threshold was recalibrated on the same labelled claims, and swapping the VLM broke the claim-level guarantee while "
   "the image-level one held. A one-sided condition explains the safe cases but is far from necessary, and a "
   "root-dominance bound shows why coupling claims in a graphical model does not make the filters more robust. "
   "Recalibrating when the evidence source or the generator changes, and otherwise checking the score change at the "
-  "calibrated threshold, is a cheap way to keep these guarantees valid in deployment.")
+  "calibrated threshold, is a cheap way to keep these guarantees valid in deployment. The image-level filter has a "
+  "further advantage: its guarantee is exact for exchangeable images, and it was also the one that survived the "
+  "change of VLM.")
 
 BACK = []  # unnumbered back matter (Heading 5 style)
 BACK.append(("Data and Code Availability",
@@ -583,36 +634,30 @@ BACK.append(("Data and Code Availability",
              "https://github.com/antonyjasfer/Budget-Coupled-Robust-Belief-Propagation-for-Visual-Hallucination-Detection "
              "and are archived on Zenodo (https://doi.org/10.5281/zenodo.23810032), together with the raw captions and "
              "detector scores (no images). Code is under the MIT licence and data under CC BY 4.0."))
-BACK.append(("Acknowledgment",
-             "The authors thank the Department of Mathematics and the Department of Artificial Intelligence and Data "
-             "Science, Amrita School of Computing, Amrita Vishwa Vidyapeetham, Nagercoil, and Kaggle for GPU time. "
-             "In line with IEEE policy on AI-generated content, the authors disclose that Claude (Anthropic) was used to "
-             "write and test analysis code, check results against the raw files, locate quotations in cited papers and "
-             "draft and edit text; the authors reviewed all such content and take full responsibility for this paper."))
 
 # ======================================================================== appendix
 APPX = []
 APPX.append(("h1n", "Appendix A: Proof of Proposition 2"))
 APPX.append(("p", "Root the tree at $r$. For a child $c$ of $r$, belief propagation gives the message "
              "$\\nu_{c\\to r}=\\tanh^{-1}(\\tanh J_{cr}\\tanh\\eta_{c\\to r})$, where $\\eta_{c\\to r}$ is the field of "
-             "$c$ in the subtree below it, and $\\eta_r=\\theta_r+\\delta_r+\\sum_c\\nu_{c\\to r}$."))
+             "$c$ in the subtree below it, and $\\eta_r(\\delta)=\\theta_r+\\delta_r+\\sum_c\\nu_{c\\to r}(\\delta)$."))
 APPX.append(("p", "~~Step 1 (one edge).~~ For $h(\\eta)=\\tanh^{-1}(\\tanh J\\tanh\\eta)$ with $J\\ge0$,"))
 APPX.append(("eq", "h'(\\eta)=\\tanh J\\,\\frac{1-\\tanh^2\\eta}{1-\\tanh^2J\\tanh^2\\eta}\\in[0,\\tanh J],", "eq:a1"))
 APPX.append(("p", "because $0\\le\\tanh^2J\\le1$ puts the fraction in $[0,1]$. This is the Ising case of the contraction "
              "in Theorem 8 of Ihler et al. [[ihler2005loopy]]."))
-APPX.append(("p", "~~Step 2 (paths).~~ The field $\\delta_i$ of a node $i\\ne r$ enters $\\eta_r$ only through the messages "
+APPX.append(("p", "~~Step 2 (paths).~~ The perturbation $\\delta_i$ of a node $i\\ne r$ enters $\\eta_r(\\delta)$ only through the messages "
              "along the unique path from $i$ to $r$. By the chain rule, $\\partial\\eta_r/\\partial\\delta_i$ is the product of "
-             "the derivatives of Step 1 along that path, so $0\\le\\partial\\eta_r/\\partial\\delta_i\\le\\gamma_i$, while "
-             "$\\partial\\eta_r/\\partial\\delta_r=1$. In particular $\\eta_r$ is non-decreasing in every $\\delta_i$."))
+             "the derivatives of Step 1 along that path, so $0\\le\\partial\\eta_r(\\delta)/\\partial\\delta_i\\le\\gamma_i$, while "
+             "$\\partial\\eta_r(\\delta)/\\partial\\delta_r=1$. In particular $\\eta_r(\\delta)$ is non-decreasing in every $\\delta_i$."))
 APPX.append(("p", "~~Step 3 (budget).~~ By Step 2 the supremum over the uncertainty set is attained with $\\delta\\ge0$. "
              "Writing $\\eta_r(\\delta)=\\eta_r(0,\\delta_{-r})+\\delta_r$ and applying the mean value theorem on the segment "
              "from $0$ to $(0,\\delta_{-r})$,"))
-APPX.append(("eq", "\\eta_r(\\delta)-\\eta_r\\le\\delta_r+\\gamma_{\\max}(B-\\delta_r),", "eq:a2"))
+APPX.append(("eq", "\\eta_r(\\delta)-\\eta_r(0)\\le\\delta_r+\\gamma_{\\max}(B-\\delta_r),", "eq:a2"))
 APPX.append(("p", "because the perturbations of the other claims sum to at most $B-\\delta_r$. The right side equals "
              "$\\gamma_{\\max}B+(1-\\gamma_{\\max})\\delta_r$ and increases in $\\delta_r\\le a=\\min(\\varepsilon_r,B)$, which gives the upper bound in "
              "{eq:p2}; the lower bound is attained by putting $\\delta_r=a$ and every other perturbation to zero. If "
-             "$B\\le\\varepsilon_r$ the two bounds coincide, the supremum is $\\eta_r+B$, and by symmetry the infimum is "
-             "$\\eta_r-B$. Since $\\eta\\mapsto\\sigma(2\\eta)$ is increasing, the interval is {eq:p2int}. $\\square$"))
+             "$B\\le\\varepsilon_r$ the two bounds coincide, the supremum is $\\eta_r(0)+B$, and by symmetry the infimum is "
+             "$\\eta_r(0)-B$. Since $\\eta\\mapsto\\sigma(2\\eta)$ is increasing, the interval is {eq:p2int}. $\\square$"))
 APPX.append(("h1n", "Appendix B: Results for Every Degradation"))
 s1_rows = []
 CORR = [("gaussian_blur", "Gaussian blur"), ("jpeg", "JPEG"), ("pixelate", "Pixelate"),

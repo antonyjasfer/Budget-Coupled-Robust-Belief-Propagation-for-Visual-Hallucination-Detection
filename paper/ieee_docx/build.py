@@ -178,7 +178,13 @@ def fix_omml(x):
     x = re.sub(r'(<m:(?:sub|sup)><m:r>)<m:rPr><m:sty m:val="p" ?/></m:rPr>(<m:t>[+\u2212]</m:t></m:r></m:(?:sub|sup)>)',
                r"\1<m:rPr><m:nor/></m:rPr>\2", x)
     # size the math like the 10 pt body text
-    x = re.sub(r"(<m:r>(?:<m:rPr>.*?</m:rPr>)?)", r'\1<w:rPr><w:sz w:val="20"/><w:szCs w:val="20"/></w:rPr>', x)
+    # and give every math run an explicit font: the template's "equation" style uses Symbol,
+    # which Word applies to upright m:nor runs (exp -> εξπ); LibreOffice ignores it
+    def font(m):
+        f = "Times New Roman" if "<m:nor" in m.group(1) else "Cambria Math"
+        return (m.group(1) + f'<w:rPr><w:rFonts w:ascii="{f}" w:hAnsi="{f}" w:cs="{f}"/>'
+                '<w:sz w:val="20"/><w:szCs w:val="20"/></w:rPr>')
+    x = re.sub(r"(<m:r>(?:<m:rPr>.*?</m:rPr>)?)", font, x)
     return x
 
 
@@ -495,6 +501,10 @@ def build(template: Path, out: Path):
             return re.sub(r'(<w:lvl w:ilvl="[01]"[^>]*>(?:(?!</w:lvl>).)*?)(<w:lvlText )', r'\1<w:suff w:val="space"/>\2', m.group(0), flags=re.S)
         num = re.sub(r'<w:abstractNum w:abstractNumId="(?:1|6)".*?</w:abstractNum>', space_suffix, num, flags=re.S)
         nb.write_text(num)
+        st = td / "word/styles.xml"  # the template's "equation" style is set in Symbol
+        st.write_text(re.sub(r'(<w:style [^>]*w:styleId="equation".*?)<w:rFonts w:ascii="Symbol" w:hAnsi="Symbol" w:cs="Symbol"/>',
+                             r'\1<w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:cs="Times New Roman"/>',
+                             st.read_text(), count=1, flags=re.S))
         for f in ("footer1.xml", "footer2.xml", "footer3.xml"):
             p = td / "word" / f
             p.write_text(p.read_text().replace("XXX-X-XXXX-XXXX-X/XX/$XX.00 ©20XX IEEE", ""))

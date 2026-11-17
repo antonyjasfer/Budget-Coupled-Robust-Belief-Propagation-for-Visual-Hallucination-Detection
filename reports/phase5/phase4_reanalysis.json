@@ -1,0 +1,133 @@
+{
+ "note": "exploratory re-analysis of Phase 4 raw files with src/phase5/stats.py",
+ "cells": {
+  "llava": {
+   "claim": {
+    "point": 0.08,
+    "lo": 0.05655216631747983,
+    "hi": 0.1061123718386876,
+    "decision": "preserved"
+   },
+   "image": {
+    "point": 0.0996579476861167,
+    "lo": 0.07522811871227365,
+    "hi": 0.12562650905432596,
+    "decision": "preserved"
+   },
+   "prevalence": 0.4688128772635815,
+   "rho": 0.21257510729613735,
+   "supported_kept": 0.5874081981212639,
+   "abstention": 0.03029175050301811,
+   "local_gap": -0.018019538188277083,
+   "warning": -0.015616914211294736,
+   "p_tost_claim": 0.0004997501249375312,
+   "p_violated_claim": 0.9315342328835582,
+   "n_test_hallucinated": 395,
+   "n_test_images": 497,
+   "hallucinated_share": 0.25223499361430396
+  },
+  "qwen25": {
+   "claim": {
+    "point": 0.12943521594684385,
+    "lo": 0.09416074115988055,
+    "hi": 0.1653461466165413,
+    "decision": "inconclusive"
+   },
+   "image": {
+    "point": 0.09304828973843059,
+    "lo": 0.0697248490945674,
+    "hi": 0.11872334004024146,
+    "decision": "preserved"
+   },
+   "prevalence": 0.42655935613682094,
+   "rho": 0.2181367924528302,
+   "supported_kept": 0.604154051647373,
+   "abstention": 0.06032193158953723,
+   "local_gap": 0.03141567775856677,
+   "warning": 0.028770682291639826,
+   "p_tost_claim": 0.4847576211894053,
+   "p_violated_claim": 0.0559720139930035,
+   "n_test_hallucinated": 301,
+   "n_test_images": 497,
+   "hallucinated_share": 0.21137640449438203
+  },
+  "internvl3": {
+   "claim": {
+    "point": 0.16008021390374333,
+    "lo": 0.11151552523942537,
+    "hi": 0.2076130268088453,
+    "decision": "violated"
+   },
+   "image": {
+    "point": 0.07434607645875252,
+    "lo": 0.053026659959758554,
+    "hi": 0.0980193661971831,
+    "decision": "preserved"
+   },
+   "prevalence": 0.2857142857142857,
+   "rho": 0.26021126760563384,
+   "supported_kept": 0.6017582897033159,
+   "abstention": 0.048189134808853125,
+   "local_gap": 0.062060675715466244,
+   "warning": 0.06475844064274444,
+   "p_tost_claim": 0.895552223888056,
+   "p_violated_claim": 0.005997001499250375,
+   "n_test_hallucinated": 187,
+   "n_test_images": 497,
+   "hallucinated_share": 0.14028507126781695
+  }
+ },
+ "crc": {
+  "llava": 0.097979144709527,
+  "qwen25": 0.0703179393823257,
+  "internvl3": 0.04808932962856504
+ },
+ "recalibration": {
+  "qwen25": [
+   {
+    "m": 25,
+    "theory_p_over": 0.14566636366748306,
+    "insufficient": false,
+    "p_over": 0.162,
+    "mean_risk": 0.07939365122908562
+   },
+   {
+    "m": 50,
+    "theory_p_over": 0.20439644959199493,
+    "insufficient": false,
+    "p_over": 0.226,
+    "mean_risk": 0.09702124134131708
+   },
+   {
+    "m": 75,
+    "theory_p_over": 0.12900103690441772,
+    "insufficient": false,
+    "p_over": 0.184,
+    "mean_risk": 0.09339532975338426
+   }
+  ],
+  "internvl3": [
+   {
+    "m": 25,
+    "theory_p_over": 0.14566636366748306,
+    "insufficient": false,
+    "p_over": 0.182,
+    "mean_risk": 0.08296152622891129
+   },
+   {
+    "m": 50,
+    "theory_p_over": 0.20439644959199493,
+    "insufficient": false,
+    "p_over": 0.206,
+    "mean_risk": 0.09552217476197845
+   },
+   {
+    "m": 75,
+    "theory_p_over": 0.12900103690441772,
+    "insufficient": true,
+    "p_over": null,
+    "mean_risk": null
+   }
+  ]
+ }
+}

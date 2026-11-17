@@ -41,7 +41,7 @@ GENERATORS: Dict[str, Generator] = {
     "qwen25": Generator("Qwen/Qwen2.5-VL-3B-Instruct", cap_pixels=True),
     "qwen3_4b": Generator("Qwen/Qwen3-VL-4B-Instruct", cap_pixels=True),
     "internvl3": Generator("OpenGVLab/InternVL3-2B-hf"),
-    "instructblip": Generator("Salesforce/instructblip-vicuna-7b"),
+    "instructblip": Generator("Salesforce/instructblip-vicuna-7b", four_bit_default=True),
     "llava_ov": Generator("llava-hf/llava-onevision-qwen2-7b-ov-hf", four_bit_default=True),
 }
 
@@ -83,8 +83,53 @@ def _inputs(proc, img, device):
     return x
 
 
+def _run_llava_sampled(image_paths: Dict[int, Path], out_path: Path, log: Callable[[str], None]) -> None:
+    """The source pipeline (4-bit LLaVA-1.5-7B at the pinned revision, same prompt) with
+    nucleus sampling instead of greedy decoding: a controlled change of prevalence."""
+    import torch
+    from transformers import AutoProcessor, BitsAndBytesConfig, LlavaForConditionalGeneration
+    from src.phase1.gpu_pipeline import LLAVA_MODEL, LLAVA_REVISION
+    g = GENERATORS["llava_t1"]
+    done = read_done(out_path, lambda r: int(r["image_id"]))
+    todo = [i for i in image_paths if i not in done]
+    log(f"llava_t1: {len(done)} done, {len(todo)} to go")
+    if not todo:
+        return
+    proc = AutoProcessor.from_pretrained(LLAVA_MODEL, revision=LLAVA_REVISION)
+    model = LlavaForConditionalGeneration.from_pretrained(
+        LLAVA_MODEL, revision=LLAVA_REVISION, device_map="auto",
+        quantization_config=BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_compute_dtype=torch.float16)).eval()
+    prompt = f"USER: <image>\n{CAPTION_PROMPT} ASSISTANT:"
+    for n, iid in enumerate(todo, 1):
+        x = proc(images=Image.open(image_paths[iid]).convert("RGB"), text=prompt, return_tensors="pt").to(model.device)
+        torch.manual_seed(int(iid))
+        with torch.inference_mode():
+            out = model.generate(**x, max_new_tokens=MAX_NEW_TOKENS, do_sample=True,
+                                 temperature=g.temperature, top_p=g.top_p)
+        gen = out[0, x["input_ids"].shape[1]:]
+        append_jsonl(out_path, {
+            "image_id": iid, "caption": proc.tokenizer.decode(gen, skip_special_tokens=True).strip(),
+            "generator": "llava_t1", "model": LLAVA_MODEL, "revision": LLAVA_REVISION, "prompt": CAPTION_PROMPT,
+            "max_new_tokens": MAX_NEW_TOKENS, "decoding": f"sample T={g.temperature} top_p={g.top_p} seed=image_id",
+            "four_bit": True, "hit_max_tokens": int(gen.shape[0]) >= MAX_NEW_TOKENS - 1})
+        if n % 25 == 0 or n == len(todo):
+            log(f"  llava_t1 {n}/{len(todo)}")
+    del model
+    torch.cuda.empty_cache()
+
+
 def run_generator(name: str, image_paths: Dict[int, Path], out_path: Path, four_bit: Optional[bool] = None,
                   log: Callable[[str], None] = print) -> None:
+    """Generators used in Phase 4 run through the exact Phase 4 code, so their captions are
+    comparable with the published results; the others use the generic loader below."""
+    if name == "llava":
+        from src.phase1.gpu_pipeline import run_captions
+        return run_captions(image_paths, out_path, log=log)
+    if name in ("qwen25", "internvl3"):
+        from src.phase4.gpu import run_vlm_captions
+        return run_vlm_captions({"qwen25": "qwen", "internvl3": "internvl"}[name], image_paths, out_path, log=log)
+    if name == "llava_t1":
+        return _run_llava_sampled(image_paths, out_path, log)
     import torch
     g = GENERATORS[name]
     done = read_done(out_path, lambda r: int(r["image_id"]))

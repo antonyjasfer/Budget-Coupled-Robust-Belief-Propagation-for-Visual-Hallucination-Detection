@@ -102,29 +102,57 @@ def _datasets(out: Path, prep: dict) -> dict:
 
 # ----------------------------------------------------------------------------- GPU stages
 
-def stage_captions(out: Path, gens: list, k: int, n: int, limit=None, four_bit=None) -> None:
+def stage_captions(out: Path, gens: list, k: int, n: int, limit=None, four_bit=None, only_ds=None) -> None:
+    """Each (generator, dataset) runs in a fresh Python process: a model deleted inside a
+    process does not reliably give its GPU memory back, and on a 15 GB T4 the next model
+    then fails with CUDA out of memory (seen in the first Kaggle pilot)."""
+    import subprocess
+    prep = _prep(out)
+    pairs = [(g, ds) for g in gens for ds in _datasets(out, prep) if only_ds in (None, ds)]
+    if len(pairs) > 1:
+        for g, ds in pairs:
+            cmd = [sys.executable, str(Path(__file__).resolve()), "captions", "--out", str(out), "--gens", g,
+                   "--only-dataset", ds, "--shard", str(k), "--nshards", str(n)]
+            if limit:
+                cmd += ["--limit", str(limit)]
+            if four_bit:
+                cmd += ["--four-bit"]
+            r = subprocess.run(cmd)
+            if r.returncode != 0:
+                log(f"captions: {g}/{ds} failed with exit code {r.returncode}; continuing with the next generator")
+        return
     from src.phase4.gpu import shard
     from src.phase5.gpu import run_generator
+    for g, ds in pairs:
+        paths = _datasets(out, prep)[ds]
+        ids = list(paths)[:limit] if limit else list(paths)
+        mine = {i: paths[i] for i in shard(ids, k, n)}
+        run_generator(g, mine, out / f"{cap_file(g, ds)}.s{k}.jsonl", four_bit=four_bit, log=log)
+
+
+def stage_detect(out: Path, gens: list, k: int, n: int, only_ds=None) -> None:
+    """One fresh process per (generator, dataset), for the same reason as stage_captions."""
+    import subprocess
     prep = _prep(out)
-    for g in gens:
-        for ds, paths in _datasets(out, prep).items():
-            ids = list(paths)[:limit] if limit else list(paths)
-            mine = {i: paths[i] for i in shard(ids, k, n)}
-            run_generator(g, mine, out / f"{cap_file(g, ds)}.s{k}.jsonl", four_bit=four_bit, log=log)
-
-
-def stage_detect(out: Path, gens: list, k: int, n: int) -> None:
+    pairs = [(g, ds) for g in gens for ds in _datasets(out, prep) if only_ds in (None, ds)]
+    if len(pairs) > 1:
+        for g, ds in pairs:
+            r = subprocess.run([sys.executable, str(Path(__file__).resolve()), "detect", "--out", str(out), "--gens", g,
+                                "--only-dataset", ds, "--shard", str(k), "--nshards", str(n)])
+            if r.returncode != 0:
+                log(f"detect: {g}/{ds} failed with exit code {r.returncode}; continuing")
+        return
     from src.phase3.gpu_extra import run_swap_detectors
     from src.phase4.gpu import run_owl_tasks, shard
-    prep, vocab = _prep(out), P4._vocab(out)
-    for g in gens:
-        for ds, paths in _datasets(out, prep).items():
-            claims = P4.claims_by_image(vocab, P4.read_all(out, cap_file(g, ds)))
-            ids = [i for i in shard(list(paths), k, n) if i in claims]
-            tasks = [{"set": f"{ds}_{g}", "image_id": i, "cond": "clean", "path": str(paths[i]), "cats": claims[i]}
-                     for i in ids]
-            run_owl_tasks(tasks, out / f"owl5_{g}_{ds}.s{k}.jsonl", log=log)
-            run_swap_detectors({i: paths[i] for i in ids}, claims, out / f"swap5_{g}_{ds}.s{k}.jsonl", log=log)
+    vocab = P4._vocab(out)
+    for g, ds in pairs:
+        paths = _datasets(out, prep)[ds]
+        claims = P4.claims_by_image(vocab, P4.read_all(out, cap_file(g, ds)))
+        ids = [i for i in shard(list(paths), k, n) if i in claims]
+        tasks = [{"set": f"{ds}_{g}", "image_id": i, "cond": "clean", "path": str(paths[i]), "cats": claims[i]}
+                 for i in ids]
+        run_owl_tasks(tasks, out / f"owl5_{g}_{ds}.s{k}.jsonl", log=log)
+        run_swap_detectors({i: paths[i] for i in ids}, claims, out / f"swap5_{g}_{ds}.s{k}.jsonl", log=log)
 
 
 # ----------------------------------------------------------------------------- tables
@@ -243,6 +271,8 @@ def main() -> None:
     ap.add_argument("--nshards", type=int, default=1)
     ap.add_argument("--limit", type=int, default=None, help="pilot/smoke test: first N images per dataset")
     ap.add_argument("--four-bit", dest="four_bit", action="store_true", default=None)
+    ap.add_argument("--only-dataset", dest="only_ds", choices=["coco", "amber"], default=None,
+                    help="internal: one dataset per process")
     ap.add_argument("--resamples", type=int, default=200)
     ap.add_argument("--boot", type=int, default=2000)
     a = ap.parse_args()
@@ -250,8 +280,8 @@ def main() -> None:
     gens = a.gens.split(",")
     {"setup": lambda: stage_setup(a.out), "images": lambda: stage_images(a.out),
      "import": lambda: P4.stage_import(a.out),
-     "captions": lambda: stage_captions(a.out, gens, a.shard, a.nshards, a.limit, a.four_bit),
-     "detect": lambda: stage_detect(a.out, gens, a.shard, a.nshards),
+     "captions": lambda: stage_captions(a.out, gens, a.shard, a.nshards, a.limit, a.four_bit, a.only_ds),
+     "detect": lambda: stage_detect(a.out, gens, a.shard, a.nshards, a.only_ds),
      "pilot": lambda: stage_pilot(a.out, gens),
      "analyze": lambda: stage_analyze(a.out, gens, a.resamples, a.boot),
      "audit": lambda: stage_audit(a.out, gens)}[a.stage]()

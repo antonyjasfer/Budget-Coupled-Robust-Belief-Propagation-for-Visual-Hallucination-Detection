@@ -1,0 +1,123 @@
+"""Phase 5 GPU stage: captions from six generators for the transfer matrix.
+
+Every generator writes append-only JSONL (one row per image) and resumes from what is
+already written, so a Kaggle session can stop at any point. Run one process per GPU
+with a different shard. Not runnable in a CPU-only workspace; smoke-test it first with
+`scripts/phase5.py captions --limit 20` on Kaggle.
+
+T4 notes: no bfloat16, so models load in float16; `four_bit=True` loads in NF4 with
+float16 compute for models that do not fit (LLaVA-OneVision-7B on one T4).
+"""
+from __future__ import annotations
+
+from dataclasses import dataclass, field
+from pathlib import Path
+from typing import Callable, Dict, Optional
+
+from PIL import Image
+
+from src.phase1.gpu_pipeline import CAPTION_PROMPT, append_jsonl, read_done
+from src.phase3.gpu_extra import cap_pixels
+
+MAX_NEW_TOKENS = 512
+MAX_PIXELS = 768 * 28 * 28
+
+
+@dataclass(frozen=True)
+class Generator:
+    hf_id: str
+    sample: bool = False            # greedy unless True
+    temperature: float = 1.0
+    top_p: float = 0.9
+    cap_pixels: bool = False        # Qwen-family processors take any resolution
+    four_bit_default: bool = False
+    extra: Dict = field(default_factory=dict)
+
+
+# Model ids as in the Q1 plan (Part D.1); check each card before the pilot.
+GENERATORS: Dict[str, Generator] = {
+    "llava": Generator("llava-hf/llava-1.5-7b-hf"),
+    "llava_t1": Generator("llava-hf/llava-1.5-7b-hf", sample=True),     # controlled prevalence knob
+    "qwen25": Generator("Qwen/Qwen2.5-VL-3B-Instruct", cap_pixels=True),
+    "qwen3_4b": Generator("Qwen/Qwen3-VL-4B-Instruct", cap_pixels=True),
+    "internvl3": Generator("OpenGVLab/InternVL3-2B-hf"),
+    "instructblip": Generator("Salesforce/instructblip-vicuna-7b"),
+    "llava_ov": Generator("llava-hf/llava-onevision-qwen2-7b-ov-hf", four_bit_default=True),
+}
+
+
+def _load(g: Generator, four_bit: bool):
+    import torch
+    from transformers import AutoModelForImageTextToText, AutoProcessor
+    kw = {"device_map": "auto"}
+    if four_bit:
+        from transformers import BitsAndBytesConfig
+        kw["quantization_config"] = BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_quant_type="nf4",
+                                                       bnb_4bit_compute_dtype=torch.float16)
+    try:
+        model = AutoModelForImageTextToText.from_pretrained(g.hf_id, dtype=torch.float16, **kw)
+    except TypeError:  # older transformers
+        model = AutoModelForImageTextToText.from_pretrained(g.hf_id, torch_dtype=torch.float16, **kw)
+    return model.eval(), AutoProcessor.from_pretrained(g.hf_id)
+
+
+def _inputs(proc, img, device):
+    """Chat template with the image inside, else template text + images, else the raw
+    prompt (InstructBLIP has no chat template)."""
+    import torch
+    msgs = [{"role": "user", "content": [{"type": "image", "image": img}, {"type": "text", "text": CAPTION_PROMPT}]}]
+    try:
+        x = proc.apply_chat_template(msgs, add_generation_prompt=True, tokenize=True, return_dict=True,
+                                     return_tensors="pt")
+    except Exception:
+        try:
+            msgs[0]["content"][0] = {"type": "image"}
+            text = proc.apply_chat_template(msgs, tokenize=False, add_generation_prompt=True)
+        except Exception:
+            text = CAPTION_PROMPT
+        x = proc(images=img, text=text, return_tensors="pt")
+    x = x.to(device)
+    for k in list(x.keys()):
+        if k.startswith("pixel_values") and x[k].is_floating_point():
+            x[k] = x[k].to(torch.float16)
+    return x
+
+
+def run_generator(name: str, image_paths: Dict[int, Path], out_path: Path, four_bit: Optional[bool] = None,
+                  log: Callable[[str], None] = print) -> None:
+    import torch
+    g = GENERATORS[name]
+    done = read_done(out_path, lambda r: int(r["image_id"]))
+    todo = [i for i in image_paths if i not in done]
+    log(f"{name}: {len(done)} done, {len(todo)} to go")
+    if not todo:
+        return
+    fb = g.four_bit_default if four_bit is None else four_bit
+    model, proc = _load(g, fb)
+    rev = getattr(getattr(model, "config", None), "_commit_hash", None)
+    for n, iid in enumerate(todo, 1):
+        img = Image.open(image_paths[iid]).convert("RGB")
+        if g.cap_pixels:
+            img = cap_pixels(img, MAX_PIXELS)
+        x = _inputs(proc, img, model.device)
+        gen_kw = dict(max_new_tokens=MAX_NEW_TOKENS, do_sample=g.sample)
+        if g.sample:
+            torch.manual_seed(int(iid))          # one seed per image: reruns give the same caption
+            gen_kw.update(temperature=g.temperature, top_p=g.top_p)
+        with torch.inference_mode():
+            out = model.generate(**x, **gen_kw)[0]
+        L = x["input_ids"].shape[1]
+        if out.shape[0] >= L and torch.equal(out[:L].cpu(), x["input_ids"][0].cpu()):
+            out = out[L:]                        # decoder-only models echo the prompt
+        caption = proc.batch_decode([out], skip_special_tokens=True)[0].strip()
+        append_jsonl(out_path, {
+            "image_id": iid, "caption": caption, "generator": name, "model": g.hf_id, "revision": rev,
+            "prompt": CAPTION_PROMPT, "max_new_tokens": MAX_NEW_TOKENS,
+            "decoding": f"sample T={g.temperature} top_p={g.top_p} seed=image_id" if g.sample else "greedy",
+            "four_bit": fb, "hit_max_tokens": int(out.shape[0]) >= MAX_NEW_TOKENS - 1,
+            "gpu": torch.cuda.get_device_name(0) if torch.cuda.is_available() else "cpu",
+        })
+        if n % 25 == 0 or n == len(todo):
+            log(f"  {name} {n}/{len(todo)}")
+    del model
+    torch.cuda.empty_cache()

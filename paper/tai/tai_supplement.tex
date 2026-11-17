@@ -1,0 +1,69 @@
+% Supplementary material for the IEEE TAI submission. Build: latexmk -pdf tai_supplement.tex
+\documentclass[journal,onecolumn,11pt]{IEEEtran}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,mathtools}
+\let\proof\relax\let\endproof\relax
+\usepackage{amsthm}
+\usepackage{graphicx,booktabs}
+\input{../numbers.tex}
+\renewcommand{\Pr}{\mathbb{P}}
+\begin{document}
+\title{Supplementary Material: When Do Conformal Hallucination Guarantees Survive Distribution Shift?}
+\author{Anonymous Authors}
+\maketitle
+
+\section{Proof of Proposition 1 (Root Dominance)}
+Root the tree at the target claim $r$. For a child $c$ of $r$, belief propagation gives the message \[\nu_{c\to r}=\tanh^{-1}(\tanh J_{cr}\tanh\eta_{c\to r}),\] where $\eta_{c\to r}$ is the field of $c$ in the subtree below it, and the field of $r$ under perturbation $\delta$ is $\eta_r(\delta)=\theta_r+\delta_r+\sum_c\nu_{c\to r}(\delta)$; we write $\eta_r=\eta_r(0)$.
+
+\emph{Step 1 (one edge).} For $h(\eta)=\tanh^{-1}(\tanh J\tanh\eta)$ with $J\ge0$,
+\[
+h'(\eta)=\tanh J\,\frac{1-\tanh^2\eta}{1-\tanh^2J\tanh^2\eta}\in[0,\tanh J],
+\]
+because $0\le\tanh^2J\le1$ puts the fraction in $[0,1]$. This is the Ising case of the message contraction of Ihler, Fisher and Willsky (JMLR 2005, Theorem 8).
+
+\emph{Step 2 (paths).} The perturbation $\delta_i$ of a claim $i\ne r$ enters $\eta_r(\delta)$ only through the messages along the unique path from $i$ to $r$. By the chain rule, $\partial\eta_r/\partial\delta_i$ is the product of the derivatives of Step 1 along that path, so $0\le\partial\eta_r(\delta)/\partial\delta_i\le\gamma_i$, while $\partial\eta_r(\delta)/\partial\delta_r=1$. In particular $\eta_r(\delta)$ is non-decreasing in every $\delta_i$.
+
+\emph{Step 3 (budget).} By Step 2 the supremum over the uncertainty set is attained with $\delta\ge0$. Writing $\eta_r(\delta)=\eta_r(0,\delta_{-r})+\delta_r$ and applying the mean value theorem on the segment from $0$ to $(0,\delta_{-r})$,
+\[
+\eta_r(\delta)-\eta_r\le\delta_r+\gamma_{\max}(B-\delta_r),
+\]
+because the perturbations of the other claims sum to at most $B-\delta_r$. The right side equals $\gamma_{\max}B+(1-\gamma_{\max})\delta_r$ and increases in $\delta_r\le a=\min(\varepsilon_r,B)$, which gives the upper bound; the lower bound is attained by setting $\delta_r=a$ and every other perturbation to zero. If $B\le\varepsilon_r$ the two bounds coincide, the supremum is $\eta_r+B$, and by symmetry the infimum is $\eta_r-B$. Since $\eta\mapsto\sigma(2\eta)$ is increasing, the robust interval for $\Pr(h_r=+1)$ is $[\sigma(2(\eta_r-B)),\sigma(2(\eta_r+B))]$. \hfill$\square$
+
+\emph{Graphical-model analysis.} We fitted a logistic model of each claim's label on its OWLv2 score on Cal-A (300 images), and a chain Ising model over each caption's claims in caption order with one shared coupling $J\in[0,2]$ chosen by exact likelihood on Cal-A. Inference is exact belief propagation. For robust intervals, $\varepsilon$ and $B$ were set to the 0.9 quantiles of the changes in claim fields caused by the corruptions on Cal-A ($\varepsilon=\RobEps$, $B=\RobB$, over \RobImgs{} test images). The coupling improved the Cal-A log-likelihood by \LLgain{} nats over $J=0$. These results are descriptive and test no hypothesis.
+
+\begin{table}[h]\centering\small
+\caption{Claim classification (positive class: hallucinated, predicted when the posterior is at least 0.5), unary model ($J=0$) against chain Ising model}
+\begin{tabular}{@{}llrrrrrrrrr@{}}\toprule
+Data & Model & Acc. & Prec. & Rec. & F1 & AUC & TP & FP & TN & FN\\\midrule
+\input{../tables/tab_pgm.tex}\end{tabular}
+\end{table}
+
+\section{Results for Every Corruption}
+\begin{table}[h]\centering\small
+\caption{All S1 conditions (target 0.10): risk [95\% interval], pre-registered decision, share of supported claims kept by the claim-level filter and abstention rate of the image-level filter}
+\begin{tabular}{@{}llllllll@{}}\toprule
+Corruption & Sev. & Claim-level risk & Decision & Image-level risk & Decision & Kept & Abst.\\\midrule
+\input{../tables/tab_s1.tex}\end{tabular}
+\end{table}
+
+\begin{table}[h]\centering\small
+\caption{ImageNet-C severity parameters used for S1}
+\begin{tabular}{@{}lrrrrr@{}}\toprule
+Corruption & 1 & 2 & 3 & 4 & 5\\\midrule
+Gaussian blur, $\sigma$ (pixels) & 1 & 2 & 3 & 4 & 6\\
+JPEG quality & 25 & 18 & 15 & 10 & 7\\
+Pixelate, resize factor & 0.6 & 0.5 & 0.4 & 0.3 & 0.25\\
+Gaussian noise, s.d.\ on $[0,1]$ & 0.08 & 0.12 & 0.18 & 0.26 & 0.38\\
+Contrast factor & 0.4 & 0.3 & 0.2 & 0.1 & 0.05\\\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Deviations from the Pre-Registration}
+\begin{table}[h]\centering\small
+\begin{tabular}{@{}p{0.27\linewidth}p{0.27\linewidth}p{0.38\linewidth}@{}}\toprule
+Planned & Actual & Reason and effect\\\midrule
+Proposition 1 (global dominance) as the theoretical account of S1 & Retained as Theorem 1(b); Theorem 1, Theorem 2 and Theorem 3 added after the tests & The confirmatory test of H2 failed while all S1 conditions were preserved; the new results explain this. All analyses that use them are labelled exploratory. Pre-registered decisions are unchanged.\\
+Graphical-model analysis in the main text & Moved to Appendix B and this supplement & Descriptive only; it tests no hypothesis.\\\bottomrule
+\end{tabular}
+\end{table}
+\end{document}

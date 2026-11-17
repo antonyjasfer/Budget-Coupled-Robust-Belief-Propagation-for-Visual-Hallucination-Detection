@@ -1,0 +1,7 @@
+paper/tai/*.aux
+paper/tai/*.log
+paper/tai/*.out
+paper/tai/*.fls
+paper/tai/*.fdb_latexmk
+paper/tai/*.blg
+paper/tai/*.bbl

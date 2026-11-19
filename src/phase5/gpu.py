@@ -31,6 +31,7 @@ class Generator:
     top_p: float = 0.9
     cap_pixels: bool = False        # Qwen-family processors take any resolution
     four_bit_default: bool = False
+    chat_template: bool = True      # False: plain prompt straight through the processor (InstructBLIP)
     extra: Dict = field(default_factory=dict)
 
 
@@ -41,7 +42,8 @@ GENERATORS: Dict[str, Generator] = {
     "qwen25": Generator("Qwen/Qwen2.5-VL-3B-Instruct", cap_pixels=True),
     "qwen3_4b": Generator("Qwen/Qwen3-VL-4B-Instruct", cap_pixels=True),
     "internvl3": Generator("OpenGVLab/InternVL3-2B-hf"),
-    "instructblip": Generator("Salesforce/instructblip-vicuna-7b", four_bit_default=True),
+    # The chat-template route gives InstructBLIP a 5-D pixel_values (pilot, transformers 5.20): use the plain prompt.
+    "instructblip": Generator("Salesforce/instructblip-vicuna-7b", four_bit_default=True, chat_template=False),
     "llava_ov": Generator("llava-hf/llava-onevision-qwen2-7b-ov-hf", four_bit_default=True),
 }
 
@@ -61,21 +63,24 @@ def _load(g: Generator, four_bit: bool):
     return model.eval(), AutoProcessor.from_pretrained(g.hf_id)
 
 
-def _inputs(proc, img, device):
+def _inputs(proc, img, device, chat_template: bool = True):
     """Chat template with the image inside, else template text + images, else the raw
-    prompt (InstructBLIP has no chat template)."""
+    prompt. chat_template=False goes straight to the raw prompt (InstructBLIP)."""
     import torch
     msgs = [{"role": "user", "content": [{"type": "image", "image": img}, {"type": "text", "text": CAPTION_PROMPT}]}]
-    try:
-        x = proc.apply_chat_template(msgs, add_generation_prompt=True, tokenize=True, return_dict=True,
-                                     return_tensors="pt")
-    except Exception:
+    if not chat_template:
+        x = proc(images=img, text=CAPTION_PROMPT, return_tensors="pt")
+    else:
         try:
-            msgs[0]["content"][0] = {"type": "image"}
-            text = proc.apply_chat_template(msgs, tokenize=False, add_generation_prompt=True)
+            x = proc.apply_chat_template(msgs, add_generation_prompt=True, tokenize=True, return_dict=True,
+                                         return_tensors="pt")
         except Exception:
-            text = CAPTION_PROMPT
-        x = proc(images=img, text=text, return_tensors="pt")
+            try:
+                msgs[0]["content"][0] = {"type": "image"}
+                text = proc.apply_chat_template(msgs, tokenize=False, add_generation_prompt=True)
+            except Exception:
+                text = CAPTION_PROMPT
+            x = proc(images=img, text=text, return_tensors="pt")
     x = x.to(device)
     for k in list(x.keys()):
         if k.startswith("pixel_values") and x[k].is_floating_point():
@@ -144,7 +149,7 @@ def run_generator(name: str, image_paths: Dict[int, Path], out_path: Path, four_
         img = Image.open(image_paths[iid]).convert("RGB")
         if g.cap_pixels:
             img = cap_pixels(img, MAX_PIXELS)
-        x = _inputs(proc, img, model.device)
+        x = _inputs(proc, img, model.device, chat_template=g.chat_template)
         gen_kw = dict(max_new_tokens=MAX_NEW_TOKENS, do_sample=g.sample)
         if g.sample:
             torch.manual_seed(int(iid))          # one seed per image: reruns give the same caption

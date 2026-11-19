@@ -42,6 +42,14 @@ Kaggle Dataset version every few hours; attach it to the next session and run `i
 LLaVA-OneVision needs `--four-bit` on one T4 (`llava_ov` in `src/phase5/gpu.py`).
 The GPU code has not been run yet: start with the pilot and check its output by hand.
 
+## Google Colab (one GPU)
+
+`notebooks/phase5_colab.ipynb` runs the same stages on one Colab GPU. It works on local disk, copies finished
+rows to `MyDrive/Phase5_Colab/` every 5 minutes and restores them at the start of each session, so a
+disconnect loses at most a few minutes. It runs the generators one after another, each in its own process.
+A wave on one T4 takes roughly 45 to 50 h, so run Run-all once per session. Kaggle and Colab can run
+different waves at the same time; do not run the same wave on both.
+
 ## CPU stages (GPU off)
 
 ```bash

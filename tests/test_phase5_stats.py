@@ -108,3 +108,60 @@ def test_transfer_matrix_flags_shifted_generator():
     diag = [S.transfer_cell(synth(700, shift=1.0, seed=50 + s), synth(1500, shift=1.0, seed=80 + s),
                             n_resamples=20, n_boot=50)["claim"]["point"] for s in range(12)]
     assert np.mean(diag) <= 0.10 + 0.01
+
+
+# ------------------------------------------------------------------ prereg-v3 checks
+
+def test_auroc_known_values():
+    assert S.auroc([3, 4], [1, 2]) == 1.0
+    assert S.auroc([1, 2], [3, 4]) == 0.0
+    assert S.auroc([1], [1]) == 0.5
+    assert S.auroc([], [1]) is None
+
+
+def test_theorem2_check_holds_when_scores_iid_within_image():
+    src = synth(800, seed=1)
+    tgt_cal = synth(800, shift=0.5, seed=2)
+    tgt_test = synth(1500, shift=0.5, seed=3)
+    r = S.theorem2_check(src, tgt_cal, tgt_test, n_resamples=20, n_boot=300)
+    assert r["holds"]
+    assert abs(r["r_pred"] - r["r_test"]) < 0.03
+    assert r["lo"] <= r["diff"] <= r["hi"]
+
+
+def test_theorem2_check_fails_when_target_test_differs():
+    src = synth(800, seed=1)
+    tgt_cal = synth(800, shift=0.0, seed=2)
+    tgt_test = synth(1500, shift=1.5, seed=3)       # test split much worse than calibration split
+    r = S.theorem2_check(src, tgt_cal, tgt_test, n_resamples=20, n_boot=300)
+    assert not r["holds"] and r["diff"] > 0
+
+
+def _cell(claim_dec, image_dec="violated", point=0.2, prev=0.5, warn=0.0):
+    return {"claim": {"decision": claim_dec, "point": point}, "image": {"decision": image_dec},
+            "prevalence": prev, "warning": warn}
+
+
+def test_hypotheses_decisions():
+    g = ["a", "b", "c"]
+    owl = {s: {t: _cell("preserved", "preserved", 0.08, prev={"a": 0.5, "b": 0.3, "c": 0.6}[t], warn=-0.01)
+               for t in g} for s in g}
+    owl["a"]["b"] = _cell("violated", "preserved", 0.18, prev=0.3, warn=0.05)   # violated, image preserved
+    other = {s: {t: {"claim": {"point": 0.15}} for t in g} for s in g}
+    res = {"gens": g, "matrices": {"owlv2": owl, "owlvit_v1": other, "grounding_dino": other},
+           "bh": {"owlv2|a|b": {"reject": True}},
+           "recalibration": {"a->b": [{"m": 170, "insufficient": False, "p_over": 0.09}]}}
+    h = S.hypotheses(res)
+    assert h["H7"]["holds"] and h["H7"]["cells"] == ["a->b"]
+    assert h["H8"]["auroc"] == 1.0 and h["H8"]["holds"]
+    assert h["H9"]["holds"] and h["H9"]["cells"]["a->b"]["pi_target"] == 0.3
+    assert h["H11"]["holds"]
+    assert h["H12"]["holds"]
+
+
+def test_hypotheses_no_violation_gives_undecided_followups():
+    g = ["a", "b"]
+    owl = {s: {t: _cell("preserved", "preserved", 0.08) for t in g} for s in g}
+    h = S.hypotheses({"gens": g, "matrices": {"owlv2": owl}, "bh": {}, "recalibration": {}})
+    assert not h["H7"]["holds"]
+    assert h["H8"]["holds"] is None and h["H9"]["holds"] is None and h["H11"]["holds"] is None

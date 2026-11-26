@@ -291,3 +291,97 @@ def transfer_cell(cal: Table, test: Table, delta: float = 0.10, alpha: float = 0
 def transfer_matrix(cal: Dict[str, Table], test: Dict[str, Table], **kw) -> Dict[str, Dict[str, dict]]:
     """cal[g] and test[g] are the calibration and test tables of generator g (one detector)."""
     return {s: {t: transfer_cell(cal[s], test[t], **kw) for t in test} for s in cal}
+
+
+# ------------------------------------------------------------------ pre-registered checks (prereg-v3)
+
+def theorem2_check(src_cal: Table, tgt_cal: Table, tgt_test: Table, alpha: float = 0.10,
+                   n_resamples: int = 200, n_boot: int = 2000, seed: int = 7) -> dict:
+    """H10 part 2. Theorem 2(b) prediction of the image-level risk of the source image
+    threshold on the target, from the target's calibration split:
+        R_pred = mean over thresholds t of (1/n) sum_i 1[K_i >= 1] (1 - (1 - Sbar(t))^K_i)
+               = pi * (1 - sum_j P(K = j | K >= 1) (1 - Sbar(t))^j),
+    with K_i the hallucinated claims of image i and Sbar(t) the share of hallucinated claims
+    scoring above t (images that produced claims only). R_test is the observed image-level
+    risk on the target's test split. Calibration and test images are bootstrapped
+    independently; the hypothesis holds if 0 lies in the 95% interval of R_test - R_pred."""
+    _, ti = thresholds(src_cal, alpha, alpha, n_resamples, seed=0)
+    ids, inv = np.unique(tgt_cal.image, return_inverse=True)
+    n = len(ids)
+    K = np.bincount(inv[tgt_cal.hall], minlength=n).astype(float)
+    hs, hi = tgt_cal.score[tgt_cal.hall], inv[tgt_cal.hall]
+    C = np.zeros((len(ti), n))                      # hallucinated claims above t, per image
+    for r, t in enumerate(ti):
+        np.add.at(C[r], hi, (hs > t).astype(float))
+
+    def pred(w: np.ndarray) -> float:
+        sbar = (C @ w) / max(float(K @ w), 1e-12)   # per threshold
+        surv = 1.0 - (1.0 - sbar[:, None]) ** K[None, :]
+        return float(((surv * (K > 0)[None, :]) @ w).mean() / w.sum())
+
+    st = per_image(tgt_test, np.zeros_like(ti), ti)
+    m = len(st["ids"])
+    rng = np.random.default_rng(seed)
+    r_pred, r_test = pred(np.ones(n)), float(st["bad"].mean())
+    diffs = np.empty(n_boot)
+    for b in range(n_boot):
+        wc = rng.multinomial(n, np.full(n, 1.0 / n)).astype(float)
+        wt = rng.multinomial(m, np.full(m, 1.0 / m)).astype(float)
+        diffs[b] = float(wt @ st["bad"] / wt.sum()) - pred(wc)
+    lo, hi_ = float(np.quantile(diffs, 0.025)), float(np.quantile(diffs, 0.975))
+    return {"r_pred": r_pred, "r_test": r_test, "diff": r_test - r_pred, "abs_diff": abs(r_test - r_pred),
+            "lo": lo, "hi": hi_, "holds": lo <= 0.0 <= hi_}
+
+
+def auroc(pos: Sequence[float], neg: Sequence[float]) -> Optional[float]:
+    """Mann-Whitney AUROC (ties count one half); None unless both groups are non-empty."""
+    pos, neg = np.asarray(pos, float), np.asarray(neg, float)
+    if not len(pos) or not len(neg):
+        return None
+    return float(((pos[:, None] > neg[None, :]).sum() + 0.5 * (pos[:, None] == neg[None, :]).sum())
+                 / (len(pos) * len(neg)))
+
+
+def hypotheses(res: dict, budget_m: int = 170) -> dict:
+    """H7-H12 decisions exactly as worded in prereg-v3 (COCO cells only; "@amber" targets are
+    secondary). A cell is violated when the interval rule says "violated"; H7 additionally
+    needs a Benjamini-Hochberg rejection in the family of all COCO off-diagonal cells of the
+    three detector matrices."""
+    M, bh = res["matrices"], res["bh"]
+    gens = [g for g in res["gens"] if g in M.get("owlv2", {})]
+    off = [(s, t) for s in gens for t in gens if s != t]
+    O = M["owlv2"]
+    viol = [(s, t) for s, t in off if O[s][t]["claim"]["decision"] == "violated"]
+    h7_cells = [(s, t) for s, t in viol if bh.get(f"owlv2|{s}|{t}", {}).get("reject")]
+    out: dict = {"H7": {"holds": bool(h7_cells), "cells": [f"{s}->{t}" for s, t in h7_cells]}}
+    # H8: signed warning (target minus source share of all claims above the threshold).
+    pos = [O[s][t]["warning"] for s, t in viol]
+    neg = [O[s][t]["warning"] for s, t in off if O[s][t]["claim"]["decision"] == "preserved"]
+    a = auroc(pos, neg)
+    out["H8"] = {"auroc": a, "n_violated": len(pos), "n_preserved": len(neg),
+                 "holds": None if a is None else a >= 0.80}
+    # H9: prevalence pi = share of images (that produced claims) with >= 1 hallucinated claim.
+    pi = {g: O[g][g]["prevalence"] for g in gens}
+    h9 = [(s, t) for s, t in viol if O[s][t]["image"]["decision"] == "preserved"]
+    out["H9"] = {"cells": {f"{s}->{t}": {"pi_source": pi[s], "pi_target": pi[t], "ok": pi[t] < pi[s]}
+                           for s, t in h9}}
+    out["H9"]["holds"] = None if not h9 else all(v["ok"] for v in out["H9"]["cells"].values())
+    # H10 part 2 and E1 are computed in stage_analyze (they need the tables).
+    out["H10"] = res.get("h10", {})
+    # H11: P(realised risk > 0.13) at m = budget_m, per target of a violated OWLv2 cell.
+    h11 = {}
+    for s, t in viol:
+        rows = res["recalibration"].get(f"{s}->{t}", [])
+        row = next((r for r in rows if r["m"] == budget_m), None)
+        p = None if row is None or row["insufficient"] else row["p_over"]
+        h11[f"{s}->{t}"] = {"p_over": p, "ok": None if p is None else p <= 0.15}
+    out["H11"] = {"cells": h11, "holds": None if not h11 or any(v["ok"] is None for v in h11.values())
+                  else all(v["ok"] for v in h11.values())}
+    # H12: every H7 cell has claim-level point risk above 0.10 under both other detectors.
+    h12 = {}
+    for s, t in h7_cells:
+        pts = {d: M[d][s][t]["claim"]["point"] for d in ("owlvit_v1", "grounding_dino")
+               if d in M and s in M[d] and t in M[d][s]}
+        h12[f"{s}->{t}"] = {"points": pts, "ok": len(pts) == 2 and all(v > 0.10 for v in pts.values())}
+    out["H12"] = {"cells": h12, "holds": None if not h12 else all(v["ok"] for v in h12.values())}
+    return out

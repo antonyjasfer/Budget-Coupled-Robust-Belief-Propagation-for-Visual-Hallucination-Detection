@@ -204,16 +204,31 @@ def stage_analyze(out: Path, gens: list, n_resamples: int, n_boot: int) -> None:
                 test[f"{g}@amber"] = T[(g, "amber", "test", d)]
         res["matrices"][d] = S.transfer_matrix(cal, test, n_resamples=n_resamples, n_boot=n_boot)
         res["crc"][d] = {s: {t: S.crc_risk(test[t], S.crc_threshold(cal[s], 0.10)) for t in test} for s in cal}
-    # Benjamini-Hochberg over every off-diagonal claim-level "violated" test.
+    import numpy as np
+    # Benjamini-Hochberg over the COCO off-diagonal claim-level tests of all three matrices
+    # (prereg-v3 H7: 30 cells x 3 detectors for six generators; AMBER cells are secondary).
     pv = {f"{d}|{s}|{t}": c["p_violated_claim"] for d, M in res["matrices"].items()
-          for s, row in M.items() for t, c in row.items() if s != t}
+          for s, row in M.items() for t, c in row.items() if s != t and "@" not in t}
     res["bh"] = S.benjamini_hochberg(pv, q=0.05)
-    # Theorem 3 check in every OWLv2 COCO cell that broke at claim level.
+    # Theorem 3 check in every OWLv2 COCO cell that broke at claim level (m = 170 is H11).
     for s, row in res["matrices"].get("owlv2", {}).items():
         for t, c in row.items():
             if c["claim"]["decision"] == "violated" and "@" not in t:
                 res["recalibration"][f"{s}->{t}"] = S.recalibration_curve(
-                    T[(t, "coco", "test", "owlv2")], [25, 50, 100, 150, 200, 300], repeats=200)
+                    T[(t, "coco", "test", "owlv2")], [25, 50, 100, 150, 170, 200, 300], repeats=200)
+    # H10 part 2 (Theorem 2 prediction) and exploratory E1, greedy LLaVA -> sampled LLaVA, OWLv2.
+    k = lambda g, sp: (g, "coco", sp, "owlv2")
+    if all(x in T for x in (k("llava", "cal"), k("llava_t1", "cal"), k("llava", "test"), k("llava_t1", "test"))):
+        h10 = {"part2": S.theorem2_check(T[k("llava", "cal")], T[k("llava_t1", "cal")],
+                                         T[k("llava_t1", "test")], n_resamples=n_resamples, n_boot=n_boot)}
+        tc, ti = S.thresholds(T[k("llava", "cal")], 0.10, 0.10, n_resamples)
+        bg = S.bootstrap(S.per_image(T[k("llava", "test")], tc, ti), n_boot, 11)["image_risk"]
+        bt = S.bootstrap(S.per_image(T[k("llava_t1", "test")], tc, ti), n_boot, 12)["image_risk"]
+        n = min(len(bg["boot"]), len(bt["boot"]))
+        h10["E1"] = {"greedy": bg["point"], "sampled": bt["point"],
+                     "p_one_sided": float((np.sum(bt["boot"][:n] - bg["boot"][:n] <= 0) + 1) / (n + 1))}
+        res["h10"] = h10
+    res["hypotheses"] = S.hypotheses(res)
     (out / "phase5_results.json").write_text(json.dumps(res, indent=1, default=float))
     log("analyze: wrote phase5_results.json")
 

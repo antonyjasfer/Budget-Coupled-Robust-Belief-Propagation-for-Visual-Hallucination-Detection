@@ -135,6 +135,8 @@ def run_generator(name: str, image_paths: Dict[int, Path], out_path: Path, four_
         return run_vlm_captions({"qwen25": "qwen", "internvl3": "internvl"}[name], image_paths, out_path, log=log)
     if name == "llava_t1":
         return _run_llava_sampled(image_paths, out_path, log)
+    if name == "instructblip":
+        return _run_instructblip(image_paths, out_path, four_bit, log)
     import torch
     g = GENERATORS[name]
     done = read_done(out_path, lambda r: int(r["image_id"]))
@@ -169,5 +171,59 @@ def run_generator(name: str, image_paths: Dict[int, Path], out_path: Path, four_
         })
         if n % 25 == 0 or n == len(todo):
             log(f"  {name} {n}/{len(todo)}")
+    del model
+    torch.cuda.empty_cache()
+
+
+def _run_instructblip(image_paths, out_path, four_bit, log):
+    """InstructBLIP via its own classes on one GPU (shard k -> GPU k). The generic route
+    (AutoProcessor, device_map='auto' across two T4s, transformers 5.20) gave the same
+    non-text caption for every image; see prereg-v3, deviation D1."""
+    import re, torch
+    from transformers import BitsAndBytesConfig, InstructBlipForConditionalGeneration, InstructBlipProcessor
+    g = GENERATORS["instructblip"]
+    done = read_done(out_path, lambda r: int(r["image_id"]))
+    todo = [i for i in image_paths if i not in done]
+    log(f"instructblip: {len(done)} done, {len(todo)} to go")
+    if not todo:
+        return
+    m = re.search(r"\.s(\d+)\.jsonl$", str(out_path))
+    dev = (int(m.group(1)) if m else 0) % max(torch.cuda.device_count(), 1)
+    fb = g.four_bit_default if four_bit is None else four_bit
+    kw = dict(device_map={"": dev}, dtype=torch.float16)
+    if fb:
+        kw["quantization_config"] = BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_quant_type="nf4",
+                                                       bnb_4bit_compute_dtype=torch.float16)
+    model = InstructBlipForConditionalGeneration.from_pretrained(g.hf_id, **kw).eval()
+    proc = InstructBlipProcessor.from_pretrained(g.hf_id)
+    rev = getattr(model.config, "_commit_hash", None)
+    vdt = next(model.vision_model.parameters()).dtype
+    first = []
+    for n, iid in enumerate(todo, 1):
+        x = proc(images=Image.open(image_paths[iid]).convert("RGB"), text=CAPTION_PROMPT, return_tensors="pt")
+        x = {k: v.to(dev) for k, v in x.items()}
+        if x["pixel_values"].ndim == 5:
+            x["pixel_values"] = x["pixel_values"].flatten(0, 1)
+        x["pixel_values"] = x["pixel_values"].to(vdt)
+        with torch.inference_mode():
+            out = model.generate(**x, max_new_tokens=MAX_NEW_TOKENS, do_sample=False)[0]
+        L = x["input_ids"].shape[1]
+        if out.shape[0] >= L and torch.equal(out[:L].cpu(), x["input_ids"][0].cpu()):
+            out = out[L:]
+        caption = proc.batch_decode([out], skip_special_tokens=True)[0].strip()
+        if caption.startswith(CAPTION_PROMPT):
+            caption = caption[len(CAPTION_PROMPT):].strip()
+        if n <= 5:
+            first.append(caption)
+            log(f"  instructblip sample {n}: {caption[:120]}")
+            if n == 5 and len(set(first)) == 1:
+                raise RuntimeError("instructblip: first 5 captions identical, stopping")
+        append_jsonl(out_path, {
+            "image_id": iid, "caption": caption, "generator": "instructblip", "model": g.hf_id, "revision": rev,
+            "prompt": CAPTION_PROMPT, "max_new_tokens": MAX_NEW_TOKENS, "decoding": "greedy",
+            "four_bit": fb, "hit_max_tokens": int(out.shape[0]) >= MAX_NEW_TOKENS - 1,
+            "gpu": torch.cuda.get_device_name(dev)})
+        if n % 25 == 0 or n == len(todo):
+            log(f"  instructblip {n}/{len(todo)}")
     del model
     torch.cuda.empty_cache()

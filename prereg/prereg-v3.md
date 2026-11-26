@@ -89,7 +89,7 @@ truncated captions removed (sensitivity analysis S1); any change of decision is 
   - *Part 1 (reported as observed, not confirmatory; see "Information seen before freezing").*
     Sampled LLaVA has a higher prevalence pi than greedy LLaVA.
   - *Part 2 (confirmatory, Theorem 2).* With t_I the greedy-LLaVA image-level thresholds (200
-    resamples) and, on the **calibration split of sampled LLaVA**, Sbar(t) the share of
+    resamples) and, on the **calibration split of sampled LLaVA**, pi, Sbar(t) the share of
     hallucinated claims scoring above t and P(K = j | K >= 1) the distribution of hallucinated
     claims per image, Theorem 2(b) predicts
     R_pred = mean over t in t_I of  pi (1 - sum_{j>=1} P(K = j | K >= 1) (1 - Sbar(t))^j).
@@ -134,7 +134,11 @@ exist; any change of decision is reported.
 2. The run monitor printed, for each generator, the CHAIR_i and CHAIR_s rates and the number
    of truncated captions over all 4,000 COCO captions (calibration and test together). Values
    seen: LLaVA CHAIR_i 0.110, CHAIR_s 0.456; sampled LLaVA 0.136, 0.516; Qwen2.5-VL-3B 0.061,
-   0.423; Qwen3-VL-4B 0.075, 0.523; InternVL3-2B 0.071, 0.309; InstructBLIP ____, ____.
+   0.423; Qwen3-VL-4B 0.075, 0.523; InternVL3-2B 0.071, 0.309. InstructBLIP's monitor line
+   was not recorded; its rates were computed on 2026-11-26, before the tag, with the monitor's own
+   function (`stage_pilot`) in the analysis environment: CHAIR_i 0.098, CHAIR_s 0.412. The same
+   computation reproduces LLaVA's CHAIR_i (0.110) and gives CHAIR_s 0.454 against the
+   monitor's 0.456 (8 of 4,000 captions; text-processing library version).
    These are hallucination rates only. No threshold, filter, risk, coverage or warning
    statistic was computed. Because these rates reveal H10 part 1, that part is reported as
    observed and is not counted as a confirmed prediction.

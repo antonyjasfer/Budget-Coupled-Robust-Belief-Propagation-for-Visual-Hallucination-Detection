@@ -52,7 +52,7 @@ def build(who):
         ("What to do for each row", True),
         ("1. Click 'open image' (column B) to see the photo.", False),
         ("2. Read the caption (column E). The words in red, underlined, are the mention being judged; column D gives its COCO object category.", False),
-        ("3. Column F (required): is that object really in the image?", False),
+        ("3. Column F (required): is the COCO category in column D really in the image?", False),
         ("     supported     the object is visible in the image", False),
         ("     hallucinated  the object is not in the image", False),
         ("     unclear       you cannot decide (too small, occluded, cut off, or the image will not load)", False),
@@ -64,7 +64,9 @@ def build(who):
         ("5. Column H: free notes (optional).", False),
         ("", False),
         ("Fill in only the yellow columns F, G and H. Do not sort, delete or reorder rows; claim_id must stay with its row.", True),
-        ("Judge the highlighted mention only, as the caption uses it. Each row stands alone.", False),
+        ("Judge whether the COCO category in column D is visible in the photo. If the caption used the word in another sense "
+         "(e.g. 'orange' as a colour, or 'container' for something that is not a bowl), mark the row hallucinated and tag it "
+         "color_or_homonym or synonym_miss in column G. Each row stands alone.", False),
         ("", False),
         ("Example row (not part of the audit)", True),
     ]
